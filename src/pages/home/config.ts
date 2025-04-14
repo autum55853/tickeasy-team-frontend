@@ -1,5 +1,5 @@
 import { lazy } from "react";
-export const homeConfig = {
+export default {
   name: "首頁",
   views: [
     {

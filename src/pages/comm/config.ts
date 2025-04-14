@@ -1,5 +1,5 @@
 import { lazy } from "react";
-export const commConfig = {
+export default {
   name: "共用頁面",
   views: [
     {
