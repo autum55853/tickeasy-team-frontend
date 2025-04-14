@@ -1,15 +1,15 @@
-import { LazyExoticComponent, ComponentType } from 'react';
+import { LazyExoticComponent, ComponentType } from "react";
 
 export interface RouteView {
-  path: string;
-  component: LazyExoticComponent<ComponentType>;
+  path: string; // 路由路徑
+  component: LazyExoticComponent<ComponentType>; // 路由組件
   meta: {
-    title: string;
+    title: string; // 路由標題
   };
-  needLogin: boolean;
+  needLogin: boolean; // 是否需要登入
 }
 
 export interface ModuleConfig {
-  name: string;
-  views: RouteView[];
+  name: string; // 模組名稱
+  views: RouteView[]; // 模組路由
 }
