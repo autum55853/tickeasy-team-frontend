@@ -20,5 +20,11 @@ export default {
       meta: { title: "404 找不到頁面" },
       needLogin: false,
     },
+    {
+      path: "/demoRequest",
+      component: lazy(() => import("./views/demoRequest")),
+      meta: { title: "Demo Request" },
+      needLogin: true,
+    },
   ],
 };
