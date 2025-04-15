@@ -11,7 +11,7 @@ export const usePageNotFound = () => {
     const currentPath = location.pathname;
 
     // 檢查目前路徑是否在已定義的路由中
-    const isValidPath = routes.some(route => {
+    const isValidPath = routes.some((route) => {
       // 檢查是否完全匹配或是動態路由
       const routePath = route.path;
       if (routePath === currentPath) return true;

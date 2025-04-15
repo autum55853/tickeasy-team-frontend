@@ -11,7 +11,7 @@ export const axiosInstance = axios.create({
 
 // 請求攔截器
 axiosInstance.interceptors.request.use(
-  config => {
+  (config) => {
     // 從 localStorage 獲取 token
     const token = localStorage.getItem("token");
     if (token) {
@@ -19,15 +19,15 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  error => {
+  (error) => {
     return Promise.reject(error);
   }
 );
 
 // 響應攔截器
 axiosInstance.interceptors.response.use(
-  response => response.data,
-  error => {
+  (response) => response.data,
+  (error) => {
     // 統一錯誤處理
     if (error.response?.status === 401) {
       // 處理未授權情況

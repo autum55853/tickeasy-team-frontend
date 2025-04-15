@@ -5,11 +5,11 @@ const useCounter = ({ initialValue = 0, min = -Infinity, max = Infinity }: UseCo
   const [count, setCount] = useState(initialValue);
 
   const increment = () => {
-    setCount(prev => (prev < max ? prev + 1 : prev));
+    setCount((prev) => (prev < max ? prev + 1 : prev));
   };
 
   const decrement = () => {
-    setCount(prev => (prev > min ? prev - 1 : prev));
+    setCount((prev) => (prev > min ? prev - 1 : prev));
   };
 
   const reset = () => {
