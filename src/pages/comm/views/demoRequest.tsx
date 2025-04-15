@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import { useRequest } from "@/core/hooks/useRequest";
-
-interface VoteItem {
-  id: number;
-  category: string;
-  name: string;
-  url: string;
-  description: string;
-}
+import { T_VoteItem } from "../types/VoteItem";
+import { CreateVoteItemSchema } from "../zod/VoteItemSchema";
+import { z } from "zod";
 
 const DemoRequest: React.FC = () => {
-  const [formData, setFormData] = useState<Partial<VoteItem>>({
+  const [formData, setFormData] = useState<Partial<T_VoteItem>>({
     category: "",
     name: "",
     url: "",
@@ -18,12 +13,12 @@ const DemoRequest: React.FC = () => {
   });
 
   // 初始化所有CRUD操作
-  const { useGet } = useRequest<VoteItem>({
+  const { useGet } = useRequest<T_VoteItem>({
     queryKey: ["votes", "list"],
     url: "/api/votes",
   });
 
-  const { useCreate, useDelete } = useRequest<VoteItem>({
+  const { useCreate, useDelete } = useRequest<T_VoteItem>({
     queryKey: ["votes", "mutation"],
     url: "/api/vote",
   });
@@ -54,15 +49,24 @@ const DemoRequest: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createMutation.mutateAsync(formData);
+      // 使用 CreateVoteItemSchema 進行驗證
+      const validatedData = CreateVoteItemSchema.parse(formData);
+      await createMutation.mutateAsync(validatedData);
       setFormData({ category: "", name: "", url: "", description: "" });
     } catch (error) {
-      console.error("提交失敗:", error);
+      if (error instanceof z.ZodError) {
+        // 將所有驗證錯誤信息合併成一個字符串
+        const errorMessage = error.errors.map((err) => err.message).join("\n");
+        alert(errorMessage);
+      } else {
+        alert("提交失敗");
+        console.error("提交失敗:", error);
+      }
     }
   };
 
   // 刪除項目
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id);
     } catch (error) {
@@ -123,7 +127,7 @@ const DemoRequest: React.FC = () => {
 
       {/* 數據列表 */}
       <div className="space-y-4">
-        {voteList?.map((item: VoteItem) => (
+        {voteList?.map((item: T_VoteItem) => (
           <div key={item.id} className="rounded border p-4">
             <h3 className="font-bold">{item.name}</h3>
             <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
