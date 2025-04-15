@@ -85,3 +85,21 @@ npm run lint
 # 格式化程式碼
 npm run format
 ```
+
+## Git 開發流程
+
+本專案採用 [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) 開發流程：
+
+1. **從 `main` 建立分支**  
+   為每個 issue 或功能建立專屬分支，命名格式建議為 `feat/#編號/功能名稱`、`fix/#編號/修正內容` 等。
+
+2. **本地開發與提交**  
+   在分支中完成開發，並適時使用 `git commit` 紀錄變更。
+
+3. **發送 Pull Request**  
+   開發完成後，發 PR 至 `main`，標題需清楚描述內容並關聯對應 Issue。
+
+4. **Code Review**  
+   由其他成員審查後進行修正或合併。
+
+5. **合併與刪除**
