@@ -1,0 +1,88 @@
+{
+  // 禁用啟動時的歡迎頁面
+  "workbench.startupEditor": "none",
+  // 在差異編輯器中不忽略空格差異
+  "diffEditor.ignoreTrimWhitespace": false,
+  // 視窗縮放級別
+  "window.zoomLevel": 1,
+  // 使用 vscode-icons 圖示主題
+  "workbench.iconTheme": "vscode-icons",
+  // 啟用滑鼠滾輪縮放
+  "editor.mouseWheelZoom": true,
+  // 自動獲取 Git 更新
+  "git.autofetch": true,
+  // 儲存時自動格式化
+  "editor.formatOnSave": true,
+  // 禁用麵包屑導航
+  "breadcrumbs.enabled": false,
+  // 禁用程式碼黏性捲動
+  "editor.stickyScroll.enabled": false,
+  // 不顯示 Live Server 資訊訊息
+  "liveServer.settings.donotShowInfoMsg": true,
+  // 檔案移動時自動更新 JavaScript 導入
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  // 設定預設格式化工具為 Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // JavaScript 檔案特定設定
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true,
+    "prettier.jsxSingleQuote": true
+  },
+  // Vue 檔案特定設定
+  "[vue]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true
+  },
+  // CSS 檔案特定設定
+  "[css]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true
+  },
+  // SCSS 檔案特定設定
+  "[scss]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true
+  },
+  // HTML 檔案特定設定
+  "[html]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.singleQuote": true
+  },
+  // Prettier 停用語言列表
+  "prettier.disableLanguages": [],
+  // 啟用 Tabnine 自動導入實驗功能
+  "tabnine.experimentalAutoImports": true,
+  // 禁用資料夾壓縮顯示
+  "explorer.compactFolders": false,
+  // 設定 Windows 終端機預設使用 PowerShell
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  // 啟用檔案巢狀顯示
+  "explorer.fileNesting.enabled": true,
+  // 檔案巢狀顯示規則設定
+  "explorer.fileNesting.patterns": {
+    // TypeScript 相關檔案巢狀規則
+    "*.ts": "${capture}.js, ${capture}.typegen.ts",
+    // JavaScript 相關檔案巢狀規則
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    // JSX 檔案巢狀規則
+    "*.jsx": "${capture}.js",
+    // TSX 檔案巢狀規則
+    "*.tsx": "${capture}.ts, ${capture}.typegen.ts",
+    // TypeScript 配置檔案巢狀規則
+    "tsconfig.json": "tsconfig.*.json",
+    // 套件相關檔案巢狀規則
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb",
+    // TypeScript 模組檔案巢狀規則
+    "*.mts": "${capture}.typegen.ts",
+    "*.cts": "${capture}.typegen.ts"
+  },
+  // 檔案移動時自動更新 TypeScript 導入
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}
