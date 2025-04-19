@@ -108,7 +108,13 @@ npm run format
 
 ```
 src/
-├── assets/           # 靜態資源文件
+├── assets/           # 應用程式資源
+│   ├── icons/       # 圖示資源
+│   └── images/      # 圖片資源
+├── public/          # 靜態資源文件
+│   ├── favicon/     # 網站圖示
+│   ├── images/      # 靜態圖片
+│   └── locales/     # 多語系檔案
 ├── core/            # 核心功能模組
 │   ├── boot/       # 應用程式啟動相關
 │   ├── components/ # 全域共用元件
@@ -134,7 +140,12 @@ src/
 
 ### 目錄說明
 
-- **assets**: 存放靜態資源，如圖片、字體等
+- **assets**: 應用程式內部使用的資源
+  - **icons**: SVG 圖示等向量圖形
+  - **images**: 應用程式內使用的圖片
+- **public**: 靜態資源文件
+  - **favicon**: 網站圖示相關檔案
+  - **images**: 不需要經過打包的靜態圖片
 - **core**: 核心功能模組
   - **boot**: 應用程式啟動與初始化相關
   - **components**: 全域共用元件
