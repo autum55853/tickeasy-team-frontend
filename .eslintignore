@@ -1,5 +1,0 @@
-dist/**/*
-build/**/*
-coverage/**/*
-*.config.js
-**/*.min.js 
