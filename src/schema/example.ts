@@ -3,7 +3,7 @@ import { z } from "zod";
 // 定義category的可選值
 const CategoryEnum = z.enum(["social", "ticketing", "crowdfunding", "subscriptions"]);
 
-export const VoteItemSchema = z.object({
+export const ExampleSchema = z.object({
   id: z.string().uuid("ID必須是有效的UUID格式"),
   category: CategoryEnum.describe("網站分類"),
   name: z.string().min(1, "網站名稱不能為空").max(100, "網站名稱不能超過100個字符"),
@@ -12,7 +12,7 @@ export const VoteItemSchema = z.object({
 });
 
 // 用於創建新項目的Schema（不需要id）
-export const CreateVoteItemSchema = VoteItemSchema.omit({ id: true });
+export const CreateExampleSchema = ExampleSchema.omit({ id: true });
 
 // 定義TypeScript類型
-export type T_VoteItemSchema = z.infer<typeof VoteItemSchema>;
+export type T_ExampleSchema = z.infer<typeof ExampleSchema>;

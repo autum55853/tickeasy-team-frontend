@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRequest } from "@/core/hooks/useRequest";
 import { T_VoteItem } from "../types/VoteItem";
-import { CreateVoteItemSchema } from "@/schema/VoteItem";
+import { CreateExampleSchema } from "@/schema/example";
 import { z } from "zod";
 
 const DemoRequest: React.FC = () => {
@@ -50,7 +50,7 @@ const DemoRequest: React.FC = () => {
     e.preventDefault();
     try {
       // 使用 CreateVoteItemSchema 進行驗證
-      const validatedData = CreateVoteItemSchema.parse(formData);
+      const validatedData = CreateExampleSchema.parse(formData);
       await createMutation.mutateAsync(validatedData);
       setFormData({ category: "", name: "", url: "", description: "" });
     } catch (error) {
