@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRequest } from "@/core/hooks/useRequest";
 import { T_VoteItem } from "../types/VoteItem";
-import { CreateVoteItemSchema } from "../zod/VoteItemSchema";
+import { CreateVoteItemSchema } from "@/schema/VoteItem";
 import { z } from "zod";
 
 const DemoRequest: React.FC = () => {
