@@ -113,8 +113,7 @@ src/
 │   └── images/      # 圖片資源
 ├── public/          # 靜態資源文件
 │   ├── favicon/     # 網站圖示
-│   ├── images/      # 靜態圖片
-│   └── locales/     # 多語系檔案
+│   └── images/      # 靜態圖片
 ├── core/            # 核心功能模組
 │   ├── boot/       # 應用程式啟動相關
 │   ├── components/ # 全域共用元件
