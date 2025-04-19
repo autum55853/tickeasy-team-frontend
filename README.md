@@ -103,3 +103,86 @@ npm run format
    由其他成員審查後進行修正或合併。
 
 5. **合併與刪除**
+
+## 專案結構
+
+```
+src/
+├── assets/           # 靜態資源文件
+├── core/            # 核心功能模組
+│   ├── boot/       # 應用程式啟動相關
+│   ├── components/ # 全域共用元件
+│   │   ├── global/ # 一般共用元件
+│   │   └── ui/     # UI 基礎元件
+│   ├── hooks/      # 全域共用 Hooks
+│   ├── lib/        # 工具函式庫
+│   ├── routers/    # 路由配置
+│   ├── styles/     # 全域樣式
+│   └── types/      # TypeScript 類型定義
+├── schema/         # Zod 資料驗證結構定義
+│   └── example.ts # 資料驗證範本
+└── pages/          # 頁面模組
+    ├── comm/       # 共用頁面 (登入、404等)
+    │   ├── types/  # 模組類型定義
+    │   └── views/  # 頁面視圖
+    └── home/       # 首頁模組
+        ├── components/ # 模組專用元件
+        ├── hooks/     # 模組專用 Hooks
+        ├── types/     # 模組類型定義
+        └── views/     # 頁面視圖
+```
+
+### 目錄說明
+
+- **assets**: 存放靜態資源，如圖片、字體等
+- **core**: 核心功能模組
+  - **boot**: 應用程式啟動與初始化相關
+  - **components**: 全域共用元件
+  - **hooks**: 全域共用的自定義 Hooks
+  - **lib**: 工具函式與共用邏輯
+  - **routers**: 路由配置與管理
+  - **styles**: 全域樣式設定
+  - **types**: TypeScript 類型定義
+- **schema**: 使用 Zod 進行資料驗證的結構定義
+  - 定義表單、API 請求/響應等資料的驗證規則
+  - 自動生成 TypeScript 類型定義
+  - 提供運行時的資料驗證
+  - 集中管理所有資料結構的驗證邏輯
+- **pages**: 頁面模組，每個子目錄代表一個功能模組
+  - **comm**: 共用頁面模組 (如登入、404等)
+  - **home**: 首頁模組
+    - 每個模組可包含自己的 components、hooks、types 等
+
+### 模組結構規範
+
+每個功能模組應包含：
+
+- `config.ts`: 模組配置文件，定義路由等設定
+- `components/`: 模組專用元件
+- `hooks/`: 模組專用的自定義 Hooks
+- `types/`: 模組相關的類型定義
+- `views/`: 實際的頁面元件
+
+### 資料驗證規範
+
+每個 schema 文件應包含：
+
+- 基本的資料結構定義
+- 必要的驗證規則（如長度限制、格式要求等）
+- 對應的 TypeScript 類型導出
+- 適當的錯誤提示信息
+
+例如 `example.ts` 的結構：
+
+```typescript
+// 定義基本結構和驗證規則
+const Schema = z.object({
+  field: z.string().min(1, "錯誤提示"),
+});
+
+// 導出用於特定用途的變體
+export const CreateSchema = Schema.omit({ id: true });
+
+// 導出 TypeScript 類型
+export type T_Schema = z.infer<typeof Schema>;
+```
