@@ -13,5 +13,8 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: process.env.PORT ? Number(process.env.PORT) : 3000,
+    strictPort: true,
+    // 允許的 host
+    allowedHosts: ["frontend-fj47.onrender.com", "localhost", ".onrender.com"],
   },
 });
