@@ -1,19 +1,68 @@
 import Logo from "@/assets/images/logo.png";
+import User from "@/assets/images/user.png";
 import { Icon } from "@iconify-icon/react";
-import { useState } from "react";
-import MenuList from "./menuList";
+import { useState, useRef } from "react";
 import DesktopSearchBar from "./deaktopSearchBar";
+import MobileMenuList from "./mobileMenuList";
+import DesktopMenuList from "./deaktopMenuList";
 export default function Header() {
   const [menu, setMenu] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [desktopSearchBlock, setDesktopSearchBlock] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const accountButtonRef = useRef<HTMLDivElement>(null);
+
+  // 新增處理互斥狀態的函數
+  const toggleMenu = (value: boolean) => {
+    setMenu(value);
+    if (value && desktopSearchBlock) {
+      setDesktopSearchBlock(false);
+    }
+  };
+
+  const toggleDesktopSearch = (value: boolean) => {
+    setDesktopSearchBlock(value);
+    if (value && menu) {
+      setMenu(false);
+    }
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 z-10 w-full bg-white">
         {/* 電腦版 */}
-        <div className="hidden sm:block">
-          <h1>Desktop Header</h1>
-          <DesktopSearchBar searchText={searchText} setSearchText={setSearchText} />
+        <div className="hidden h-16 sm:block">
+          <div className="flex h-full items-center justify-around px-4 md:px-10 lg:px-12 xl:px-20">
+            <div className="flex items-center gap-4">
+              <p>查看票券</p>
+              {isLogin && <p>探索頁面</p>}
+            </div>
+            <div>
+              <img src={Logo} alt="Logo" />
+            </div>
+            <div className="flex items-center gap-6">
+              <Icon onClick={() => toggleDesktopSearch(true)} icon="my-search" className="text-2xl" />
+              {isLogin ? (
+                <div ref={accountButtonRef} onClick={() => toggleMenu(!menu)} className="flex items-center gap-2 rounded-sm bg-neutral-100 p-2">
+                  <img src={User} alt="User" className="h-6 w-6 rounded-full" />
+                  <p>帳號</p>
+                  <Icon icon="my-chevron-down" className="text-[8px]" />
+                </div>
+              ) : (
+                <>
+                  <p>登入</p>
+                  <p>註冊</p>
+                </>
+              )}
+            </div>
+          </div>
+          <DesktopSearchBar
+            desktopSearchBlock={desktopSearchBlock}
+            setDesktopSearchBlock={toggleDesktopSearch}
+            searchText={searchText}
+            setSearchText={setSearchText}
+          />
+          <DesktopMenuList menuOpen={menu} accountButtonRef={accountButtonRef} />
         </div>
 
         {/* 手機版 */}
@@ -21,14 +70,20 @@ export default function Header() {
           <div className="flex items-center justify-between p-4">
             <img src={Logo} alt="Logo" />
             {menu ? (
-              <Icon icon="my-close" className="text-4xl transition-all duration-300" onClick={() => setMenu(!menu)} />
+              <Icon icon="my-close" className="text-4xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
             ) : (
-              <Icon icon="my-menu" className="text-2xl transition-all duration-300" onClick={() => setMenu(!menu)} />
+              <Icon icon="my-menu" className="text-2xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
             )}
           </div>
+          <MobileMenuList menuOpen={menu} isLogin={isLogin} searchText={searchText} setSearchText={setSearchText} />
         </div>
       </header>
-      <MenuList menuOpen={menu} isLogin={isLogin} searchText={searchText} setSearchText={setSearchText} />
+
+      <div className="fixed right-0 bottom-0 left-0 z-10 flex h-12 items-center justify-center bg-white">
+        <div className="flex items-center gap-4">
+          <p onClick={() => setIsLogin(!isLogin)}>{isLogin ? "登出" : "登入"}</p>
+        </div>
+      </div>
     </>
   );
 }
