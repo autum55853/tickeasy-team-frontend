@@ -31,14 +31,14 @@ export default function Header() {
     <>
       <header className="fixed top-0 left-0 z-10 w-full bg-white">
         {/* 電腦版 */}
-        <div className="hidden h-16 sm:block">
+        <div className="hidden h-20 py-2 sm:block">
           <div className="flex h-full items-center justify-around px-4 md:px-10 lg:px-12 xl:px-20">
             <div className="flex items-center gap-4">
               <p>查看票券</p>
               {isLogin && <p>探索頁面</p>}
             </div>
-            <div>
-              <img src={Logo} alt="Logo" />
+            <div className="w-[300px]">
+              <img className="mx-auto" src={Logo} alt="Logo" />
             </div>
             <div className="flex items-center gap-6">
               <Icon onClick={() => toggleDesktopSearch(true)} icon="my-search" className="text-2xl" />
