@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import "@/core/styles/global.css";
 import App from "./App.tsx";
-import '@/core/icons/register';
+import "@/core/icons/register";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
