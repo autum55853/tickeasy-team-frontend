@@ -29,7 +29,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 z-10 w-full bg-white select-none">
+      <header className="fixed top-0 left-0 z-20 w-full bg-white select-none">
         {/* 電腦版 */}
         <div className="hidden h-20 py-2 sm:block">
           <div className="flex h-full items-center justify-around px-4 md:px-10 lg:px-12 xl:px-20">

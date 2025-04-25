@@ -137,6 +137,24 @@
     line-height: 1.5;
   }
 
+  /* Hide scrollbar but keep scrolling functionality */
+  /* For Webkit browsers (Chrome, Safari) */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: none;
+  }
+
+  /* For IE and Edge */
+  * {
+    -ms-overflow-style: none;
+  }
+
   h1 {
     font-size: var(--text-heading-01);
     line-height: 1.2;
