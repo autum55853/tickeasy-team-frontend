@@ -16,34 +16,34 @@ interface HomeCarouselProps {
 export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
   const [api, setApi] = React.useState<any>(null);
   const [activeIndex, setActiveIndex] = React.useState(bannerList[0].id);
-  
+
   // 監聽滑動變化
   React.useEffect(() => {
     if (!api) return;
-    
+
     const onSelect = () => {
       setActiveIndex(api.selectedScrollSnap());
     };
-    
-    api.on('select', onSelect);
+
+    api.on("select", onSelect);
     return () => {
-      api.off('select', onSelect);
+      api.off("select", onSelect);
     };
   }, [api]);
-  
+
   // 添加自動輪播功能
   React.useEffect(() => {
     if (!api) return;
-    
+
     // 設置3秒自動切換
     const autoplayInterval = setInterval(() => {
       api.scrollNext();
     }, 5000);
-    
+
     // 清理定時器
     return () => clearInterval(autoplayInterval);
   }, [api]);
-  
+
   // 處理分頁點擊事件
   const handlePaginationClick = (index: number) => {
     if (api) {
@@ -51,17 +51,17 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
     }
     setActiveIndex(index);
   };
-  
+
   // 處理報名按鈕點擊事件
   const handleSignUpClick = (id: number) => {
-    console.log('activeIndex',id);
-    
+    console.log("activeIndex", id);
+
     handlePaginationClick(id);
   };
-  
+
   return (
     <div className="relative w-full">
-      <Carousel 
+      <Carousel
         className="w-full"
         opts={{
           loop: true,
@@ -81,9 +81,9 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         {/* <CarouselPrevious className="left-10" /> */}
         {/* <CarouselNext className="right-10" /> */}
       </Carousel>
-      
+
       {/* 遮罩內容 - 固定位置，不隨輪播移動 */}
-      <div className="absolute bottom-0 left-0 right-0 z-10">
+      <div className="absolute right-0 bottom-0 left-0 z-10">
         {/* 凹槽主體，內凹中央 */}
         <div className="absolute -bottom-1 left-1/2 z-10 block h-[80px] w-[calc(75%-118px)] min-w-[270px] translate-x-[-50%] rounded-t-[40px] bg-white lg:left-[77%] lg:max-w-[300px] lg:translate-x-[-77%]"></div>
         {/* 左下凹槽 */}
@@ -118,19 +118,19 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         />
         <Button
           variant={"gradientVertical"}
-          className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white sm:text-left lg:left-[calc(77%-20px)] lg:translate-x-[-77%] lg:max-w-[250px]"
+          className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white sm:text-left lg:left-[calc(77%-20px)] lg:max-w-[250px] lg:translate-x-[-77%]"
           onClick={() => handleSignUpClick(activeIndex)}
         >
           <h4>報名!</h4>
         </Button>
       </div>
       {/* banner pagination */}
-      <div className="absolute -bottom-16 left-0 right-0 lg:-bottom-6 lg:translate-x-[-20%] flex justify-center gap-2 z-10">
+      <div className="absolute right-0 -bottom-16 left-0 z-10 flex justify-center gap-2 lg:-bottom-6 lg:translate-x-[-20%]">
         {bannerList.map((banner, index) => (
           <button
             disabled={true}
             key={banner.id}
-            className={`h-2 w-[40px] lg:w-[80px] rounded-full transition-all bg-gray-300 ${
+            className={`h-2 w-[40px] rounded-full bg-gray-300 transition-all lg:w-[80px] ${
               index === activeIndex ? "bg-[image:var(--primary-gradient-horizontal)]" : ""
             }`}
             onClick={() => handlePaginationClick(index)}
