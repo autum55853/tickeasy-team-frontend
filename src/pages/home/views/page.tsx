@@ -7,9 +7,9 @@ import VenueSection from "../components/VenueSection";
 
 export default function Page() {
   return (
-    <div className="h-screen w-full overflow-y-auto">
+    <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col">
       <Header />
-      <main className="lk mt-24">
+      <main className="flex-grow">
         <BannerSection />
         <TrendSection />
         <LastestSection />
