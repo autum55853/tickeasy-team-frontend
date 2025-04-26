@@ -7,14 +7,14 @@ import VenueSection from "../components/VenueSection";
 import Footer from "@/core/components/global/footer";
 export default function Page() {
   return (
-    <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col">
+    <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col pb-[400px]">
       <Header />
       <main className="flex-grow">
         <BannerSection />
-        {/* <TrendSection /> */}
-        {/* <LastestSection /> */}
-        {/* <CategorySection /> */}
-        {/* <VenueSection /> */}
+        <TrendSection />
+        <LastestSection />
+        <CategorySection />
+        <VenueSection />
         <Footer />
       </main>
     </div>
