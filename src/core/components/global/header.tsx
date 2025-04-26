@@ -34,8 +34,8 @@ export default function Header() {
         <div className="hidden h-20 py-2 sm:block">
           <div className="flex h-full items-center justify-around px-4 md:px-10 lg:px-12 xl:px-20">
             <div className="flex w-[200px] items-center gap-4">
-              <p>查看票券</p>
-              {isLogin && <p>探索頁面</p>}
+              <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">查看票券</p>
+              {isLogin && <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">探索頁面</p>}
             </div>
             <div className="w-[300px]">
               <img className="mx-auto" src={Logo} alt="Logo" draggable={false} />
@@ -43,15 +43,19 @@ export default function Header() {
             <div className="flex w-[200px] items-center gap-6">
               <Icon onClick={() => toggleDesktopSearch(true)} icon="my-search" className="text-2xl" />
               {isLogin ? (
-                <div ref={accountButtonRef} onClick={() => toggleMenu(!menu)} className="flex items-center gap-2 rounded-sm bg-neutral-100 p-2">
+                <div
+                  ref={accountButtonRef}
+                  onClick={() => toggleMenu(!menu)}
+                  className="flex cursor-pointer items-center gap-2 rounded-sm p-2 transition-all duration-300 hover:bg-neutral-100"
+                >
                   <img src={User} alt="User" className="h-6 w-6 rounded-full" draggable={false} />
                   <p>帳號</p>
                   <Icon icon="my-chevron-down" className="text-[8px]" />
                 </div>
               ) : (
                 <>
-                  <p>登入</p>
-                  <p>註冊</p>
+                  <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">登入</p>
+                  <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">註冊</p>
                 </>
               )}
             </div>
