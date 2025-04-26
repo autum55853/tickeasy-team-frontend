@@ -9,7 +9,7 @@ export default function CarouselItem({ imageUrl, title }: { imageUrl: string; ti
       }}
     >
       {/* 標題 */}
-      <p className="absolute top-1/6 left-1/2 z-10 mx-2 inline-block w-full max-w-[350px] translate-x-[-50%] text-center text-4xl text-white select-none sm:text-left lg:top-1/3 lg:max-w-[750px] lg:text-5xl xl:left-1/3">
+      <p className="absolute top-1/6 left-1/2 z-10 mx-2 inline-block w-full max-w-[350px] translate-x-[-50%] text-center text-4xl font-bold text-white select-none sm:text-left lg:top-1/3 lg:max-w-[750px] lg:text-5xl xl:left-1/3">
         {title}
       </p>
     </div>
