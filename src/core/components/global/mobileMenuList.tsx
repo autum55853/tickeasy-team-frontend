@@ -13,7 +13,9 @@ export default function MobileMenuList({
 }) {
   return (
     <div
-      className={`fixed top-20 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out sm:hidden ${menuOpen ? "bg-[#eaf2f9] opacity-100" : "bg-white opacity-0"}`}
+      className={`fixed top-18 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out sm:hidden ${
+        menuOpen ? "pointer-events-auto bg-[#eaf2f9] opacity-100" : "pointer-events-none bg-white opacity-0"
+      }`}
     >
       <nav className="p-4 text-xl">
         {isLogin ? (
