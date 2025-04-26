@@ -1,7 +1,7 @@
 import Banner1 from "@/assets/images/banner1.jpg";
 import Banner2 from "@/assets/images/banner2.jpg";
 import Banner3 from "@/assets/images/banner3.jpg";
-import HomeCarousel from "./Carousel";
+import HomeCarousel from "./bannerCarousel";
 export default function BannerSection() {
   // 前端要自己加上圖片索引 確保頁嵌更新一致
   const bannerList = [

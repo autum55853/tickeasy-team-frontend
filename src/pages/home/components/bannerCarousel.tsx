@@ -1,5 +1,5 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/core/components/ui/Carousel";
-import CustomCarouselItem from "./CarouselItem";
+import CustomCarouselItem from "./bannerCarouselItem";
 import { Button } from "@/core/components/ui/button";
 import React from "react";
 
