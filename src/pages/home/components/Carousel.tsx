@@ -118,7 +118,7 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         />
         <Button
           variant={"gradientVertical"}
-          className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white sm:text-left lg:left-[calc(77%-20px)] lg:max-w-[250px] lg:translate-x-[-77%]"
+          className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white select-none sm:text-left lg:left-[calc(77%-20px)] lg:max-w-[250px] lg:translate-x-[-77%]"
           onClick={() => handleSignUpClick(activeIndex)}
         >
           <h4>報名!</h4>
