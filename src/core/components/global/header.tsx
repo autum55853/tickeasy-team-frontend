@@ -79,11 +79,11 @@ export default function Header() {
         </div>
       </header>
 
-      <div className="fixed right-0 bottom-0 left-0 z-10 flex h-12 items-center justify-center bg-white">
+      {/* <div className="fixed right-0 bottom-0 left-0 z-10 flex h-12 items-center justify-center bg-white">
         <div className="flex items-center gap-4">
           <p onClick={() => setIsLogin(!isLogin)}>{isLogin ? "登出" : "登入"}</p>
         </div>
-      </div>
+      </div> */}
     </>
   );
 }
