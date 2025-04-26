@@ -2,6 +2,7 @@ import useCounter from "../hooks/useCounter";
 import HomeBtn from "../components/homeBtn";
 import Title from "@/core/components/global/title";
 import { Button } from "@/core/components/ui/button";
+import Footer from "@/core/components/global/footer";
 export default function Page() {
   const { count, increment, decrement, reset } = useCounter({ initialValue: 7, min: 0, max: 10 });
   return (
@@ -35,6 +36,7 @@ export default function Page() {
       <h4>我是h4</h4>
       <h5>我是h5</h5>
       <h6>我是h6</h6>
+      <Footer />
     </div>
   );
 }
