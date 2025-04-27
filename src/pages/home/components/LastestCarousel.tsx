@@ -65,7 +65,7 @@ export default function LastestCarousel({ cardList }: LastestCarouselProps) {
   };
 
   return (
-    <div className="relative mb-12 lg:hidden">
+    <div className="relative mb-16 lg:hidden">
       <Carousel
         className="w-full"
         opts={{
@@ -85,17 +85,18 @@ export default function LastestCarousel({ cardList }: LastestCarouselProps) {
         </CarouselContent>
       </Carousel>
       {/* banner pagination */}
-      <div className="absolute right-0 -bottom-8 left-0 z-10 flex justify-center gap-4">
+      <div className="absolute right-0 -bottom-8 left-0 z-10 flex justify-center gap-0">
         {cardList.map((banner, index) => (
-          <button
-            disabled={false}
-            key={banner.id}
-            className={`h-3 w-3 cursor-pointer rounded-full bg-gray-300 transition-all ${
-              index === activeIndex ? "w-[40px] bg-[image:var(--primary-gradient-horizontal)]" : ""
-            }`}
-            onClick={() => handlePaginationClick(index)}
-            aria-label={`Go to slide ${index + 1}`}
-          />
+          <div key={banner.id} className="relative w-[40px]">
+            <button
+              disabled={false}
+              className={`absolute left-1/2 h-3 -translate-x-1/2 cursor-pointer rounded-full bg-gray-300 transition-all duration-300 ${
+                index === activeIndex ? "w-[40px] bg-[image:var(--primary-gradient-horizontal)]" : "w-3"
+              }`}
+              onClick={() => handlePaginationClick(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          </div>
         ))}
       </div>
     </div>
