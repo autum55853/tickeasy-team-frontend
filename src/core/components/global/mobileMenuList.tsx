@@ -13,7 +13,7 @@ export default function MobileMenuList({
 }) {
   return (
     <div
-      className={`fixed top-18 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out sm:hidden ${
+      className={`fixed top-18 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out lg:hidden ${
         menuOpen ? "pointer-events-auto bg-[#eaf2f9] opacity-100" : "pointer-events-none bg-white opacity-0"
       }`}
     >

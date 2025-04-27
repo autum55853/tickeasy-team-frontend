@@ -14,8 +14,8 @@ export default function DesktopSearchBar({ searchText, setSearchText }: { search
   };
 
   return (
-    <div className="block h-16 w-full sm:hidden">
-      <div className="mx-4 flex max-w-screen-sm items-center gap-x-2 rounded-md bg-white px-4 py-2">
+    <div className="block h-16 w-full lg:hidden">
+      <div className="mx-4 flex max-w-screen-sm items-center gap-x-2 rounded-md bg-white px-4 py-2 sm:mx-auto">
         <div className="flex-1">
           <input
             className="w-full text-xl focus:outline-none"

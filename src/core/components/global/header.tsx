@@ -31,7 +31,7 @@ export default function Header() {
     <>
       <header className="fixed top-0 left-0 z-50 w-full bg-white select-none">
         {/* 電腦版 */}
-        <div className="hidden h-20 py-2 sm:block">
+        <div className="hidden h-20 py-2 lg:block">
           <div className="flex h-full items-center justify-around px-4 md:px-10 lg:px-12 xl:px-20">
             <div className="flex w-[200px] items-center gap-4">
               <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">查看票券</p>
@@ -70,7 +70,7 @@ export default function Header() {
         </div>
 
         {/* 手機版 */}
-        <div className="block sm:hidden">
+        <div className="block lg:hidden">
           <div className="flex items-center justify-between p-4">
             <img src={Logo} alt="Logo" />
             {menu ? (
