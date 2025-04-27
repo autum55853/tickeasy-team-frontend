@@ -90,7 +90,7 @@ export default function LastestCarousel({ cardList }: LastestCarouselProps) {
           <button
             disabled={false}
             key={banner.id}
-            className={`h-3 w-3 rounded-full bg-gray-300 transition-all ${
+            className={`h-3 w-3 cursor-pointer rounded-full bg-gray-300 transition-all ${
               index === activeIndex ? "w-[40px] bg-[image:var(--primary-gradient-horizontal)]" : ""
             }`}
             onClick={() => handlePaginationClick(index)}
