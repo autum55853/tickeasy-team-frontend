@@ -69,9 +69,6 @@ export default function LastestSection() {
         <MobileTitle title="最新活動" subtitle="Latest Events" subClass="text-neutral-200" />
         <div className="mt-10 flex flex-col gap-4">
           <LastestCarousel cardList={data} />
-          {/* {data.map((item) => (
-            <LastestCard key={item.id} {...item} />
-          ))} */}
         </div>
       </div>
       {/* 電腦板 */}

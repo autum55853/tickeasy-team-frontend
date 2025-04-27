@@ -42,7 +42,6 @@ export default function CategorySection() {
 
   // 根據選中的類別過濾卡片
   const filteredCards = cardList.filter((card) => card.type === selectedCategory?.value);
-  console.log("filteredCards", filteredCards);
 
   return (
     <section className="mt-12 min-h-[100px] lg:mt-60">
