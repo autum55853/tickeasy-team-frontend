@@ -3,7 +3,7 @@ import { Icon } from "@iconify-icon/react";
 export default function LastestCard(data: LastestCardProps) {
   return (
     <div className="mx-auto">
-      <div className="relative flex h-[400px] w-full max-w-[500px] flex-col overflow-hidden rounded-lg border-2 border-neutral-200 bg-white shadow-md">
+      <div className="relative flex min-h-[400px] w-full max-w-[500px] flex-col overflow-hidden rounded-lg border-2 border-neutral-200 bg-white shadow-md lg:h-auto">
         <div className="relative h-[70%] w-full">
           <img src={data.image} alt={data.title} className="h-full w-full object-cover" />
         </div>

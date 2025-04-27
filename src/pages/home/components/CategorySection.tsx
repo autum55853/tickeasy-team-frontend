@@ -45,7 +45,7 @@ export default function CategorySection() {
 
   return (
     <section className="mt-12 min-h-[100px] lg:mt-60">
-      <div className="">
+      <div className="mx-auto lg:w-[96%]">
         <MobileTitle title="活動分類" subtitle="Event Categories" deskTopShow={true} />
         {/* 手機 select */}
         <div className="my-10 flex items-center justify-center lg:hidden">

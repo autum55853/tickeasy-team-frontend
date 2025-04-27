@@ -83,10 +83,10 @@ export default function LastestSection() {
         <img
           src={bgBlock}
           alt="bgBlock"
-          className="absolute top-0 left-1/2 z-0 h-full min-h-[1000px] min-w-[1200px] -translate-x-1/2 scale-x-[1.2] scale-y-[1.1] object-cover"
+          className="absolute top-0 left-1/2 z-0 h-full min-w-[1200px] -translate-x-1/2 scale-x-[1.2] scale-y-[1.1] object-cover lg:min-h-[1050px]"
         />
         {/* cardContainer */}
-        <div className="mx-auto mt-16 grid w-full max-w-[1600px] grid-cols-3 gap-4">
+        <div className="mx-auto mt-16 grid w-[96%] max-w-[1600px] grid-cols-1 gap-4 lg:grid-cols-3">
           {data.map((item) => (
             <LastestCard key={item.id} {...item} />
           ))}
