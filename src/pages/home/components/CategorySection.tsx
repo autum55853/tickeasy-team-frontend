@@ -57,7 +57,7 @@ export default function CategorySection() {
           <CategoryTab tabs={options} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         </div>
         {/* card content */}
-        <div className="mx-4 mb-8 grid max-w-[1400px] grid-cols-2 gap-4 lg:mx-auto lg:mt-4 lg:grid-cols-3">
+        <div className="mx-4 mb-8 grid max-w-[1400px] grid-cols-2 gap-4 lg:mt-4 lg:grid-cols-3 xl:mx-auto">
           {filteredCards.map((card, index) => (
             <CategoryCard key={index} {...card} />
           ))}
