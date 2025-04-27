@@ -34,11 +34,16 @@ export default function VenueCard(data: VenueCardProps) {
           </span>
         </div>
         <div className="flex gap-2">
-          <Button variant="default" className="w-full rounded-full">
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.title)}`} target="_blank" rel="noopener noreferrer">
+          <a
+            className="block h-full w-full"
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.title)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="default" className="w-full rounded-full">
               查看google地圖
-            </a>
-          </Button>
+            </Button>
+          </a>
         </div>
       </div>
     </div>
