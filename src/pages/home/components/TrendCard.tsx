@@ -10,10 +10,8 @@ export default function TrendCard(data: TrendCardProps) {
     <>
       {/* 手機板 */}
       <div className="flex justify-center lg:hidden">
-        <div className="imem relative mx-4 flex max-w-[500px] flex-col overflow-hidden rounded-[30px] border-1 border-neutral-200">
-          <div className="">
-            <img src={data.image} alt={data.title} className="h-[200px] w-full object-cover" />
-          </div>
+        <div className="relative mx-4 flex max-w-[400px] flex-col overflow-hidden rounded-lg border-1 border-neutral-200">
+          <img src={data.image} alt={data.title} className="h-[200px] w-full object-cover" />
           <div className="space-y-2 px-4 py-4">
             <h5 className="line-clamp-2 font-bold">{data.title}</h5>
             <p className="line-clamp-3 text-base text-gray-500">{data.description}</p>
