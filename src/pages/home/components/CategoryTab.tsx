@@ -8,6 +8,19 @@ interface CategoryTabProps {
 }
 
 export default function CategoryTab({ tabs, selectedCategory, setSelectedCategory }: CategoryTabProps) {
+  // 使用安全的映射方式
+  const gridColsMap: { [key: number]: string } = {
+    1: "grid-cols-1",
+    2: "grid-cols-2",
+    3: "grid-cols-3",
+    4: "grid-cols-4",
+    5: "grid-cols-5",
+    6: "grid-cols-6",
+    // 根據需求添加更多
+  };
+
+  const gridCols = gridColsMap[tabs.length] || "grid-cols-1"; // 設置默認值
+
   return (
     <Tabs
       value={selectedCategory?.value}
@@ -17,7 +30,8 @@ export default function CategoryTab({ tabs, selectedCategory, setSelectedCategor
         if (selected) setSelectedCategory(selected);
       }}
     >
-      <TabsList className={`mx-auto grid min-h-[80px] w-full max-w-[1200px] grid-cols-${tabs.length} bg-slate-100`}>
+      <TabsList className={`mx-auto grid min-h-[80px] w-full max-w-[1200px] ${gridCols} bg-slate-100`}>
+        {/* {gridCols.toString()} */}
         {tabs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value} className="flex h-full flex-1 cursor-pointer flex-col gap-1">
             <span className="text-base font-bold">{tab.label}</span>
