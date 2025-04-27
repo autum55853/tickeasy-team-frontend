@@ -12,6 +12,7 @@
     "register-icons": "node scripts/register-icons.js"
   },
   "dependencies": {
+    "@iconify/react": "^5.2.1",
     "@radix-ui/react-slot": "^1.2.0",
     "@tailwindcss/vite": "^4.1.3",
     "@tanstack/react-query": "^5.74.3",
