@@ -2,6 +2,7 @@ import { Carousel, CarouselContent, CarouselItem } from "@/core/components/ui/Ca
 import CustomCarouselItem from "./bannerCarouselItem";
 import { Button } from "@/core/components/ui/button";
 import React from "react";
+import { CarouselApi } from "@/core/components/ui/Carousel";
 
 interface BannerItem {
   id: number;
@@ -14,7 +15,7 @@ interface HomeCarouselProps {
 }
 
 export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
-  const [api, setApi] = React.useState<any>(null);
+  const [api, setApi] = React.useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = React.useState(bannerList[0].id);
 
   // 監聽滑動變化
@@ -35,7 +36,7 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
   React.useEffect(() => {
     if (!api) return;
 
-    // 設置3秒自動切換
+    // 設置5秒自動切換
     const autoplayInterval = setInterval(() => {
       api.scrollNext();
     }, 5000);
