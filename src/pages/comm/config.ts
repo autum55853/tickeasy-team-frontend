@@ -26,5 +26,11 @@ export default {
       meta: { title: "Demo Request" },
       needLogin: true,
     },
+    {
+      path: "/componentsDemo",
+      component: lazy(() => import("./views/componentsDemo")),
+      meta: { title: "Components Demo" },
+      needLogin: true,
+    },
   ],
 };
