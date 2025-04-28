@@ -130,11 +130,40 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
   body {
     font-family: var(--font-mono) !important;
     @apply bg-background text-foreground;
     font-size: var(--text-body);
     line-height: 1.5;
+  }
+
+  /* Hide scrollbar but keep scrolling functionality */
+  /* For Webkit browsers (Chrome, Safari) */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: none;
+  }
+
+  /* For IE and Edge */
+  * {
+    -ms-overflow-style: none;
   }
 
   h1 {
