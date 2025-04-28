@@ -24,7 +24,7 @@ export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOp
 
   return (
     <div
-      className={`fixed z-10 bg-white transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"}`}
+      className={`fixed z-10 bg-white transition-opacity ${menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
       style={{
         top: `${position.top + 10}px`,
         right: `${position.right}px`,
