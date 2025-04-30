@@ -10,6 +10,9 @@ export function LoginSection() {
       <div className="flex-column flex flex-col items-center justify-center">
         <Input type="text" label="帳號" id="account" placeholder="輸入帳號" />
         <Input type="password" label="密碼" id="password" placeholder="輸入密碼" />
+        <Button type="button" variant="link" className="block size-2 w-full p-0 pb-5 pl-2 text-left text-xs text-red-500">
+          忘記密碼?
+        </Button>
         <Button type="button" variant="gradient" className="my-5 w-full">
           登入
         </Button>
