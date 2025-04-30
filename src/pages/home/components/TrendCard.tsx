@@ -15,7 +15,11 @@ export default function TrendCard(data: TrendCardProps) {
           <div className="space-y-2 px-4 py-4">
             <h5 className="line-clamp-2 font-bold">{data.title}</h5>
             <p className="line-clamp-3 text-base text-gray-500">{data.description}</p>
-            <Button onClick={() => navigate(data.link)} variant={"outline"} className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left">
+            <Button
+              onClick={() => navigate(`/concerts/${data.link}`)}
+              variant={"outline"}
+              className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left"
+            >
               <div className="flex w-full items-center justify-between">
                 <p className="text-base">立刻訂票</p>
                 <Icon icon="my-arrow-right" className="text-2xl" />
@@ -33,7 +37,11 @@ export default function TrendCard(data: TrendCardProps) {
           <div className="flex w-1/2 flex-col gap-y-8 p-8">
             <h3 className="font-bold">{data.title}</h3>
             <p className="text-xl text-gray-500">{data.description}</p>
-            <Button onClick={() => navigate(data.link)} variant={"outline"} className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left">
+            <Button
+              onClick={() => navigate(`/concerts/${data.link}`)}
+              variant={"outline"}
+              className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left"
+            >
               <div className="flex w-full items-center justify-between">
                 <p className="text-xl">立刻訂票</p>
                 <Icon icon="my-arrow-right" className="text-2xl" />

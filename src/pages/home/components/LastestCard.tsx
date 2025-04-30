@@ -1,6 +1,8 @@
 import { LastestCardProps } from "../types/LastestCard";
 import { Icon } from "@iconify-icon/react";
+import { useNavigate } from "react-router-dom";
 export default function LastestCard(data: LastestCardProps) {
+  const navigate = useNavigate();
   return (
     <div className="mx-auto">
       <div className="relative flex min-h-[400px] w-full max-w-[500px] flex-col overflow-hidden rounded-lg border-2 border-neutral-200 bg-white shadow-md lg:h-auto">
@@ -21,7 +23,10 @@ export default function LastestCard(data: LastestCardProps) {
               {data.location}
             </a>
           </p>
-          <div className="border-primary absolute right-4 bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1">
+          <div
+            onClick={() => navigate(`/concerts/${data.id}`)}
+            className="border-primary absolute right-4 bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1"
+          >
             <Icon icon="my-arrow-right" className="text-primary text-xl" />
           </div>
         </div>
