@@ -4,11 +4,13 @@ export default function DesktopSearchBar({
   setDesktopSearchBlock,
   searchText,
   setSearchText,
+  handleSearch,
 }: {
   desktopSearchBlock: boolean;
   setDesktopSearchBlock: (block: boolean) => void;
   searchText: string;
   setSearchText: (text: string) => void;
+  handleSearch: (text: string) => void;
 }) {
   return (
     <>
@@ -25,8 +27,16 @@ export default function DesktopSearchBar({
                 type="text"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(searchText);
+                  }
+                }}
               />
-              <div className="bg-primary flex h-[56px] w-[56px] cursor-pointer items-center justify-center rounded-[100px] transition-colors hover:bg-neutral-600">
+              <div
+                onClick={() => handleSearch(searchText)}
+                className="bg-primary flex h-[56px] w-[56px] cursor-pointer items-center justify-center rounded-[100px] transition-colors hover:bg-neutral-600"
+              >
                 <Icon icon="my-search" className="text-2xl text-white" />
               </div>
             </div>
