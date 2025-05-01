@@ -6,26 +6,70 @@ import { ModalForgotPassword } from "./components/modalForgotPassword";
 import { ResetPassword } from "./components/resetPassword";
 import login from "@/assets/images/undraw_login_weas.svg";
 import { createContext, useState } from "react";
+import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 
 interface ModalStatusContextType {
   isModalForgotPasswordActive: boolean;
   setIsModalForgotPasswordActive: (value: boolean) => void;
   isResetPassword: boolean;
   setIsResetPassword: (value: boolean) => void;
+  email: string;
+  setEmail: (value: string) => void;
+  resetPasswordData: {
+    verifiedCode: string;
+    newPassword: string;
+    reNewPassword: string;
+  };
+  setResetPasswordData: React.Dispatch<
+    React.SetStateAction<{
+      verifiedCode: string;
+      newPassword: string;
+      reNewPassword: string;
+    }>
+  >;
 }
+
 export const ModalStatusContext = createContext<ModalStatusContextType | null>(null);
 
 export default function Login() {
   const [isModalForgotPasswordActive, setIsModalForgotPasswordActive] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const { email, setEmail, isValid, errorMessage } = useEmailValidation("");
+  const [resetPasswordData, setResetPasswordData] = useState({
+    verifiedCode: "",
+    newPassword: "",
+    reNewPassword: "",
+  });
+
   return (
     <Layout>
-      <ModalStatusContext.Provider value={{ isModalForgotPasswordActive, setIsModalForgotPasswordActive, isResetPassword, setIsResetPassword }}>
+      <ModalStatusContext.Provider
+        value={{
+          isModalForgotPasswordActive,
+          setIsModalForgotPasswordActive,
+          isResetPassword,
+          setIsResetPassword,
+          email,
+          setEmail,
+          resetPasswordData,
+          setResetPasswordData,
+        }}
+      >
         <ModalForgotPassword active={isModalForgotPasswordActive}>
           {isResetPassword ? (
             <ResetPassword />
           ) : (
-            <Input type="email" label="" id="email" placeholder="請輸入註冊信箱" className="mx-auto mt-8 w-[70%]" />
+            <Input
+              type="email"
+              label=""
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="請輸入註冊信箱"
+              className="mx-auto mt-8 w-[70%]"
+              error={!isValid}
+              errorMessage={errorMessage}
+            />
           )}
         </ModalForgotPassword>
         <div className="grid h-[calc(100vh-6rem)] w-full md:grid-cols-2">
