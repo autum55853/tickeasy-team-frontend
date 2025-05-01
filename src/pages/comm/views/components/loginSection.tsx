@@ -2,7 +2,11 @@ import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { GoogleButton } from "./googleButton";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { ModalStatusContext } from "../login";
+
 export function LoginSection() {
+  const { setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!;
   return (
     <section className="flex flex-col items-center justify-center p-8">
       <h2>會員登入</h2>
@@ -10,7 +14,12 @@ export function LoginSection() {
       <div className="flex-column flex flex-col items-center justify-center">
         <Input type="text" label="帳號" id="account" placeholder="輸入帳號" />
         <Input type="password" label="密碼" id="password" placeholder="輸入密碼" />
-        <Button type="button" variant="link" className="block size-2 w-full p-0 pb-5 pl-2 text-left text-xs text-red-500">
+        <Button
+          type="button"
+          variant="link"
+          className="block size-2 w-full p-0 pb-5 pl-2 text-left text-xs text-red-500"
+          onClick={() => setIsModalForgotPasswordActive(true)}
+        >
           忘記密碼?
         </Button>
         <Button type="button" variant="gradient" className="my-5 w-full">
