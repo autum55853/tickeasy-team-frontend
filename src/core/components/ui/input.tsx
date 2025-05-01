@@ -5,11 +5,13 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
   type?: string;
   placeholder?: string;
   id?: string;
+  error?: boolean;
+  errorMessage?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, CheckboxProps>(({ id, type, label, placeholder, onChange, ...props }) => {
+const Input = React.forwardRef<HTMLInputElement, CheckboxProps>(({ id, type, label, placeholder, onChange, error, errorMessage, ...props }) => {
   return (
-    <div className={cn("m-3 grid w-full max-w-sm items-center gap-1")} {...props}>
+    <div className={cn("m-3 grid w-full items-center gap-1")} {...props}>
       <label className="pl-2" htmlFor={id}>
         {label}
       </label>
@@ -20,6 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, CheckboxProps>(({ id, type, lab
         placeholder={placeholder}
         onChange={(e) => onChange?.(e)}
       />
+      {error && <p className="text-red-500">{errorMessage}</p>}
     </div>
   );
 });
