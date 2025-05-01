@@ -1,16 +1,22 @@
 import User from "@/assets/images/user.png";
 import MobileSearchBar from "./mobileSearchBar";
+import { useLogout } from "@/core/hooks/useLogout";
+import { useNavigate } from "react-router-dom";
 export default function MobileMenuList({
   menuOpen,
   isLogin,
+  handleSearch,
   searchText,
   setSearchText,
 }: {
   menuOpen: boolean;
   isLogin: boolean;
+  handleSearch: (text: string) => void;
   searchText: string;
   setSearchText: (text: string) => void;
 }) {
+  const { handleLogout } = useLogout();
+  const navigate = useNavigate();
   return (
     <div
       className={`fixed top-18 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out lg:hidden ${
@@ -21,31 +27,46 @@ export default function MobileMenuList({
         {isLogin ? (
           /* 已登入 */
           <ul className="flex flex-col space-y-4">
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">查看票券</li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">探索頁面</li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/history")}>
+              查看票券
+            </li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/concerts")}>
+              探索頁面
+            </li>
             <li className="p-2">
               <div className="flex items-center gap-2">
                 <img src={User} alt="User" className="h-6 w-6" />
                 <span>帳號</span>
               </div>
               <ul className="mt-4 ml-8 flex flex-col space-y-4">
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">會員中心</li>
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">辦演唱會</li>
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">查看參與的演唱會</li>
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">登出</li>
+                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user")}>
+                  會員中心
+                </li>
+                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/history")}>
+                  查看參與的演唱會
+                </li>
+                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={handleLogout}>
+                  登出
+                </li>
               </ul>
             </li>
           </ul>
         ) : (
           /* 未登入 */
           <ul className="flex flex-col space-y-4">
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">探索頁面</li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">登入</li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">註冊</li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/concerts")}>
+              探索頁面
+            </li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/login")}>
+              登入
+            </li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/signup")}>
+              註冊
+            </li>
           </ul>
         )}
       </nav>
-      <MobileSearchBar searchText={searchText} setSearchText={setSearchText} />
+      <MobileSearchBar handleSearch={handleSearch} searchText={searchText} setSearchText={setSearchText} />
     </div>
   );
 }

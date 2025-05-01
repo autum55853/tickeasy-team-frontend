@@ -9,6 +9,18 @@ export default {
       needLogin: false,
     },
     {
+      path: "/signup",
+      component: lazy(() => import("./views/signUp")),
+      meta: { title: "註冊頁面" },
+      needLogin: false,
+    },
+    {
+      path: "/question",
+      component: lazy(() => import("./views/question")),
+      meta: { title: "常見問題" },
+      needLogin: false,
+    },
+    {
       path: "/403",
       component: lazy(() => import("./views/403")),
       meta: { title: "403 無權限" },

@@ -1,20 +1,26 @@
-import { defineConfig } from "vite";
+/// <reference types="vite/client" />
+
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+
+// 添加環境變量加載
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
+    plugins: [react(), tailwindcss()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
-  },
-  server: {
-    host: "0.0.0.0",
-    port: process.env.PORT ? Number(process.env.PORT) : 3000,
-    strictPort: true,
-    // 允許的 host
-    allowedHosts: ["frontend-fj47.onrender.com", "localhost", ".onrender.com"],
-  },
+    server: {
+      host: "0.0.0.0",
+      port: env.VITE_PORT ? Number(env.VITE_PORT) : 3000,
+      strictPort: true,
+      // 允許的 host
+      allowedHosts: ["frontend-fj47.onrender.com", "localhost", ".onrender.com"],
+    },
+  };
 });
