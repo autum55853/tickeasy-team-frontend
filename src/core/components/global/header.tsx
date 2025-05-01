@@ -83,7 +83,9 @@ export default function Header() {
                   <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100" onClick={() => navigate("/login")}>
                     登入
                   </p>
-                  <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">註冊</p>
+                  <p onClick={() => navigate("/signup")} className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">
+                    註冊
+                  </p>
                 </>
               )}
             </div>

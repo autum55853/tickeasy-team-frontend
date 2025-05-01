@@ -2,7 +2,9 @@ import footerBlock from "@/assets/images/footerBlock.jpg";
 import DeaktopLogo from "@/assets/images/logo-bg.png";
 import MobileLogo from "@/assets/images/logo.png";
 import { Icon } from "@iconify-icon/react";
+import { useNavigate } from "react-router-dom";
 export default function Footer() {
+  const navigate = useNavigate();
   return (
     <>
       {/* 電腦版 */}
@@ -37,8 +39,10 @@ export default function Footer() {
                 </div>
               </div>
               <p className="empty"></p>
-              <p>常見問題</p>
-              <p>隱私權政策</p>
+              <p className="cursor-pointer" onClick={() => navigate("/question")}>
+                常見問題
+              </p>
+              <p className="cursor-pointer">隱私權政策</p>
               <div className="col-span-3"></div>
             </div>
           </div>
@@ -66,8 +70,10 @@ export default function Footer() {
               <Icon icon="my-youtube" className="text-[28px]" />
             </div>
           </div>
-          <div className="col-span-3 mx-4 text-right">常見問題</div>
-          <div className="col-span-3 mx-4 text-left">隠私權政策</div>
+          <div className="col-span-3 mx-4 cursor-pointer text-right" onClick={() => navigate("/question")}>
+            常見問題
+          </div>
+          <div className="col-span-3 mx-4 cursor-pointer text-left">隠私權政策</div>
           <div className="col-span-6 mx-4 border-t border-neutral-200 pt-4 text-center">樂票網股份有限公司 © Tickeasy. All Rights Reserved.</div>
         </div>
       </footer>

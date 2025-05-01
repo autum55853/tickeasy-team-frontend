@@ -60,7 +60,9 @@ export default function MobileMenuList({
             <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/login")}>
               登入
             </li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100">註冊</li>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/signup")}>
+              註冊
+            </li>
           </ul>
         )}
       </nav>
