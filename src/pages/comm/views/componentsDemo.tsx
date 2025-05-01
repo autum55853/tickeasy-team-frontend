@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/core/hooks/useToast";
 import { Button } from "@/core/components/ui/button";
 import { Toaster } from "@/core/components/ui/toaster";
+import { ConfirmDialog } from "@/core/components/global/confirmDialog";
 
 const TOTAL_ITEMS = 200; // 假設總共有N筆資料
 const ITEMS_PER_PAGE = 10;
@@ -42,6 +43,14 @@ export default function PaginationDemo() {
     });
   };
 
+  const handleConfirm = () => {
+    toast({
+      title: "Confirmed!",
+      description: "You confirmed the action",
+      variant: "default",
+    });
+  };
+
   return (
     <>
       <div className="flex flex-col items-center space-y-8 py-10">
@@ -56,6 +65,18 @@ export default function PaginationDemo() {
               Show Error Toast
             </Button>
           </div>
+        </div>
+
+        {/* Confirm Dialog Demo Section */}
+        <div className="w-full max-w-md space-y-4">
+          <h2 className="text-xl font-semibold">Confirm Dialog Demo</h2>
+          <ConfirmDialog
+            title="Are you sure?"
+            description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
+            trigger={<Button variant="default">Delete Account</Button>}
+            confirmText="Yes, delete account"
+            onConfirm={handleConfirm}
+          />
         </div>
 
         {/* Pagination Demo Section */}
