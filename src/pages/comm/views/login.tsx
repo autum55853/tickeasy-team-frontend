@@ -6,13 +6,22 @@ import { ModalForgotPassword } from "./components/modalForgotPassword";
 import { ResetPassword } from "./components/resetPassword";
 import login from "@/assets/images/undraw_login_weas.svg";
 import { createContext, useState } from "react";
-import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 
 interface ModalStatusContextType {
   isModalForgotPasswordActive: boolean;
   setIsModalForgotPasswordActive: (value: boolean) => void;
   isResetPassword: boolean;
   setIsResetPassword: (value: boolean) => void;
+  loginData: {
+    email: string;
+    password: string;
+  };
+  setLoginData: React.Dispatch<
+    React.SetStateAction<{
+      email: string;
+      password: string;
+    }>
+  >;
   email: string;
   setEmail: (value: string) => void;
   resetPasswordData: {
@@ -34,7 +43,11 @@ export const ModalStatusContext = createContext<ModalStatusContextType | null>(n
 export default function Login() {
   const [isModalForgotPasswordActive, setIsModalForgotPasswordActive] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
-  const { email, setEmail, isValid, errorMessage } = useEmailValidation("");
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+  const [email, setEmail] = useState("");
   const [resetPasswordData, setResetPasswordData] = useState({
     verifiedCode: "",
     newPassword: "",
@@ -49,6 +62,8 @@ export default function Login() {
           setIsModalForgotPasswordActive,
           isResetPassword,
           setIsResetPassword,
+          loginData,
+          setLoginData,
           email,
           setEmail,
           resetPasswordData,
@@ -67,8 +82,6 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="請輸入註冊信箱"
               className="mx-auto mt-8 w-[70%]"
-              error={!isValid}
-              errorMessage={errorMessage}
             />
           )}
         </ModalForgotPassword>

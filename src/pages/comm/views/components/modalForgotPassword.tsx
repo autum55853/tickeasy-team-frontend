@@ -5,14 +5,13 @@ import { useContext } from "react";
 import { ModalStatusContext } from "../login";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
-
 interface ModalForgotPasswordProps {
   children: React.ReactElement<{ passwordError?: string }>;
   active: boolean;
 }
 
 export function ModalForgotPassword({ children, active }: ModalForgotPasswordProps) {
-  const { setIsModalForgotPasswordActive, isResetPassword, setIsResetPassword, email, resetPasswordData } = useContext(ModalStatusContext)!;
+  const { setIsModalForgotPasswordActive, email, isResetPassword, setIsResetPassword, resetPasswordData } = useContext(ModalStatusContext)!;
   const { toast } = useToast();
   const [passwordError, setPasswordError] = React.useState("");
 
@@ -35,7 +34,6 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
       });
     },
     onError: (error: Error) => {
-      console.log(error);
       toast({
         variant: "destructive",
         title: "錯誤",
@@ -79,6 +77,14 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
         newPassword: resetPasswordData.newPassword,
       });
     } else {
+      if (!email) {
+        toast({
+          variant: "destructive",
+          title: "錯誤",
+          description: "請輸入註冊信箱",
+        });
+        return;
+      }
       // 發送請求重設密碼的請求
       requestPasswordResetMutation.mutate({
         email: email,
