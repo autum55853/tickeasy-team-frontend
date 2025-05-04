@@ -7,25 +7,31 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
   id?: string;
   error?: boolean;
   errorMessage?: string;
+  inputClass?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, CheckboxProps>(({ id, type, label, placeholder, onChange, error, errorMessage, ...props }) => {
-  return (
-    <div className={cn("m-3 grid w-full items-center gap-1")} {...props}>
-      <label className="pl-2" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-        type={type}
-        id={id}
-        placeholder={placeholder}
-        onChange={(e) => onChange?.(e)}
-      />
-      {error && <p className="text-red-500">{errorMessage}</p>}
-    </div>
-  );
-});
+const Input = React.forwardRef<HTMLInputElement, CheckboxProps>(
+  ({ id, type, label, placeholder, disabled, maxLength, onChange, error, errorMessage, inputClass, ...props }, ref) => {
+    return (
+      <div className={cn("m-3 grid w-full items-center gap-1")} {...props}>
+        <label className="pl-2" htmlFor={id}>
+          {label}
+        </label>
+        <input
+          className={`${inputClass} border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${inputClass}`}
+          type={type}
+          id={id}
+          placeholder={placeholder}
+          onChange={(e) => onChange?.(e)}
+          ref={ref}
+          disabled={disabled}
+          maxLength={maxLength}
+        />
+        {error && <p className="text-red-500">{errorMessage}</p>}
+      </div>
+    );
+  }
+);
 Input.displayName = "Input";
 
 export { Input };

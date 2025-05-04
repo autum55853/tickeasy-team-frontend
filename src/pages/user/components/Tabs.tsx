@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 export default function Tabs() {
   return (
     <>
-      <nav className="mb-8">
-        <ul className="flex gap-6">
+      <nav className="fixed top-16 z-20 mb-8 flex w-full justify-center bg-white px-0 py-4 lg:relative lg:top-auto lg:left-auto lg:block lg:translate-x-0 lg:px-20">
+        <ul className="flex w-full justify-center gap-8 lg:justify-start lg:px-40">
           <li>
             <NavLink to="/user/profile" className={({ isActive }) => (isActive ? "text-primary font-bold" : "hover:text-primary")}>
               會員中心

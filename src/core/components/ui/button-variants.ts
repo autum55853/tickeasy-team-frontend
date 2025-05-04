@@ -19,6 +19,8 @@ export const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         gradient: "bg-[image:var(--primary-gradient-horizontal)] text-primary-foreground hover:opacity-90",
         gradientVertical: "bg-[image:var(--primary-gradient-vertical)] text-primary-foreground hover:opacity-90",
+        inputStyle:
+          "border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
       },
       size: {
         default: "h-10 px-4 py-2",
