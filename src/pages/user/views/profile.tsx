@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
 import ProfileInfo from "../components/ProfileInfo";
 import { T_ProfileInfo } from "../types/profileInfo";
-// import { useToast } from "@/core/hooks/useToast";
-export default function Profile() {
-  // const { toast } = useToast();
+import { UpdateProfileSchema } from "../schema/updateProfile";
+import { ZodError } from "zod";
 
+export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
   const [profileData, setProfileData] = useState<T_ProfileInfo>({
     email: "adam294577@gmail.com",
@@ -21,9 +21,27 @@ export default function Profile() {
   });
 
   const handleSubmit = (updatedData: T_ProfileInfo) => {
-    setProfileData(updatedData);
-    setIsEdit(false);
-    window.scrollTo(0, 0);
+    try {
+      // 使用 schema 驗證數據
+      const validatedData = UpdateProfileSchema.parse(updatedData);
+      // 驗證通過後才執行更新
+      setProfileData(validatedData);
+      setIsEdit(false);
+      window.scrollTo(0, 0);
+    } catch (error: unknown) {
+      // 處理 Zod 驗證錯誤
+      if (error instanceof ZodError) {
+        const errorMessages = error.errors.map((err) => err.message).join("\n");
+        console.log("errorMessages", errorMessages);
+        return;
+      }
+
+      // 處理其他類型錯誤
+      if (error instanceof Error) {
+        console.log("error", error);
+        return;
+      }
+    }
   };
   return (
     <>

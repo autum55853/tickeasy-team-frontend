@@ -79,7 +79,8 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               {...register("email")}
               value={watch("email")}
               onChange={(e) => setValue("email", e.target.value)}
-              className="max-w-[250px] flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+              className="max-w-[300px] flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+              inputClass="bg-neutral-300 border-none"
               disabled
             />
           </div>
@@ -90,7 +91,8 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               {...register("name")}
               value={watch("name")}
               onChange={(e) => setValue("name", e.target.value)}
-              className="max-w-[250px] flex-1"
+              className="max-w-[300px] flex-1"
+              maxLength={20}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -100,13 +102,15 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               {...register("phone")}
               value={watch("phone")}
               onChange={(e) => setValue("phone", e.target.value)}
-              className="max-w-[250px] flex-1"
+              className="max-w-[300px] flex-1"
+              maxLength={10}
+              placeholder="格式：09xxxxxxxx"
             />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">出生年月日</p>
             <SingleDatePicker
-              inputClassName="ml-2 max-w-[250px] flex-1"
+              inputClassName="ml-2 max-w-[300px] flex-1"
               date={watch("birthday") ? new Date(watch("birthday") as string) : null}
               setDate={(date) =>
                 setValue(
@@ -135,7 +139,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
                 setValue("gender", value);
               }}
             >
-              <SelectTrigger className="ml-2 max-w-[250px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
+              <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇性別" />
               </SelectTrigger>
               <SelectContent>
@@ -167,7 +171,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
                 setValue("country", value);
               }}
             >
-              <SelectTrigger className="ml-2 max-w-[250px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
+              <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇國家／地區" />
               </SelectTrigger>
               <SelectContent>
@@ -184,7 +188,8 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               {...register("address")}
               value={watch("address")}
               onChange={(e) => setValue("address", e.target.value)}
-              className="max-w-[250px] flex-1"
+              className="max-w-[300px] flex-1"
+              maxLength={50}
             />
           </div>
           <div className="flex justify-end gap-4 lg:mt-4 lg:justify-start lg:pl-28">
@@ -231,11 +236,11 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <p className="flex-1 text-sm text-gray-500">{formatPreferredRegions(data?.preferredRegions)}</p>
+            <p className="flex-1 text-sm text-gray-500">{formatPreferredRegions(data?.preferredRegions || [])}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <p className="flex-1 text-sm text-gray-500">{formatPreferredEventTypes(data?.preferredEventTypes)}</p>
+            <p className="flex-1 text-sm text-gray-500">{formatPreferredEventTypes(data?.preferredEventTypes || [])}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
