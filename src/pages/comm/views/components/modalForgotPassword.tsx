@@ -73,7 +73,7 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
       // 發送重設新密碼的請求
       resetPasswordMutation.mutate({
         email: email,
-        verifiedCode: resetPasswordData.verifiedCode,
+        code: resetPasswordData.verifiedCode,
         newPassword: resetPasswordData.newPassword,
       });
     } else {

@@ -7,9 +7,10 @@ import { ModalStatusContext } from "../login";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { useEmailValidation } from "@/core/hooks/useEmailValidation";
-
+import { useNavigate } from "react-router-dom";
 export function LoginSection() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!;
   const { email, setEmail, isValid: isEmailValid, errorMessage: emailErrorMessage } = useEmailValidation(loginData.email);
   const [touched, setTouched] = useState(false);
@@ -24,6 +25,7 @@ export function LoginSection() {
       toast({
         title: "登入成功",
       });
+      navigate("/");
     },
     onError: (error: Error) => {
       toast({
