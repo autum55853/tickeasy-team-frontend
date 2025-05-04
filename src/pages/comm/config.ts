@@ -15,6 +15,12 @@ export default {
       needLogin: false,
     },
     {
+      path: "/origanization/concerts",
+      component: lazy(() => import("./views/orgConcertsList")),
+      meta: { title: "演唱會清單" },
+      needLogin: false,
+    },
+    {
       path: "/question",
       component: lazy(() => import("./views/question")),
       meta: { title: "常見問題" },
