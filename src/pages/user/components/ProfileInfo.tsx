@@ -6,7 +6,11 @@ import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
 import { Button } from "@/core/components/ui/button";
 import { useEffect } from "react";
-
+import ProfilePreferRegions from "./ProfilePreferRegions";
+import ProfilePreferEventTypes from "./ProfilePreferEventTypes";
+import { formatPreferredRegions } from "../utils/preferredRegions";
+import { formatPreferredEventTypes } from "../utils/preferredEventTypes";
+import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
 interface ProfileInfoProps {
   isEdit: boolean;
   data: T_ProfileInfo;
@@ -18,6 +22,34 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
   const { register, watch, setValue, handleSubmit } = useForm<T_ProfileInfo>({
     defaultValues: data,
   });
+  // 全部偏好活動類型
+  const allEventTypes: CategoryOptions[] = [
+    {
+      label: "療癒系音樂",
+      value: "A",
+      subLabel: "Pop",
+    },
+    {
+      label: "搖滾音樂",
+      value: "B",
+      subLabel: "Rock",
+    },
+    {
+      label: "電子音樂",
+      value: "C",
+      subLabel: "Electronic",
+    },
+    {
+      label: "嘻哈/饒舌",
+      value: "D",
+      subLabel: "Hip-Hop/Rap",
+    },
+    {
+      label: "古典/交響樂",
+      value: "E",
+      subLabel: "Classical/Symphony",
+    },
+  ];
 
   useEffect(() => {
     // 手动更新所有字段
@@ -27,7 +59,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
   }, [data, setValue]);
 
   const renderContent = () => (
-    <div className="relative mt-2 min-h-[70vh] lg:mt-0">
+    <div className="relative mt-2 lg:mt-0">
       {isEdit ? (
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -104,18 +136,13 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               </SelectContent>
             </Select>
           </div>
-          <div className="flex h-[40px] items-center">
+          <div className="flex h-[80px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <Input id="preferredRegions" {...register("preferredRegions")} value={watch("preferredRegions")} className="max-w-[250px] flex-1" />
+            <ProfilePreferRegions regions={register("preferredRegions")} />
           </div>
-          <div className="flex h-[40px] items-center">
+          <div className="flex h-[200px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <Input
-              id="preferredEventTypes"
-              {...register("preferredEventTypes")}
-              value={watch("preferredEventTypes")}
-              className="max-w-[250px] flex-1"
-            />
+            <ProfilePreferEventTypes eventTypes={register("preferredEventTypes")} allEventTypes={allEventTypes} />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
@@ -189,11 +216,11 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <p className="flex-1 text-sm text-gray-500">{data?.preferredRegions || "-"}</p>
+            <p className="flex-1 text-sm text-gray-500">{formatPreferredRegions(data?.preferredRegions)}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <p className="flex-1 text-sm text-gray-500">{data?.preferredEventTypes || "-"}</p>
+            <p className="flex-1 text-sm text-gray-500">{formatPreferredEventTypes(data?.preferredEventTypes)}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
@@ -209,7 +236,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
   );
 
   return (
-    <div className="relative min-h-[70vh] p-4">
+    <div className="relative p-4">
       {/* 會員頭像 */}
       <div className="flex justify-center lg:justify-start">
         <ProfileAvatar img={data?.img || DefaultImg} />

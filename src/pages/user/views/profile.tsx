@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
 import ProfileInfo from "../components/ProfileInfo";
 import { T_ProfileInfo } from "../types/profileInfo";
+// import { useToast } from "@/core/hooks/useToast";
 export default function Profile() {
+  // const { toast } = useToast();
+
   const [isEdit, setIsEdit] = useState(false);
   const [profileData, setProfileData] = useState<T_ProfileInfo>({
     email: "adam294577@gmail.com",
@@ -10,18 +13,17 @@ export default function Profile() {
     phone: "0912345678",
     birthday: "1990-01-01",
     gender: "男",
-    preferredRegions: ["台北市"],
-    preferredEventTypes: ["流行"],
+    preferredRegions: ["北部", "南部"],
+    preferredEventTypes: ["A"],
     country: "台灣",
     address: "台北市中山區",
     img: "",
   });
 
   const handleSubmit = (updatedData: T_ProfileInfo) => {
-    console.log("updatedData", updatedData);
-
     setProfileData(updatedData);
     setIsEdit(false);
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -34,7 +36,15 @@ export default function Profile() {
           </Button>
         )}
       </div>
-      <ProfileInfo isEdit={isEdit} data={profileData} onSubmit={handleSubmit} onCancel={() => setIsEdit(false)} />
+      <ProfileInfo
+        isEdit={isEdit}
+        data={profileData}
+        onSubmit={handleSubmit}
+        onCancel={() => {
+          setIsEdit(false);
+          window.scrollTo(0, 0);
+        }}
+      />
     </>
   );
 }
