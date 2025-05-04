@@ -12,8 +12,6 @@ export const useRouterMiddleWare = () => {
     const currentPath = location.pathname;
 
     // 修改路由查找邏輯，加入遞歸搜索子路由
-    console.log("routes", routes);
-
     const findRoute = (routes: RouteView[], parentPath: string = ""): RouteView | undefined => {
       for (const route of routes) {
         // 組合完整路徑，確保路徑格式正確
