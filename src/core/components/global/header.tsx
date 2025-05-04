@@ -37,7 +37,9 @@ export default function Header() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menu && accountButtonRef.current && !accountButtonRef.current.contains(event.target as Node)) {
-        setMenu(false);
+        setTimeout(() => {
+          setMenu(false);
+        }, 100);
       }
     };
 
