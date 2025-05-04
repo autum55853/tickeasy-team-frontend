@@ -2,7 +2,7 @@ import { useEffect, useState, RefObject } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/core/hooks/useLogout";
 export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOpen: boolean; accountButtonRef: RefObject<HTMLDivElement | null> }) {
-  const [position, setPosition] = useState({ top: 0, right: 0 });
+  const [position, setPosition] = useState({ top: -1000, right: 0 });
   const { handleLogout } = useLogout();
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOp
     <div
       className={`fixed z-10 transition-opacity ${menuOpen ? "opacity-100" : "opacity-0"}`}
       style={{
-        top: `${position.top + 10}px`,
+        top: menuOpen ? `${position.top + 10}px` : "-1000px",
         right: `${position.right}px`,
       }}
     >
