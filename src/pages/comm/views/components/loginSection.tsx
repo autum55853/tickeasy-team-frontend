@@ -2,7 +2,7 @@ import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { GoogleButton } from "./googleButton";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ModalStatusContext } from "../login";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
@@ -12,6 +12,7 @@ export function LoginSection() {
   const { toast } = useToast();
   const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!;
   const { email, setEmail, isValid: isEmailValid, errorMessage: emailErrorMessage } = useEmailValidation(loginData.email);
+  const [touched, setTouched] = useState(false);
 
   const { useCreate: requestLogin } = useRequest({
     queryKey: ["auth", "request-password-reset"],
@@ -25,7 +26,6 @@ export function LoginSection() {
       });
     },
     onError: (error: Error) => {
-      console.log(error);
       toast({
         variant: "destructive",
         title: "錯誤",
@@ -43,7 +43,6 @@ export function LoginSection() {
       });
       return;
     }
-    console.log("登入");
     requestLoginMutation.mutate({
       email: loginData.email,
       password: loginData.password,
@@ -67,9 +66,13 @@ export function LoginSection() {
             id="account"
             placeholder="輸入帳號(Email)"
             value={email}
-            onChange={(e) => handleEmailChange(e.target.value)}
-            error={!isEmailValid}
-            errorMessage={emailErrorMessage}
+            onBlur={() => setTouched(true)}
+            onChange={(e) => {
+              handleEmailChange(e.target.value);
+              setTouched(true);
+            }}
+            error={touched && !isEmailValid}
+            errorMessage={touched ? emailErrorMessage : ""}
             className="w-full"
           />
 
