@@ -25,7 +25,6 @@ export default function Profile() {
     setIsEdit(false);
     window.scrollTo(0, 0);
   };
-
   return (
     <>
       <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">

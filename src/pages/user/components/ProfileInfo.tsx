@@ -5,12 +5,14 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
 import { Button } from "@/core/components/ui/button";
+import { SingleDatePicker } from "@/core/components/ui/singleDatePicker";
 import { useEffect } from "react";
 import ProfilePreferRegions from "./ProfilePreferRegions";
 import ProfilePreferEventTypes from "./ProfilePreferEventTypes";
 import { formatPreferredRegions } from "../utils/preferredRegions";
 import { formatPreferredEventTypes } from "../utils/preferredEventTypes";
 import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
+import dayjs from "dayjs";
 interface ProfileInfoProps {
   isEdit: boolean;
   data: T_ProfileInfo;
@@ -103,13 +105,26 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">出生年月日</p>
-            <Input
-              id="birthday"
-              type="date"
-              {...register("birthday")}
-              value={watch("birthday")}
-              onChange={(e) => setValue("birthday", e.target.value)}
-              className="max-w-[250px] flex-1"
+            <SingleDatePicker
+              inputClassName="ml-2 max-w-[250px] flex-1"
+              date={watch("birthday") ? new Date(watch("birthday") as string) : null}
+              setDate={(date) =>
+                setValue(
+                  "birthday",
+                  date
+                    ? date
+                        .toLocaleDateString("zh-TW", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })
+                        .split("/")
+                        .join("-")
+                    : null
+                )
+              }
+              defaultMonth={dayjs().subtract(20, "year").startOf("year").toDate()}
+              placeholder="請選擇出生年月日"
             />
           </div>
           <div className="flex h-[40px] items-center">
