@@ -8,7 +8,7 @@ interface UseRequestOptions {
 }
 
 interface MutationOptions {
-  onSuccess?: () => void;
+  onSuccess?: (response: unknown) => void;
   onError?: (error: Error) => void;
 }
 
@@ -47,9 +47,9 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
-        options?.onSuccess?.();
+        options?.onSuccess?.(data);
       },
       onError: (error: Error) => {
         options?.onError?.(error);
@@ -71,9 +71,9 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
-        options?.onSuccess?.();
+        options?.onSuccess?.(data);
       },
       onError: (error: Error) => {
         options?.onError?.(error);
@@ -95,9 +95,9 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
-        options?.onSuccess?.();
+        options?.onSuccess?.(data);
       },
       onError: (error: Error) => {
         options?.onError?.(error);

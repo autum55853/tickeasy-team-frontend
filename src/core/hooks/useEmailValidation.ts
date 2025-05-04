@@ -9,7 +9,7 @@ interface UseEmailValidationReturn {
 
 export const useEmailValidation = (initialEmail = ""): UseEmailValidationReturn => {
   const [email, setEmail] = useState(initialEmail);
-  const [isValid, setIsValid] = useState(true);
+  const [isValid, setIsValid] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const validateEmail = useCallback((value: string) => {
