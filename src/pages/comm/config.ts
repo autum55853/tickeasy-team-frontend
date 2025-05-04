@@ -42,7 +42,7 @@ export default {
       path: "/componentsDemo",
       component: lazy(() => import("./views/componentsDemo")),
       meta: { title: "Components Demo" },
-      needLogin: true,
+      needLogin: false,
     },
   ],
 };
