@@ -9,7 +9,7 @@ import AlertError from "../components/AlertError";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
   const [error, setError] = useState<string>("");
-  const [showError, setShowError] = useState(true);
+  const [showError, setShowError] = useState(false);
   const [profileData, setProfileData] = useState<T_ProfileInfo>({
     email: "adam294577@gmail.com",
     name: "Adam",

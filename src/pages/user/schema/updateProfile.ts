@@ -5,7 +5,7 @@ const GenderEnum = z.enum(["男", "女", "其他"]);
 
 export const UpdateProfileSchema = z.object({
   email: z.string().email("請輸入有效的電子信箱"),
-  name: z.string().min(1, "姓名不能為空").max(20, "姓名不能超過20個字符").optional(),
+  name: z.string().min(0).max(20, "姓名不能超過20個字符").optional(),
   phone: z
     .union([
       z.string().length(0, "請輸入有效的手機號碼（格式：09xxxxxxxx）"),
