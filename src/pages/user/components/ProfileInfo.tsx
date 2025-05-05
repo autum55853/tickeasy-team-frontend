@@ -96,7 +96,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             />
           </div>
           <div className="flex h-[40px] items-center">
-            <p className="w-[120px] pr-4 text-right font-bold">聯絡方式</p>
+            <p className="w-[120px] pr-4 text-right font-bold">手機號碼</p>
             <Input
               id="phone"
               {...register("phone")}

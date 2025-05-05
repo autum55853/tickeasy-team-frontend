@@ -5,8 +5,11 @@ import { T_ProfileInfo } from "../types/profileInfo";
 import { UpdateProfileSchema } from "../schema/updateProfile";
 import { ZodError } from "zod";
 
+import AlertError from "../components/AlertError";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [showError, setShowError] = useState(false);
   const [profileData, setProfileData] = useState<T_ProfileInfo>({
     email: "adam294577@gmail.com",
     name: "Adam",
@@ -32,13 +35,15 @@ export default function Profile() {
       // 處理 Zod 驗證錯誤
       if (error instanceof ZodError) {
         const errorMessages = error.errors.map((err) => err.message).join("\n");
-        console.log("errorMessages", errorMessages);
+        setError(errorMessages);
+        setShowError(true);
         return;
       }
 
       // 處理其他類型錯誤
       if (error instanceof Error) {
-        console.log("error", error);
+        setError(error.message);
+        setShowError(true);
         return;
       }
     }
@@ -62,6 +67,8 @@ export default function Profile() {
           window.scrollTo(0, 0);
         }}
       />
+      {/* 錯誤提示 */}
+      <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />
     </>
   );
 }

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 import Tabs from "../components/Tabs";
 export default function Page() {
   return (
-    <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col pb-[400px]">
+    <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col">
       <Header />
       <main className="flex-grow">
         <Tabs />
