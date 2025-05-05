@@ -3,4 +3,3 @@ export interface T_Password {
   newPassword: string;
   confirmPassword: string;
 }
-

@@ -14,64 +14,63 @@ export default function PasswordInfo({ data, onSubmit, errors }: PasswordInfoPro
   });
   return (
     <div className="flex w-full flex-col gap-4">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex w-full flex-col gap-6"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-            }
-          }}
-        >
-          <div className="flex h-[40px] items-center relative">
-            <p className="w-[120px] pr-4 text-right font-bold">目前密碼</p>
-            <Input
-              type="password"
-              id="oldPassword"
-              {...register("oldPassword")}
-              value={watch("oldPassword")}
-              onChange={(e) => setValue("oldPassword", e.target.value)}
-              className="max-w-[300px] flex-1 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            <p className="text-red-500 absolute top-full left-[130px] text-[14px]">
-              {errors.find((error) => error.path[0] === "oldPassword")?.message}
-            </p>
-          </div>
-          <div className="flex h-[40px] items-center relative">
-            <p className="w-[120px] pr-4 text-right font-bold">新密碼</p>
-            <Input
-              type="password"
-              id="newPassword"
-              {...register("newPassword")}
-              value={watch("newPassword")}
-              onChange={(e) => setValue("newPassword", e.target.value)}
-              className="max-w-[300px] flex-1"
-            />
-            <p className="text-red-500 absolute top-full left-[130px] text-[14px]">
-              {errors.find((error) => error.path[0] === "newPassword")?.message}
-            </p>
-          </div>
-          <div className="flex h-[40px] items-center relative">
-            <p className="w-[120px] pr-4 text-right font-bold">確認新密碼</p>
-            <Input
-              type="password"
-              id="confirmPassword"
-              {...register("confirmPassword")}
-              value={watch("confirmPassword")}
-              onChange={(e) => setValue("confirmPassword", e.target.value)}
-              className="max-w-[300px] flex-1"
-            />
-            <p className="text-red-500 absolute top-full left-[130px] text-[14px]">
-              {errors.find((error) => error.path[0] === "confirmPassword")?.message}
-            </p>
-          </div>
-          <div className="flex justify-end gap-4 lg:mt-4 lg:justify-start lg:pl-28">
-            <Button type="submit" variant="default">
-              修改密碼
-            </Button>
-          </div>
-        </form>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex w-full flex-col gap-6"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+          }
+        }}
+      >
+        <div className="relative flex h-[40px] items-center">
+          <p className="w-[120px] pr-4 text-right font-bold">目前密碼</p>
+          <Input
+            type="password"
+            id="oldPassword"
+            {...register("oldPassword")}
+            value={watch("oldPassword")}
+            onChange={(e) => setValue("oldPassword", e.target.value)}
+            className="max-w-[300px] flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          <p className="absolute top-full left-[130px] text-[14px] text-red-500">
+            {errors.find((error) => error.path[0] === "oldPassword")?.message}
+          </p>
+        </div>
+        <div className="relative flex h-[40px] items-center">
+          <p className="w-[120px] pr-4 text-right font-bold">新密碼</p>
+          <Input
+            type="password"
+            id="newPassword"
+            {...register("newPassword")}
+            value={watch("newPassword")}
+            onChange={(e) => setValue("newPassword", e.target.value)}
+            className="max-w-[300px] flex-1"
+          />
+          <p className="absolute top-full left-[130px] text-[14px] text-red-500">
+            {errors.find((error) => error.path[0] === "newPassword")?.message}
+          </p>
+        </div>
+        <div className="relative flex h-[40px] items-center">
+          <p className="w-[120px] pr-4 text-right font-bold">確認新密碼</p>
+          <Input
+            type="password"
+            id="confirmPassword"
+            {...register("confirmPassword")}
+            value={watch("confirmPassword")}
+            onChange={(e) => setValue("confirmPassword", e.target.value)}
+            className="max-w-[300px] flex-1"
+          />
+          <p className="absolute top-full left-[130px] text-[14px] text-red-500">
+            {errors.find((error) => error.path[0] === "confirmPassword")?.message}
+          </p>
+        </div>
+        <div className="flex justify-end gap-4 lg:mt-4 lg:justify-start lg:pl-28">
+          <Button type="submit" variant="default">
+            修改密碼
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
-
