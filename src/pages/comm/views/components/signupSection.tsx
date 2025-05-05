@@ -87,7 +87,7 @@ export function SignupSection() {
         description: "請至您的信箱進行驗證",
       });
       // 將response的token和email設定到authStore
-      const res = (response as { data: { token: string; user: { email: string } } }).data;
+      const res = response as { token: string; user: { email: string } };
       setAuth(res.token, res.user.email);
       // 跳轉到首頁
       navigate("/");
@@ -209,7 +209,6 @@ export function SignupSection() {
           onClick={handleSignup}
           disabled={!signupData.name || !isValid || !isCheckedPassword || !signupData.agreementService}
         >
-          立即註冊
           {requestSignupMutation.isPending ? "處理中..." : "立即註冊"}
         </Button>
       </div>
