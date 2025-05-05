@@ -7,6 +7,11 @@ interface UseRequestOptions {
   url: string;
 }
 
+interface MutationOptions {
+  onSuccess?: (response: unknown) => void;
+  onError?: (error: Error) => void;
+}
+
 export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
   const queryClient = useQueryClient();
 
@@ -29,7 +34,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
   };
 
   // 創建數據
-  const useCreate = (options?: { onSuccess?: () => void }) => {
+  const useCreate = (options?: MutationOptions) => {
     return useMutation({
       mutationFn: async (data: Partial<T>) => {
         try {
@@ -42,15 +47,18 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
-        options?.onSuccess?.();
+        options?.onSuccess?.(data);
+      },
+      onError: (error: Error) => {
+        options?.onError?.(error);
       },
     });
   };
 
   // 更新數據
-  const useUpdate = () => {
+  const useUpdate = (options?: MutationOptions) => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string | number; data: Partial<T> }) => {
         try {
@@ -63,14 +71,18 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
+        options?.onSuccess?.(data);
+      },
+      onError: (error: Error) => {
+        options?.onError?.(error);
       },
     });
   };
 
   // 刪除數據
-  const useDelete = (options?: { onSuccess?: () => void }) => {
+  const useDelete = (options?: MutationOptions) => {
     return useMutation({
       mutationFn: async (id: string | number) => {
         try {
@@ -83,9 +95,12 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data: unknown) => {
         queryClient.invalidateQueries({ queryKey });
-        options?.onSuccess?.();
+        options?.onSuccess?.(data);
+      },
+      onError: (error: Error) => {
+        options?.onError?.(error);
       },
     });
   };

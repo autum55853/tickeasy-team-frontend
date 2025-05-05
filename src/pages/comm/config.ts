@@ -21,6 +21,12 @@ export default {
       needLogin: false,
     },
     {
+      path: "/callback",
+      component: lazy(() => import("./views/googleAuthCallbackPage")),
+      meta: { title: "Google OAuth callback" },
+      needLogin: false,
+    },
+    {
       path: "/question",
       component: lazy(() => import("./views/question")),
       meta: { title: "常見問題" },
