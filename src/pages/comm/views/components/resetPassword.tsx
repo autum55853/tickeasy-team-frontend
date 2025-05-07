@@ -1,6 +1,7 @@
 import { Input } from "@/core/components/ui/input";
 import { useContext } from "react";
-import { ModalStatusContext } from "../login";
+import { ModalStatusContext } from "@/context/modalStatusContext";
+
 import { usePasswordValidation } from "@/core/hooks/usePasswordValidation";
 
 interface ResetPasswordProps {
