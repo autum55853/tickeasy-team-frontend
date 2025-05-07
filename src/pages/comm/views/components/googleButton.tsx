@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 export function GoogleButton() {
   const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
   const redirectUri = `${window.location.origin}/callback`;
-  const googleAuthUrl = `${apiUrl}/api/v1/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
+  const googleAuthUrl = `${apiUrl}/api/v1/auth/google?state=${encodeURIComponent(redirectUri)}`;
 
   return (
     <div className="my-5">
