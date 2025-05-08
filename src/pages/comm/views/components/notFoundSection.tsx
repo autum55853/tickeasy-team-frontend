@@ -41,7 +41,7 @@ export function NotFoundSection() {
           </div>
         </div>
       </div>
-      <Button type="button" variant="gradient" className="my-5 p-6">
+      <Button onClick={() => navigate("/")} type="button" variant="gradient" className="my-5 p-6">
         Back to HomePage 回到首頁
       </Button>
     </section>
