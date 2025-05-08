@@ -1,32 +1,56 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/core/components/ui/button";
 import ProfileInfo from "../components/ProfileInfo";
-import { T_ProfileInfo } from "../types/profileInfo";
+import { T_Profile } from "../types/porfile";
 import { UpdateProfileSchema } from "../schema/updateProfile";
 import { ZodError } from "zod";
-
+import { useRequest } from "@/core/hooks/useRequest";
 import AlertError from "../components/AlertError";
+import { UserResponse } from "../types/porfile";
+import { useToast } from "@/core/hooks/useToast";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
+  const { toast } = useToast();
   const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
-  const [profileData, setProfileData] = useState<T_ProfileInfo>({
-    email: "adam294577@gmail.com",
-    name: "Adam",
-    phone: "0912345678",
-    birthday: "1990-01-01",
-    gender: "男",
-    preferredRegions: ["北部", "南部"],
-    preferredEventTypes: ["A"],
-    country: "台灣",
-    address: "台北市中山區",
-    img: "",
+  const [profileData, setProfileData] = useState<T_Profile>({});
+  const { data, isLoading } = useRequest<UserResponse>({
+    url: "/api/v1/users/profile",
+    queryKey: ["userInfo"],
+  }).useGet();
+
+  const { useUpdate: putProfile } = useRequest({
+    url: "/api/v1/users/profile",
+    queryKey: ["userInfo"],
+  });
+  const putProfileMutation = putProfile({
+    onSuccess: () => {
+      toast({
+        title: "更新成功",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "更新失敗，請稍後再試",
+      });
+    },
   });
 
-  const handleSubmit = (updatedData: T_ProfileInfo) => {
+  useEffect(() => {
+    if (isLoading || !data) return;
+    const userData = Array.isArray(data) ? data[0] : data;
+    if (userData.user) {
+      setProfileData(userData.user);
+    }
+  }, [data, isLoading]);
+
+  const handleSubmit = async (updatedData: T_Profile) => {
     try {
       // 使用 schema 驗證數據
       const validatedData = UpdateProfileSchema.parse(updatedData);
+      await putProfileMutation.mutateAsync({ id: "", data: validatedData });
       // 驗證通過後才執行更新
       setProfileData(validatedData);
       setIsEdit(false);
@@ -50,25 +74,34 @@ export default function Profile() {
   };
   return (
     <>
-      <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">
-        <h4 className="text-2xl font-bold">基本資料</h4>
-        {!isEdit && (
-          <Button variant="outline" onClick={() => setIsEdit(true)}>
-            修改會員資料
-          </Button>
-        )}
-      </div>
-      <ProfileInfo
-        isEdit={isEdit}
-        data={profileData}
-        onSubmit={handleSubmit}
-        onCancel={() => {
-          setIsEdit(false);
-          window.scrollTo(0, 0);
-        }}
-      />
-      {/* 錯誤提示 */}
-      <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />
+      {isLoading ? (
+        <div className="flex min-h-[200px] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        <>
+          <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">
+            <h4 className="text-2xl font-bold">基本資料</h4>
+            {!isEdit && (
+              <Button variant="outline" onClick={() => setIsEdit(true)} disabled={putProfileMutation.isPending}>
+                修改會員資料
+              </Button>
+            )}
+          </div>
+          <ProfileInfo
+            isEdit={isEdit}
+            data={profileData}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setIsEdit(false);
+              window.scrollTo(0, 0);
+            }}
+            isPending={putProfileMutation.isPending}
+          />
+          {/* 錯誤提示 */}
+          <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />
+        </>
+      )}
     </>
   );
 }

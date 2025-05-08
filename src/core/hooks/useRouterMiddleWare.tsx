@@ -55,8 +55,6 @@ export const useRouterMiddleWare = () => {
     }
 
     // 檢查登入狀態
-    //const token = localStorage.getItem("token");
-
     if (currentRoute?.needLogin && !isLogin) {
       // 檢查是否是從登入頁面返回
       if (location.state?.from === "/login") {

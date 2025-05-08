@@ -16,7 +16,7 @@ export default function CategoryCard(data: CategoryCardProps) {
               </p>
             ))}
           </div>
-          <p className="text-sm lg:text-base">{data.title}</p>
+          <p className="line-clamp-1 text-xs md:text-sm lg:text-base">{data.title}</p>
         </div>
       </div>
     </>

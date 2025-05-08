@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { useAuthStore } from "@/store/authStore";
 // 創建 axios 實例
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3001",
@@ -13,7 +13,7 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // 從 localStorage 獲取 token
-    const token = localStorage.getItem("token");
+    const token = useAuthStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
