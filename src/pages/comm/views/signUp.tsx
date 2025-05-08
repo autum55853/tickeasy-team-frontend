@@ -20,7 +20,7 @@ export default function Signup() {
   }, []);
   return (
     <Layout>
-      <div className="flex w-full items-center justify-center md:grid-cols-2">
+      <div className="flex grid w-full grid-cols-1 items-center md:h-[calc(100vh-2rem)] md:grid-cols-2">
         <SignupSection />
         <ImageSection imageUrl={signup} alt="signUp" />
       </div>

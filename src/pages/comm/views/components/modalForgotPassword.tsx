@@ -95,8 +95,8 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-5">
+    <div className="fixed inset-0 z-50 my-5 flex items-center justify-center bg-black/50">
+      <div className="h-[220px] w-[90%] rounded-lg bg-white px-5 md:min-h-[220px] md:w-[30%] md:p-5">
         <div className="flex justify-end">
           <Button
             type="button"
@@ -111,7 +111,7 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
         <Button
           type="button"
           variant="gradientVertical"
-          className="mx-auto mt-8 mb-3 block w-[80px]"
+          className="mx-auto mt-8 mb-3 block w-[80%] md:w-[100px]"
           onClick={handleConfirm}
           disabled={requestPasswordResetMutation.isPending || resetPasswordMutation.isPending}
         >
