@@ -45,12 +45,6 @@ export default {
       needLogin: false,
     },
     {
-      path: "/demoRequest",
-      component: lazy(() => import("./views/demoRequest")),
-      meta: { title: "Demo Request" },
-      needLogin: true,
-    },
-    {
       path: "/componentsDemo",
       component: lazy(() => import("./views/componentsDemo")),
       meta: { title: "Components Demo" },

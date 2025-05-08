@@ -21,8 +21,8 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       queryKey: id ? [...queryKey, id] : queryKey,
       queryFn: async () => {
         try {
-          const response = await axiosInstance.get<T[]>(id ? `${url}/${id}` : url);
-          return response.data;
+          const response = await axiosInstance.get<T | T[]>(id ? `${url}/${id}` : url);
+          return response;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || "獲取數據失敗");
@@ -39,7 +39,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       mutationFn: async (data: Partial<T>) => {
         try {
           const response = await axiosInstance.post<T>(url, data);
-          return response.data;
+          return response;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || "創建數據失敗");
@@ -63,7 +63,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       mutationFn: async ({ id, data }: { id: string | number; data: Partial<T> }) => {
         try {
           const response = await axiosInstance.put<T>(`${url}/${id}`, data);
-          return response.data;
+          return response;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || "更新數據失敗");
@@ -87,7 +87,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       mutationFn: async (id: string | number) => {
         try {
           const response = await axiosInstance.delete(`${url}/${id}`);
-          return response.data;
+          return response;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || "刪除數據失敗");
