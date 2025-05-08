@@ -37,11 +37,11 @@ export default function Login() {
             value={context?.email ?? ""}
             onChange={(e) => context?.setEmail?.(e.target.value)}
             placeholder="請輸入註冊信箱"
-            className="mx-auto mt-8 w-[70%]"
+            className="mx-auto mt-8 w-full md:w-[70%]"
           />
         )}
       </ModalForgotPassword>
-      <div className="grid h-[calc(100vh-6rem)] w-full md:grid-cols-2">
+      <div className="flex grid h-[calc(70vh-3rem)] w-full grid-cols-1 items-center md:h-[calc(90vh-4rem)] md:grid-cols-2">
         <ImageSection imageUrl={login} alt="logIn" />
         <LoginSection />
       </div>

@@ -58,36 +58,34 @@ export function LoginSection() {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center p-8">
+    <section className="flex w-full flex-col items-center justify-center p-8">
       <h2>會員登入</h2>
       <GoogleButton />
-      <div className="flex-column flex flex-col items-center justify-center">
-        <div className="mb-3 flex w-full flex-col gap-5">
-          <Input
-            type="text"
-            label="帳號(Email)"
-            id="account"
-            placeholder="輸入帳號(Email)"
-            value={email}
-            onBlur={() => setTouched(true)}
-            onChange={(e) => {
-              handleEmailChange(e.target.value);
-              setTouched(true);
-            }}
-            error={touched && !isEmailValid}
-            errorMessage={touched ? emailErrorMessage : ""}
-            className="w-full"
-          />
+      <div className="flex-column flex min-h-[200px] w-full max-w-md flex-col items-center justify-center md:px-8">
+        <Input
+          type="text"
+          label="帳號(Email)"
+          id="account"
+          placeholder="輸入帳號(Email)"
+          value={email}
+          onBlur={() => setTouched(true)}
+          onChange={(e) => {
+            handleEmailChange(e.target.value);
+            setTouched(true);
+          }}
+          error={touched && !isEmailValid}
+          errorMessage={touched ? emailErrorMessage : ""}
+          className="my-3 w-full"
+        />
 
-          <Input
-            type="password"
-            label="密碼"
-            id="password"
-            placeholder="輸入密碼"
-            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-            className="w-full"
-          />
-        </div>
+        <Input
+          type="password"
+          label="密碼"
+          id="password"
+          placeholder="輸入密碼"
+          onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+          className="mb-1 w-full"
+        />
         <Button
           type="button"
           variant="link"
@@ -97,8 +95,8 @@ export function LoginSection() {
           忘記密碼?
         </Button>
 
-        <Button type="button" variant="gradient" className="my-5 w-full" onClick={handleLogin}>
-          登入
+        <Button type="button" variant="gradient" className="my-5 w-full md:w-[80%]" onClick={handleLogin}>
+          {requestLoginMutation.isPending ? "處理中" : "登入"}
         </Button>
       </div>
       <div className="flex">

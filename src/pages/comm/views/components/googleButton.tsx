@@ -1,7 +1,8 @@
 import { Icon } from "@iconify/react";
 
 export function GoogleButton() {
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  // 判斷是否為生產環境
+  const apiUrl = import.meta.env.MODE === "production" ? import.meta.env.VITE_API_BASE_URL : "http://localhost:3000";
   const redirectUri = `${window.location.origin}/callback`;
   const googleAuthUrl = `${apiUrl}/api/v1/auth/google?state=${encodeURIComponent(redirectUri)}`;
 
