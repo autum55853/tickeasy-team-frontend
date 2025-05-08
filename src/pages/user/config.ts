@@ -5,7 +5,8 @@ export default {
   views: [
     {
       path: "/user",
-      redirect: "/user/about",
+      redirect: "/user/about/profile",
+      needLogin: true,
     },
     {
       path: "/user/about",
