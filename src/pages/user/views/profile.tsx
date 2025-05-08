@@ -4,15 +4,19 @@ import ProfileInfo from "../components/ProfileInfo";
 import { T_Profile } from "../types/porfile";
 import { UpdateProfileSchema } from "../schema/updateProfile";
 import { ZodError } from "zod";
-import { useGetUserInfo } from "../service";
-
+import { useRequest } from "@/core/hooks/useRequest";
 import AlertError from "../components/AlertError";
+import { UserResponse } from "../types/porfile";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
   const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
   const [profileData, setProfileData] = useState<T_Profile>({});
-  const { data, isLoading } = useGetUserInfo();
+  const { data, isLoading } = useRequest<UserResponse>({
+    url: "/api/v1/users/profile",
+    queryKey: ["userInfo"],
+  }).useGet();
+
   useEffect(() => {
     if (isLoading || !data) return;
     const userData = Array.isArray(data) ? data[0] : data;
@@ -21,7 +25,7 @@ export default function Profile() {
     }
   }, [data, isLoading]);
 
-  const handleSubmit = (updatedData: T_Profile) => {
+  const handleSubmit = async (updatedData: T_Profile) => {
     try {
       // 使用 schema 驗證數據
       const validatedData = UpdateProfileSchema.parse(updatedData);
