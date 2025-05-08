@@ -6,13 +6,15 @@ import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
 import { Button } from "@/core/components/ui/button";
 import { SingleDatePicker } from "@/core/components/ui/singleDatePicker";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProfilePreferRegions from "./ProfilePreferRegions";
 import ProfilePreferEventTypes from "./ProfilePreferEventTypes";
 import { formatPreferredRegions } from "../utils/preferredRegions";
 import { formatPreferredEventTypes } from "../utils/preferredEventTypes";
-import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
 import dayjs from "dayjs";
+import { useGetMusicType, useGetRegion } from "../service";
+import { MusicTypeOption } from "../types/musicType";
+import { RegionOption } from "../types/region";
 interface ProfileInfoProps {
   isEdit: boolean;
   data: T_Profile;
@@ -24,34 +26,21 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
   const { register, watch, setValue, handleSubmit } = useForm<T_Profile>({
     defaultValues: data,
   });
-  // 全部偏好活動類型
-  const allEventTypes: CategoryOptions[] = [
-    {
-      label: "療癒系音樂",
-      value: "A",
-      subLabel: "Pop",
-    },
-    {
-      label: "搖滾音樂",
-      value: "B",
-      subLabel: "Rock",
-    },
-    {
-      label: "電子音樂",
-      value: "C",
-      subLabel: "Electronic",
-    },
-    {
-      label: "嘻哈/饒舌",
-      value: "D",
-      subLabel: "Hip-Hop/Rap",
-    },
-    {
-      label: "古典/交響樂",
-      value: "E",
-      subLabel: "Classical/Symphony",
-    },
-  ];
+  const { data: MusicOptions, isLoading } = useGetMusicType();
+  const [allEventTypesData, setAllEventTypesData] = useState<MusicTypeOption[]>([]);
+  const [regionOptionsData, setRegionOptionsData] = useState<RegionOption[]>([]);
+  const { data: regionOptions, isLoading: regionLoading } = useGetRegion();
+
+  useEffect(() => {
+    if (!isLoading && MusicOptions) {
+      setAllEventTypesData(MusicOptions);
+    }
+  }, [isLoading, MusicOptions]);
+  useEffect(() => {
+    if (!regionLoading && regionOptions) {
+      setRegionOptionsData(regionOptions);
+    }
+  }, [regionLoading, regionOptions]);
 
   useEffect(() => {
     // 手动更新所有字段
@@ -168,11 +157,16 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[80px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <ProfilePreferRegions regions={register("preferredRegions")} />
+            <ProfilePreferRegions regions={register("preferredRegions")} regionOptions={regionOptionsData} />
           </div>
-          <div className="flex h-[200px] items-center">
+          <div
+            className="flex items-center"
+            style={{
+              height: `${Math.max(200, (allEventTypesData?.length || 0) * 30 + 20)}px`,
+            }}
+          >
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <ProfilePreferEventTypes eventTypes={register("preferredEventTypes")} allEventTypes={allEventTypes} />
+            <ProfilePreferEventTypes eventTypes={register("preferredEventTypes")} allEventTypes={allEventTypesData} />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>

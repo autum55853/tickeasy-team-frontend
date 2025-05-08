@@ -15,7 +15,7 @@ export default function Profile() {
   const { data, isLoading } = useGetUserInfo();
   useEffect(() => {
     if (isLoading || !data) return;
-    const userData = Array.isArray(data) ? data[0] : data.data;
+    const userData = Array.isArray(data) ? data[0] : data;
     if (userData.user) {
       setProfileData(userData.user);
     }
@@ -48,25 +48,33 @@ export default function Profile() {
   };
   return (
     <>
-      <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">
-        <h4 className="text-2xl font-bold">基本資料</h4>
-        {!isEdit && (
-          <Button variant="outline" onClick={() => setIsEdit(true)}>
-            修改會員資料
-          </Button>
-        )}
-      </div>
-      <ProfileInfo
-        isEdit={isEdit}
-        data={profileData}
-        onSubmit={handleSubmit}
-        onCancel={() => {
-          setIsEdit(false);
-          window.scrollTo(0, 0);
-        }}
-      />
-      {/* 錯誤提示 */}
-      <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />
+      {isLoading ? (
+        <div className="flex min-h-[200px] items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        <>
+          <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">
+            <h4 className="text-2xl font-bold">基本資料</h4>
+            {!isEdit && (
+              <Button variant="outline" onClick={() => setIsEdit(true)}>
+                修改會員資料
+              </Button>
+            )}
+          </div>
+          <ProfileInfo
+            isEdit={isEdit}
+            data={profileData}
+            onSubmit={handleSubmit}
+            onCancel={() => {
+              setIsEdit(false);
+              window.scrollTo(0, 0);
+            }}
+          />
+          {/* 錯誤提示 */}
+          <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />
+        </>
+      )}
     </>
   );
 }

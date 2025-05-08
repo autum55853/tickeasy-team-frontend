@@ -1,8 +1,9 @@
 import { UseFormRegisterReturn } from "react-hook-form";
-import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
+import { MusicTypeOption } from "../types/musicType";
+
 interface ProfilePreferEventTypesProps {
   eventTypes: UseFormRegisterReturn;
-  allEventTypes: CategoryOptions[];
+  allEventTypes: MusicTypeOption[];
 }
 
 export default function ProfilePreferEventTypes({ eventTypes, allEventTypes }: ProfilePreferEventTypesProps) {
