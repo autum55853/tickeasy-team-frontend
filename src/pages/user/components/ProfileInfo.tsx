@@ -1,6 +1,6 @@
 import ProfileAvatar from "./ProfileAvatar";
 import DefaultImg from "@/assets/images/bg-user.png";
-import { T_ProfileInfo } from "../types/profileInfo";
+import { T_Profile } from "../types/porfile";
 import { useForm } from "react-hook-form";
 import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
@@ -11,52 +11,35 @@ import ProfilePreferRegions from "./ProfilePreferRegions";
 import ProfilePreferEventTypes from "./ProfilePreferEventTypes";
 import { formatPreferredRegions } from "../utils/preferredRegions";
 import { formatPreferredEventTypes } from "../utils/preferredEventTypes";
-import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
 import dayjs from "dayjs";
+import { useRequest } from "@/core/hooks/useRequest";
+import { MusicTypeOption } from "../types/musicType";
+import { RegionOption } from "../types/region";
 interface ProfileInfoProps {
   isEdit: boolean;
-  data: T_ProfileInfo;
-  onSubmit: (data: T_ProfileInfo) => void;
+  data: T_Profile;
+  onSubmit: (data: T_Profile) => void;
   onCancel: () => void;
+  isPending: boolean;
 }
 
-export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: ProfileInfoProps) {
-  const { register, watch, setValue, handleSubmit } = useForm<T_ProfileInfo>({
+export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPending }: ProfileInfoProps) {
+  const { register, watch, setValue, handleSubmit } = useForm<T_Profile>({
     defaultValues: data,
   });
-  // 全部偏好活動類型
-  const allEventTypes: CategoryOptions[] = [
-    {
-      label: "療癒系音樂",
-      value: "A",
-      subLabel: "Pop",
-    },
-    {
-      label: "搖滾音樂",
-      value: "B",
-      subLabel: "Rock",
-    },
-    {
-      label: "電子音樂",
-      value: "C",
-      subLabel: "Electronic",
-    },
-    {
-      label: "嘻哈/饒舌",
-      value: "D",
-      subLabel: "Hip-Hop/Rap",
-    },
-    {
-      label: "古典/交響樂",
-      value: "E",
-      subLabel: "Classical/Symphony",
-    },
-  ];
+  const { data: MusicOptions } = useRequest<MusicTypeOption>({
+    url: "/api/v1/users/profile/event-types",
+    queryKey: ["musicType"],
+  }).useGet();
+  const { data: regionOptions } = useRequest<RegionOption>({
+    url: "/api/v1/users/profile/regions",
+    queryKey: ["region"],
+  }).useGet();
 
   useEffect(() => {
     // 手动更新所有字段
     Object.keys(data).forEach((key) => {
-      setValue(key as keyof T_ProfileInfo, data[key as keyof T_ProfileInfo]);
+      setValue(key as keyof T_Profile, data[key as keyof T_Profile]);
     });
   }, [data, setValue]);
 
@@ -85,14 +68,27 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             />
           </div>
           <div className="flex h-[40px] items-center">
-            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
             <Input
               id="name"
               {...register("name")}
-              value={watch("name")}
+              value={watch("name") || ""}
               onChange={(e) => setValue("name", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={20}
+              disabled={isPending}
+            />
+          </div>
+          <div className="flex h-[40px] items-center">
+            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <Input
+              id="nickname"
+              {...register("nickname")}
+              value={watch("nickname") || ""}
+              onChange={(e) => setValue("nickname", e.target.value)}
+              className="max-w-[300px] flex-1"
+              maxLength={20}
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -100,11 +96,12 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <Input
               id="phone"
               {...register("phone")}
-              value={watch("phone")}
+              value={watch("phone") || ""}
               onChange={(e) => setValue("phone", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={10}
               placeholder="格式：09xxxxxxxx"
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -129,15 +126,17 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               }
               defaultMonth={dayjs().subtract(20, "year").startOf("year").toDate()}
               placeholder="請選擇出生年月日"
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">生理性別</p>
             <Select
-              value={watch("gender")}
+              value={watch("gender") || ""}
               onValueChange={(value) => {
                 setValue("gender", value);
               }}
+              disabled={isPending}
             >
               <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇性別" />
@@ -157,19 +156,25 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[80px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <ProfilePreferRegions regions={register("preferredRegions")} />
+            <ProfilePreferRegions disabled={isPending} regions={register("preferredRegions")} regionOptions={regionOptions || []} />
           </div>
-          <div className="flex h-[200px] items-center">
+          <div
+            className="flex items-center"
+            style={{
+              height: `${Math.max(200, (MusicOptions?.length || 0) * 30 + 20)}px`,
+            }}
+          >
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <ProfilePreferEventTypes eventTypes={register("preferredEventTypes")} allEventTypes={allEventTypes} />
+            <ProfilePreferEventTypes disabled={isPending} eventTypes={register("preferredEventTypes")} MusicOptions={MusicOptions || []} />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
             <Select
-              value={watch("country")}
+              value={watch("country") || ""}
               onValueChange={(value) => {
                 setValue("country", value);
               }}
+              disabled={isPending}
             >
               <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇國家／地區" />
@@ -186,7 +191,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <Input
               id="address"
               {...register("address")}
-              value={watch("address")}
+              value={watch("address") || ""}
               onChange={(e) => setValue("address", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={50}
@@ -200,7 +205,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
                 e.preventDefault();
                 // 重置表單數據到原始狀態
                 Object.keys(data).forEach((key) => {
-                  setValue(key as keyof T_ProfileInfo, data[key as keyof T_ProfileInfo]);
+                  setValue(key as keyof T_Profile, data[key as keyof T_Profile]);
                 });
                 onCancel();
               }}
@@ -219,8 +224,12 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <p className="flex-1 text-sm text-gray-500">{data.email}</p>
           </div>
           <div className="flex h-[40px] items-center">
-            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
             <p className="flex-1 text-sm text-gray-500">{data?.name || "-"}</p>
+          </div>
+          <div className="flex h-[40px] items-center">
+            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="flex-1 text-sm text-gray-500">{data?.nickname || "-"}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">聯絡方式</p>
@@ -259,7 +268,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
     <div className="relative p-4">
       {/* 會員頭像 */}
       <div className="flex justify-center lg:justify-start">
-        <ProfileAvatar img={data?.img || DefaultImg} />
+        <ProfileAvatar img={data?.avatar || DefaultImg} />
       </div>
       {/* 會員資訊 */}
       {renderContent()}

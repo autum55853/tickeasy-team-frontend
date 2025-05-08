@@ -15,13 +15,22 @@ interface SingleDatePickerProps {
   inputClassName?: string;
   format?: string;
   defaultMonth?: Date;
+  disabled?: boolean;
 }
 
-export function SingleDatePicker({ date, setDate, placeholder, inputClassName, format = "YYYY-MM-DD", defaultMonth }: SingleDatePickerProps) {
+export function SingleDatePicker({
+  date,
+  setDate,
+  placeholder,
+  inputClassName,
+  format = "YYYY-MM-DD",
+  defaultMonth,
+  disabled,
+}: SingleDatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant={"inputStyle"} className={cn(`${inputClassName} justify-between`, !date && "text-muted-foreground")}>
+        <Button variant={"inputStyle"} className={cn(`${inputClassName} justify-between`, !date && "text-muted-foreground")} disabled={disabled}>
           {date ? dayjs(date).format(format) : <span>{placeholder}</span>}
           <CalendarIcon className="mr-2 h-4 w-4" />
         </Button>

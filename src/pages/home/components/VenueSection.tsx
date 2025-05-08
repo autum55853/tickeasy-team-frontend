@@ -3,8 +3,6 @@ import VenueCard from "./VenueCard";
 import { VenueCardData } from "./VenueCardData";
 import VenueCarousel from "./VenueCarousel";
 export default function VenueSection() {
-  console.log("VenueCardData", VenueCardData);
-
   return (
     <section className="mt-10 min-h-[100px]">
       {/* 手機板 */}

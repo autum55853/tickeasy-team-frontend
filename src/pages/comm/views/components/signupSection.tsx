@@ -119,7 +119,7 @@ export function SignupSection() {
   };
 
   return (
-    <section className="flex w-full flex-col items-center p-8">
+    <section className="flex w-full flex-col items-center justify-center p-8">
       <h2>會員註冊</h2>
       <div className="flex-column flex min-h-[450px] w-full max-w-md flex-col items-start">
         <Input
@@ -188,7 +188,7 @@ export function SignupSection() {
         />
         {error["checkedPassword"].error && <p className="text-sm text-red-500">{error["checkedPassword"].errorMessage}</p>}
       </div>
-      <div className="m-3 w-sm px-3">
+      <div className="flex w-full flex-col items-center justify-center">
         <Checkbox
           label="我已閱讀並同意服務條款及隱私政策"
           id="agreementService"
@@ -205,7 +205,7 @@ export function SignupSection() {
         <Button
           type="button"
           variant="gradient"
-          className="my-5 w-full"
+          className="my-5 w-full md:w-[50%]"
           onClick={handleSignup}
           disabled={!signupData.name || !isValid || !isCheckedPassword || !signupData.agreementService}
         >
