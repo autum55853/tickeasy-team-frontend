@@ -20,9 +20,10 @@ interface ProfileInfoProps {
   data: T_Profile;
   onSubmit: (data: T_Profile) => void;
   onCancel: () => void;
+  isPending: boolean;
 }
 
-export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: ProfileInfoProps) {
+export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPending }: ProfileInfoProps) {
   const { register, watch, setValue, handleSubmit } = useForm<T_Profile>({
     defaultValues: data,
   });
@@ -75,6 +76,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               onChange={(e) => setValue("name", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={20}
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -86,6 +88,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               onChange={(e) => setValue("nickname", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={20}
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -98,6 +101,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               className="max-w-[300px] flex-1"
               maxLength={10}
               placeholder="格式：09xxxxxxxx"
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -122,6 +126,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               }
               defaultMonth={dayjs().subtract(20, "year").startOf("year").toDate()}
               placeholder="請選擇出生年月日"
+              disabled={isPending}
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -131,6 +136,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               onValueChange={(value) => {
                 setValue("gender", value);
               }}
+              disabled={isPending}
             >
               <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇性別" />
@@ -150,7 +156,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           </div>
           <div className="flex h-[80px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <ProfilePreferRegions regions={register("preferredRegions")} regionOptions={regionOptions || []} />
+            <ProfilePreferRegions disabled={isPending} regions={register("preferredRegions")} regionOptions={regionOptions || []} />
           </div>
           <div
             className="flex items-center"
@@ -159,7 +165,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             }}
           >
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <ProfilePreferEventTypes eventTypes={register("preferredEventTypes")} MusicOptions={MusicOptions || []} />
+            <ProfilePreferEventTypes disabled={isPending} eventTypes={register("preferredEventTypes")} MusicOptions={MusicOptions || []} />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
@@ -168,6 +174,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
               onValueChange={(value) => {
                 setValue("country", value);
               }}
+              disabled={isPending}
             >
               <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇國家／地區" />
