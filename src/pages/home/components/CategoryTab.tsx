@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/core/components/ui/tab";
+import { Tabs, TabsList, TabsTrigger } from "@/core/components/ui/tab";
 import { CategoryOptions } from "../types/CategoryOptions";
 
 interface CategoryTabProps {
