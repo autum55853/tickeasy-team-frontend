@@ -4,7 +4,7 @@ export default {
   name: "會員中心",
   views: [
     {
-      path: "/user",
+      path: "/user/about",
       component: lazy(() => import("./views/page")),
       meta: { title: "會員中心" },
       needLogin: true,
