@@ -1,3 +1,50 @@
+import { Layout } from "./layout";
+import { Input } from "@/core/components/ui/input";
+import { ImageSection } from "./components/imageSection";
+import { LoginSection } from "./components/loginSection";
+import { ModalForgotPassword } from "./components/modalForgotPassword";
+import { ResetPassword } from "./components/resetPassword";
+import login from "@/assets/images/undraw_login_weas.svg";
+import { ModalStatusContext } from "@/context/modalStatusContext";
+import { useAuthStore } from "@/store/authStore";
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/core/hooks/useToast";
+
 export default function Login() {
-  return <div>我是 Login</div>;
+  const navigate = useNavigate();
+  const context = useContext(ModalStatusContext); // 如果要額外使用 context 內容
+  const isLogin = useAuthStore((state) => state.isLogin);
+  useEffect(() => {
+    if (isLogin) {
+      toast({
+        title: "你已登入",
+        description: "將回到首頁",
+      });
+      navigate("/");
+    }
+  }, []);
+  return (
+    <Layout>
+      <ModalForgotPassword active={context?.isModalForgotPasswordActive ?? false}>
+        {context?.isResetPassword ? (
+          <ResetPassword />
+        ) : (
+          <Input
+            type="email"
+            label=""
+            id="email"
+            value={context?.email ?? ""}
+            onChange={(e) => context?.setEmail?.(e.target.value)}
+            placeholder="請輸入註冊信箱"
+            className="mx-auto mt-8 w-[70%]"
+          />
+        )}
+      </ModalForgotPassword>
+      <div className="grid h-[calc(100vh-6rem)] w-full md:grid-cols-2">
+        <ImageSection imageUrl={login} alt="logIn" />
+        <LoginSection />
+      </div>
+    </Layout>
+  );
 }

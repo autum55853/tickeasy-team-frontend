@@ -9,6 +9,30 @@ export default {
       needLogin: false,
     },
     {
+      path: "/signup",
+      component: lazy(() => import("./views/signUp")),
+      meta: { title: "註冊頁面" },
+      needLogin: false,
+    },
+    {
+      path: "/origanization/concerts",
+      component: lazy(() => import("./views/orgConcertsList")),
+      meta: { title: "演唱會清單" },
+      needLogin: false,
+    },
+    {
+      path: "/callback",
+      component: lazy(() => import("./views/googleAuthCallbackPage")),
+      meta: { title: "Google OAuth callback" },
+      needLogin: false,
+    },
+    {
+      path: "/question",
+      component: lazy(() => import("./views/question")),
+      meta: { title: "常見問題" },
+      needLogin: false,
+    },
+    {
       path: "/403",
       component: lazy(() => import("./views/403")),
       meta: { title: "403 無權限" },
@@ -25,6 +49,12 @@ export default {
       component: lazy(() => import("./views/demoRequest")),
       meta: { title: "Demo Request" },
       needLogin: true,
+    },
+    {
+      path: "/componentsDemo",
+      component: lazy(() => import("./views/componentsDemo")),
+      meta: { title: "Components Demo" },
+      needLogin: false,
     },
   ],
 };

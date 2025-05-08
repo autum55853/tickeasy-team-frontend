@@ -7,7 +7,9 @@ import CategoryTab from "./CategoryTab";
 import { CategoryDemoApiData } from "./CategoryDemoApiData";
 import { CategoryCardProps } from "../types/CategoryCard";
 import CategoryCard from "./CategoryCard";
+import { useNavigate } from "react-router-dom";
 export default function CategorySection() {
+  const navigate = useNavigate();
   const options: CategoryOptions[] = [
     {
       label: "療癒系音樂",
@@ -64,7 +66,7 @@ export default function CategorySection() {
 
         {/* 搜尋按鈕 */}
         <div className="flex items-center justify-center">
-          <Button className="w-[90%] max-w-[800px] rounded-full text-lg" variant="outline">
+          <Button onClick={() => navigate("/concerts")} className="w-[90%] max-w-[800px] rounded-full text-lg" variant="outline">
             搜尋更多
           </Button>
         </div>

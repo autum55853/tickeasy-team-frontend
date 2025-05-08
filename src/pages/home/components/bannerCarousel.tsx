@@ -3,7 +3,7 @@ import CustomCarouselItem from "./bannerCarouselItem";
 import { Button } from "@/core/components/ui/button";
 import React from "react";
 import { CarouselApi } from "@/core/components/ui/Carousel";
-
+import { useNavigate } from "react-router-dom";
 interface BannerItem {
   id: number;
   image: string;
@@ -17,7 +17,7 @@ interface HomeCarouselProps {
 export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = React.useState(bannerList[0].id);
-
+  const navigate = useNavigate();
   // 監聽滑動變化
   React.useEffect(() => {
     if (!api) return;
@@ -51,13 +51,6 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
       api.scrollTo(index);
     }
     setActiveIndex(index);
-  };
-
-  // 處理報名按鈕點擊事件
-  const handleSignUpClick = (id: number) => {
-    console.log("activeIndex", id);
-
-    handlePaginationClick(id);
   };
 
   return (
@@ -120,7 +113,7 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         <Button
           variant={"gradientVertical"}
           className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white select-none sm:text-left lg:left-[calc(77%-20px)] lg:max-w-[250px] lg:translate-x-[-77%]"
-          onClick={() => handleSignUpClick(activeIndex)}
+          onClick={() => navigate(`/concerts/${activeIndex}`)}
         >
           <h4>報名!</h4>
         </Button>
