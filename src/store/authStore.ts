@@ -4,23 +4,27 @@ import { persist } from "zustand/middleware";
 interface AuthState {
   token: string;
   email: string;
+  isLogin: boolean;
   setAuth: (token: string, email: string) => void;
   logout: () => void;
-  reset: () => void; // 新增 reset 方法
 }
 
 const initialState = {
   token: "",
   email: "",
+  isLogin: false,
 };
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       ...initialState,
-      setAuth: (token, email) => set({ token, email }),
-      logout: () => set({ token: "", email: "" }),
-      reset: () => set({ ...initialState }), // 一鍵清空
+      setAuth: (token, email) => set({ token, email, isLogin: true }),
+      logout: () => {
+        set({ token: "", email: "", isLogin: false });
+        // 清除 localStorage 中的 auth-storage
+        localStorage.removeItem("auth-storage");
+      },
     }),
     {
       name: "auth-storage",

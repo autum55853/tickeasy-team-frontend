@@ -2,16 +2,18 @@ import React from "react";
 import { Button } from "@/core/components/ui/button";
 import { X } from "lucide-react";
 import { useContext } from "react";
-import { ModalStatusContext } from "../login";
+import { ModalStatusContext } from "@/context/modalStatusContext"; // 引入 context
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
+
 interface ModalForgotPasswordProps {
   children: React.ReactElement<{ passwordError?: string }>;
   active: boolean;
 }
 
 export function ModalForgotPassword({ children, active }: ModalForgotPasswordProps) {
-  const { setIsModalForgotPasswordActive, email, isResetPassword, setIsResetPassword, resetPasswordData } = useContext(ModalStatusContext)!;
+  const { setIsModalForgotPasswordActive, email, isResetPassword, setIsResetPassword, resetPasswordData } = useContext(ModalStatusContext)!; // 使用自定義的 hook 來獲取 context
+
   const { toast } = useToast();
   const [passwordError, setPasswordError] = React.useState("");
 
@@ -100,7 +102,7 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
             type="button"
             variant="ghost"
             className="p-0 transition-transform duration-500 hover:rotate-[360deg] [&_svg]:size-6"
-            onClick={() => setIsModalForgotPasswordActive(false)}
+            onClick={() => setIsModalForgotPasswordActive(false)} // 使用context來關閉Modal
           >
             <X />
           </Button>

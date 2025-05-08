@@ -2,11 +2,11 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routes } from "@/pages";
 import { RouteView } from "@/core/types/router";
-
+import { useAuthStore } from "@/store/authStore";
 export const useRouterMiddleWare = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const isLogin = useAuthStore((state) => state.isLogin);
   useEffect(() => {
     window.scrollTo(0, 0);
     const currentPath = location.pathname;
@@ -55,8 +55,9 @@ export const useRouterMiddleWare = () => {
     }
 
     // 檢查登入狀態
-    const token = localStorage.getItem("token");
-    if (currentRoute?.needLogin && !token) {
+    //const token = localStorage.getItem("token");
+
+    if (currentRoute?.needLogin && !isLogin) {
       // 檢查是否是從登入頁面返回
       if (location.state?.from === "/login") {
         // 如果是從登入頁面返回，導向首頁或其他適當的頁面
@@ -70,5 +71,5 @@ export const useRouterMiddleWare = () => {
       }
       return;
     }
-  }, [location.pathname, location.state?.from, navigate]);
+  }, [location.pathname, location.state?.from, navigate, isLogin]);
 };

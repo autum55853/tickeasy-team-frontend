@@ -7,16 +7,21 @@ import MobileMenuList from "./mobileMenuList";
 import DesktopMenuList from "./deaktopMenuList";
 import { useNavigate } from "react-router-dom";
 import { useHeaderSearchBar } from "@/core/hooks/useHeaderSearchBar";
+import { useAuthStore } from "@/store/authStore";
+
 export default function Header() {
   const [menu, setMenu] = useState(false);
   const { handleSearch } = useHeaderSearchBar(() => {
     setMenu(false);
   });
-  const [isLogin, setIsLogin] = useState(false);
+  //const [isLogin, setIsLogin] = useState(false);
   const [desktopSearchBlock, setDesktopSearchBlock] = useState(false);
   const [searchText, setSearchText] = useState("");
   const accountButtonRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // 從 store 中獲取登入狀態
+  const isLogin = useAuthStore((state) => state.isLogin);
 
   // 新增處理互斥狀態的函數
   const toggleMenu = (value: boolean) => {

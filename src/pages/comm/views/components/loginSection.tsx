@@ -3,15 +3,16 @@ import { Button } from "@/core/components/ui/button";
 import { GoogleButton } from "./googleButton";
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
-import { ModalStatusContext } from "../login";
+import { ModalStatusContext } from "@/context/modalStatusContext";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 import { useNavigate } from "react-router-dom";
+
 export function LoginSection() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!;
+  const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!; // 使用 context
   const { email, setEmail, isValid: isEmailValid, errorMessage: emailErrorMessage } = useEmailValidation(loginData.email);
   const [touched, setTouched] = useState(false);
 
@@ -91,7 +92,7 @@ export function LoginSection() {
           type="button"
           variant="link"
           className="block size-2 w-full p-0 pb-5 pl-2 text-left text-xs text-red-500"
-          onClick={() => setIsModalForgotPasswordActive(true)}
+          onClick={() => setIsModalForgotPasswordActive(true)} // 呼叫 context 中的 setter
         >
           忘記密碼?
         </Button>

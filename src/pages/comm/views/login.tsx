@@ -5,91 +5,46 @@ import { LoginSection } from "./components/loginSection";
 import { ModalForgotPassword } from "./components/modalForgotPassword";
 import { ResetPassword } from "./components/resetPassword";
 import login from "@/assets/images/undraw_login_weas.svg";
-import { createContext, useState } from "react";
-
-interface ModalStatusContextType {
-  isModalForgotPasswordActive: boolean;
-  setIsModalForgotPasswordActive: (value: boolean) => void;
-  isResetPassword: boolean;
-  setIsResetPassword: (value: boolean) => void;
-  loginData: {
-    email: string;
-    password: string;
-  };
-  setLoginData: React.Dispatch<
-    React.SetStateAction<{
-      email: string;
-      password: string;
-    }>
-  >;
-  email: string;
-  setEmail: (value: string) => void;
-  resetPasswordData: {
-    verifiedCode: string;
-    newPassword: string;
-    reNewPassword: string;
-  };
-  setResetPasswordData: React.Dispatch<
-    React.SetStateAction<{
-      verifiedCode: string;
-      newPassword: string;
-      reNewPassword: string;
-    }>
-  >;
-}
-
-export const ModalStatusContext = createContext<ModalStatusContextType | null>(null);
+import { ModalStatusContext } from "@/context/modalStatusContext";
+import { useAuthStore } from "@/store/authStore";
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/core/hooks/useToast";
 
 export default function Login() {
-  const [isModalForgotPasswordActive, setIsModalForgotPasswordActive] = useState(false);
-  const [isResetPassword, setIsResetPassword] = useState(false);
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: "",
-  });
-  const [email, setEmail] = useState("");
-  const [resetPasswordData, setResetPasswordData] = useState({
-    verifiedCode: "",
-    newPassword: "",
-    reNewPassword: "",
-  });
-
+  const navigate = useNavigate();
+  const context = useContext(ModalStatusContext); // 如果要額外使用 context 內容
+  const isLogin = useAuthStore((state) => state.isLogin);
+  useEffect(() => {
+    if (isLogin) {
+      toast({
+        title: "你已登入",
+        description: "將回到首頁",
+      });
+      navigate("/");
+    }
+  }, []);
   return (
     <Layout>
-      <ModalStatusContext.Provider
-        value={{
-          isModalForgotPasswordActive,
-          setIsModalForgotPasswordActive,
-          isResetPassword,
-          setIsResetPassword,
-          loginData,
-          setLoginData,
-          email,
-          setEmail,
-          resetPasswordData,
-          setResetPasswordData,
-        }}
-      >
-        <ModalForgotPassword active={isModalForgotPasswordActive}>
-          {isResetPassword ? (
-            <ResetPassword />
-          ) : (
-            <Input
-              type="email"
-              label=""
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="請輸入註冊信箱"
-              className="mx-auto mt-8 w-[70%]"
-            />
-          )}
-        </ModalForgotPassword>
-        <div className="grid h-[calc(100vh-6rem)] w-full md:grid-cols-2">
-          <ImageSection imageUrl={login} alt="logIn" />
-          <LoginSection />
-        </div>
-      </ModalStatusContext.Provider>
+      <ModalForgotPassword active={context?.isModalForgotPasswordActive ?? false}>
+        {context?.isResetPassword ? (
+          <ResetPassword />
+        ) : (
+          <Input
+            type="email"
+            label=""
+            id="email"
+            value={context?.email ?? ""}
+            onChange={(e) => context?.setEmail?.(e.target.value)}
+            placeholder="請輸入註冊信箱"
+            className="mx-auto mt-8 w-[70%]"
+          />
+        )}
+      </ModalForgotPassword>
+      <div className="grid h-[calc(100vh-6rem)] w-full md:grid-cols-2">
+        <ImageSection imageUrl={login} alt="logIn" />
+        <LoginSection />
+      </div>
     </Layout>
   );
 }
