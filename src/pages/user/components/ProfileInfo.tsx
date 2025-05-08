@@ -1,6 +1,6 @@
 import ProfileAvatar from "./ProfileAvatar";
 import DefaultImg from "@/assets/images/bg-user.png";
-import { T_ProfileInfo } from "../types/profileInfo";
+import { T_Profile } from "../types/porfile";
 import { useForm } from "react-hook-form";
 import { Input } from "@/core/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";
@@ -15,13 +15,13 @@ import { CategoryOptions } from "@/pages/home/types/CategoryOptions";
 import dayjs from "dayjs";
 interface ProfileInfoProps {
   isEdit: boolean;
-  data: T_ProfileInfo;
-  onSubmit: (data: T_ProfileInfo) => void;
+  data: T_Profile;
+  onSubmit: (data: T_Profile) => void;
   onCancel: () => void;
 }
 
 export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: ProfileInfoProps) {
-  const { register, watch, setValue, handleSubmit } = useForm<T_ProfileInfo>({
+  const { register, watch, setValue, handleSubmit } = useForm<T_Profile>({
     defaultValues: data,
   });
   // 全部偏好活動類型
@@ -56,7 +56,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
   useEffect(() => {
     // 手动更新所有字段
     Object.keys(data).forEach((key) => {
-      setValue(key as keyof T_ProfileInfo, data[key as keyof T_ProfileInfo]);
+      setValue(key as keyof T_Profile, data[key as keyof T_Profile]);
     });
   }, [data, setValue]);
 
@@ -85,12 +85,23 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             />
           </div>
           <div className="flex h-[40px] items-center">
-            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
             <Input
               id="name"
               {...register("name")}
-              value={watch("name")}
+              value={watch("name") || ""}
               onChange={(e) => setValue("name", e.target.value)}
+              className="max-w-[300px] flex-1"
+              maxLength={20}
+            />
+          </div>
+          <div className="flex h-[40px] items-center">
+            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <Input
+              id="nickname"
+              {...register("nickname")}
+              value={watch("nickname") || ""}
+              onChange={(e) => setValue("nickname", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={20}
             />
@@ -100,7 +111,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <Input
               id="phone"
               {...register("phone")}
-              value={watch("phone")}
+              value={watch("phone") || ""}
               onChange={(e) => setValue("phone", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={10}
@@ -134,7 +145,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">生理性別</p>
             <Select
-              value={watch("gender")}
+              value={watch("gender") || ""}
               onValueChange={(value) => {
                 setValue("gender", value);
               }}
@@ -166,7 +177,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
             <Select
-              value={watch("country")}
+              value={watch("country") || ""}
               onValueChange={(value) => {
                 setValue("country", value);
               }}
@@ -186,7 +197,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <Input
               id="address"
               {...register("address")}
-              value={watch("address")}
+              value={watch("address") || ""}
               onChange={(e) => setValue("address", e.target.value)}
               className="max-w-[300px] flex-1"
               maxLength={50}
@@ -200,7 +211,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
                 e.preventDefault();
                 // 重置表單數據到原始狀態
                 Object.keys(data).forEach((key) => {
-                  setValue(key as keyof T_ProfileInfo, data[key as keyof T_ProfileInfo]);
+                  setValue(key as keyof T_Profile, data[key as keyof T_Profile]);
                 });
                 onCancel();
               }}
@@ -219,8 +230,12 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
             <p className="flex-1 text-sm text-gray-500">{data.email}</p>
           </div>
           <div className="flex h-[40px] items-center">
-            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
             <p className="flex-1 text-sm text-gray-500">{data?.name || "-"}</p>
+          </div>
+          <div className="flex h-[40px] items-center">
+            <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
+            <p className="flex-1 text-sm text-gray-500">{data?.nickname || "-"}</p>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">聯絡方式</p>
@@ -259,7 +274,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel }: Profil
     <div className="relative p-4">
       {/* 會員頭像 */}
       <div className="flex justify-center lg:justify-start">
-        <ProfileAvatar img={data?.img || DefaultImg} />
+        <ProfileAvatar img={data?.avatar || DefaultImg} />
       </div>
       {/* 會員資訊 */}
       {renderContent()}

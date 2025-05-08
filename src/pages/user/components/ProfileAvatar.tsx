@@ -2,7 +2,7 @@
 import { Icon } from "@iconify/react";
 export default function ProfileAvatar({ img }: { img: string }) {
   return (
-    <div className="relative z-10 h-[100px] w-[100px] overflow-hidden lg:absolute lg:top-[10%] lg:right-[10%] lg:scale-180">
+    <div className="relative z-10 overflow-hidden lg:absolute lg:top-[10%] lg:right-[10%] lg:scale-180">
       <div className="h-full w-full overflow-hidden rounded-full">
         <img src={img} className="h-[96px] w-[96px] object-cover" />
       </div>

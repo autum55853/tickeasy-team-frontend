@@ -1,29 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/core/components/ui/button";
 import ProfileInfo from "../components/ProfileInfo";
-import { T_ProfileInfo } from "../types/profileInfo";
+import { T_Profile } from "../types/porfile";
 import { UpdateProfileSchema } from "../schema/updateProfile";
 import { ZodError } from "zod";
+import { useGetUserInfo } from "../service";
 
 import AlertError from "../components/AlertError";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
   const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
-  const [profileData, setProfileData] = useState<T_ProfileInfo>({
-    email: "adam294577@gmail.com",
-    name: "Adam",
-    phone: "0912345678",
-    birthday: "1990-01-01",
-    gender: "男",
-    preferredRegions: ["北部", "南部"],
-    preferredEventTypes: ["A"],
-    country: "台灣",
-    address: "台北市中山區",
-    img: "",
-  });
+  const [profileData, setProfileData] = useState<T_Profile>({});
+  const { data, isLoading } = useGetUserInfo();
+  useEffect(() => {
+    if (isLoading || !data) return;
+    const userData = Array.isArray(data) ? data[0] : data.data;
+    if (userData.user) {
+      setProfileData(userData.user);
+    }
+  }, [data, isLoading]);
 
-  const handleSubmit = (updatedData: T_ProfileInfo) => {
+  const handleSubmit = (updatedData: T_Profile) => {
     try {
       // 使用 schema 驗證數據
       const validatedData = UpdateProfileSchema.parse(updatedData);
