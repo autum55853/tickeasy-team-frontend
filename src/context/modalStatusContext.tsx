@@ -24,6 +24,7 @@ interface ModalStatusContextType {
       reNewPassword: string;
     }>
   >;
+  resetLoginData: () => void;
 }
 
 export const ModalStatusContext = createContext<ModalStatusContextType | null>(null);
@@ -41,7 +42,10 @@ export function ModalStatusProvider({ children }: { children: ReactNode }) {
     newPassword: "",
     reNewPassword: "",
   });
-
+  const resetLoginData = () => {
+    setLoginData({ email: "", password: "" });
+    setEmail("");
+  };
   return (
     <ModalStatusContext.Provider
       value={{
@@ -55,6 +59,7 @@ export function ModalStatusProvider({ children }: { children: ReactNode }) {
         setEmail,
         resetPasswordData,
         setResetPasswordData,
+        resetLoginData,
       }}
     >
       {children}

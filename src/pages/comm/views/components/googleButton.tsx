@@ -1,11 +1,8 @@
 import { Icon } from "@iconify/react";
 
 export function GoogleButton() {
-  // 判斷是否為生產環境
-  const apiUrl = import.meta.env.MODE === "production" ? import.meta.env.VITE_API_BASE_URL : "http://localhost:3000";
-  const redirectUri = `${window.location.origin}/callback`;
-  const googleAuthUrl = `${apiUrl}/api/v1/auth/google?state=${encodeURIComponent(redirectUri)}`;
-
+  const redirectUri = "/callback";
+  const googleAuthUrl = `https://tickeasy-team-backend.onrender.com/api/v1/auth/google?state=${encodeURIComponent(redirectUri)}`;
   return (
     <div className="my-5">
       <a

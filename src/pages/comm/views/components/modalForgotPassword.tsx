@@ -96,7 +96,7 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
 
   return (
     <div className="fixed inset-0 z-50 my-5 flex items-center justify-center bg-black/50">
-      <div className="h-[220px] w-[90%] rounded-lg bg-white px-5 md:min-h-[220px] md:w-[30%] md:p-5">
+      <div className="max-h-[90vh] w-[90%] overflow-y-auto rounded-lg bg-white px-5 py-4 md:w-[30%] md:p-5">
         <div className="flex justify-end">
           <Button
             type="button"
