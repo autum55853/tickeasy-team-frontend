@@ -8,8 +8,16 @@ import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 
+interface LoginResponse {
+  token: string;
+  user: {
+    email: string;
+  };
+}
 export function LoginSection() {
+  const setAuth = useAuthStore((state) => state.setAuth);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!; // 使用 context
@@ -22,7 +30,11 @@ export function LoginSection() {
   });
 
   const requestLoginMutation = requestLogin({
-    onSuccess: () => {
+    onSuccess: (response) => {
+      const res = response as LoginResponse;
+      console.log("res:", res);
+      setAuth(res.token, res.user.email); // ✅ 存進 authStore
+
       toast({
         title: "登入成功",
       });
@@ -56,7 +68,6 @@ export function LoginSection() {
     setEmail(value);
     setLoginData({ ...loginData, email: value });
   };
-
   return (
     <section className="flex w-full flex-col items-center justify-center p-8">
       <h2>會員登入</h2>
