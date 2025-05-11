@@ -96,7 +96,7 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
 
   return (
     <div className="fixed inset-0 z-50 my-5 flex items-center justify-center bg-black/50">
-      <div className="max-h-[90vh] w-[90%] overflow-y-auto rounded-lg bg-white px-5 py-4 md:w-[30%] md:p-5">
+      <div className="max-h-[90vh] w-[80%] overflow-y-auto rounded-lg bg-white px-5 py-4 md:w-[30%] md:p-5">
         <div className="flex justify-end">
           <Button
             type="button"
@@ -107,11 +107,12 @@ export function ModalForgotPassword({ children, active }: ModalForgotPasswordPro
             <X />
           </Button>
         </div>
-        {React.cloneElement(children, { passwordError })}
+        <div className="mx-auto flex w-[60%] flex-col items-center justify-center md:w-[80%]">{React.cloneElement(children, { passwordError })}</div>
+
         <Button
           type="button"
           variant="gradientVertical"
-          className="mx-auto mt-8 mb-3 block w-[80%] md:w-[100px]"
+          className="mx-auto mb-3 block w-[30%] md:w-[100px]"
           onClick={handleConfirm}
           disabled={requestPasswordResetMutation.isPending || resetPasswordMutation.isPending}
         >

@@ -7,14 +7,18 @@ import { ResetPassword } from "./components/resetPassword";
 import login from "@/assets/images/undraw_login_weas.svg";
 import { ModalStatusContext } from "@/context/modalStatusContext";
 import { useAuthStore } from "@/store/authStore";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/core/hooks/useToast";
+import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 
 export default function Login() {
   const navigate = useNavigate();
-  const context = useContext(ModalStatusContext); // 如果要額外使用 context 內容
+  const context = useContext(ModalStatusContext);
   const isLogin = useAuthStore((state) => state.isLogin);
+  const { email, setEmail, isValid: isEmailValid, errorMessage: emailErrorMessage } = useEmailValidation(context?.email ?? "");
+  const [touched, setTouched] = useState(false);
+
   useEffect(() => {
     if (isLogin) {
       toast({
@@ -24,6 +28,7 @@ export default function Login() {
       navigate("/");
     }
   }, []);
+
   return (
     <Layout>
       <ModalForgotPassword active={context?.isModalForgotPasswordActive ?? false}>
@@ -34,10 +39,15 @@ export default function Login() {
             type="email"
             label=""
             id="email"
-            value={context?.email ?? ""}
-            onChange={(e) => context?.setEmail?.(e.target.value)}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              context?.setEmail?.(e.target.value);
+              setTouched(true);
+            }}
             placeholder="請輸入註冊信箱"
-            className="mx-auto mt-8 w-full md:w-[70%]"
+            error={touched && !isEmailValid}
+            errorMessage={touched ? emailErrorMessage : ""}
           />
         )}
       </ModalForgotPassword>
