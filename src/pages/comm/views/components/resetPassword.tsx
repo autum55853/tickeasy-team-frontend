@@ -33,7 +33,7 @@ export function ResetPassword({ passwordError }: ResetPasswordProps) {
 
   return (
     <>
-      <div className="px-5">
+      <div className="w-full px-5">
         <Input type="text" label="" id="verifiedCode" value={resetPasswordData.verifiedCode} placeholder="請輸入驗證碼" onChange={handleSetItems} />
         <div className="relative">
           <Input

@@ -86,7 +86,6 @@ export function LoginSection() {
           }}
           error={touched && !isEmailValid}
           errorMessage={touched ? emailErrorMessage : ""}
-          className="my-3 w-full"
         />
 
         <Input
