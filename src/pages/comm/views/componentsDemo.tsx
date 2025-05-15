@@ -98,6 +98,9 @@ export default function PaginationDemo() {
         </div>
       </div>
       <Toaster />
+      <Button>
+        <a href="http://localhost:3000/api/v1/auth/google">使用 Google 登入</a>
+      </Button>
     </>
   );
 }

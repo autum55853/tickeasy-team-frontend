@@ -1,9 +1,5 @@
-import { Pagination } from "@/core/components/ui/pagination";
-import { usePagination } from "@/core/hooks/usePagination";
-import { useEffect, useState } from "react";
-import { useToast } from "@/core/hooks/useToast";
+import { useState } from "react";
 import { Button } from "@/core/components/ui/button";
-import { Toaster } from "@/core/components/ui/toaster";
 import Header from "@/core/components/global/header";
 import Footer from "@/core/components/global/footer";
 import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
@@ -22,43 +18,7 @@ interface Concert {
   status: ConcertStatus;
 }
 
-const TOTAL_ITEMS = 200; // 假設總共有N筆資料
-const ITEMS_PER_PAGE = 10;
-
 export default function PaginationDemo() {
-  const { currentPage, totalPages, goToPage } = usePagination({
-    totalItems: TOTAL_ITEMS,
-    itemsPerPage: ITEMS_PER_PAGE,
-  });
-
-  const { toast } = useToast();
-  const [items, setItems] = useState<string[]>([]);
-
-  // 模擬取得目前頁面的資料
-  useEffect(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
-    const end = Math.min(start + ITEMS_PER_PAGE - 1, TOTAL_ITEMS);
-
-    const pageItems = Array.from({ length: end - start + 1 }, (_, i) => `Item ${start + i}`);
-    setItems(pageItems);
-  }, [currentPage]);
-
-  const showToast = () => {
-    toast({
-      title: "Success!",
-      description: "This is a toast notification",
-      variant: "default",
-    });
-  };
-
-  const showDestructiveToast = () => {
-    toast({
-      title: "Error!",
-      description: "Something went wrong",
-      variant: "destructive",
-    });
-  };
-
   const concerts: Concert[] = [
     {
       id: 1,
