@@ -31,6 +31,14 @@ export default {
       component: lazy(() => import("./views/question")),
       meta: { title: "常見問題" },
       needLogin: false,
+      children: [
+        {
+          path: "detail",
+          component: lazy(() => import("./views/questionDetail")),
+          meta: { title: "常見問題細項" },
+          needLogin: false,
+        },
+      ],
     },
     {
       path: "/403",

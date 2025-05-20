@@ -1,11 +1,18 @@
-import { useEffect, useState, RefObject } from "react";
+import { useEffect, useState, RefObject, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/core/hooks/useLogout";
 export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOpen: boolean; accountButtonRef: RefObject<HTMLDivElement | null> }) {
   const [position, setPosition] = useState({ top: -1000, right: 0 });
   const { handleLogout } = useLogout();
   const navigate = useNavigate();
-
+  const handleNavigation = useCallback(
+    (path: string) => {
+      if (menuOpen) {
+        navigate(path);
+      }
+    },
+    [menuOpen, navigate]
+  );
   useEffect(() => {
     const updatePosition = () => {
       if (accountButtonRef.current) {
@@ -34,14 +41,14 @@ export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOp
       }}
     >
       <ul className="flex flex-col gap-3 overflow-hidden rounded-md bg-white py-2 shadow-sm">
-        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => navigate("/user")}>
+        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/user")}>
           會員中心
         </li>
-        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => navigate("/user/history")}>
-          查看參與的演唱會
+        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/company")}>
+          舉辦演唱會
         </li>
-        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => navigate("/user/password")}>
-          修改密碼
+        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/user/history")}>
+          查看參與的演唱會
         </li>
         <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={handleLogout}>
           登出
