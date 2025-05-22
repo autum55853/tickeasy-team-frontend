@@ -1,5 +1,5 @@
-import { QuestionType } from "../types/question";
-import { useQuestionDetail } from "../hook/useQuestionDetailContext";
+import { QuestionType } from "../../types/question";
+import { useQuestionDetail } from "../../hook/useQuestionDetailContext";
 import { useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/core/components/ui/select";

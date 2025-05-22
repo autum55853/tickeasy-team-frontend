@@ -1,6 +1,6 @@
 import { Button } from "@/core/components/ui/button";
-import { QuestionType } from "../types/question";
-import { useQuestionDetail } from "../hook/useQuestionDetailContext";
+import { QuestionType } from "../../types/question";
+import { useQuestionDetail } from "../../hook/useQuestionDetailContext";
 import { useEffect } from "react";
 import { Icon } from "@iconify/react";
 const faqDetails = {

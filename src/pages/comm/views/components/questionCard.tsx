@@ -1,8 +1,8 @@
 import { Card as RadixCard, Text, Box } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
-import { useQuestionDetail } from "@/pages/comm/views/hook/useQuestionDetailContext";
+import { useQuestionDetail } from "@/pages/comm/hook/useQuestionDetailContext";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { QuestionType } from "../types/question";
+import { QuestionType } from "../../types/question";
 const borderColor = {
   concert: "border-chart-1",
   ticket: "border-chart-2",

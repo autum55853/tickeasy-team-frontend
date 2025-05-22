@@ -1,5 +1,5 @@
 import { QuestionCard } from "./questionCard";
-import { QuestionType } from "../types/question";
+import { QuestionType } from "../../types/question";
 
 export default function QuestionNormalListItem({
   title,

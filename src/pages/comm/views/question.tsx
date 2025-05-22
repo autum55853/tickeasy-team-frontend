@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import QuestionButtonGroup from "./components/questionButtonGroup";
 import QuestionNormalList from "./components/questionNormalList";
-import { QuestionDetailProvider } from "./hook/QuestionDetailProvider";
+import { QuestionDetailProvider } from "../hook/QuestionDetailProvider";
 export default function Question() {
   const [searchText, setSearchText] = useState("");
   const location = useLocation();

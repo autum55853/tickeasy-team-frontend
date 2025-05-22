@@ -1,5 +1,5 @@
 import QuestionNormalListItem from "./questionNormalListItem";
-import { QuestionType } from "../types/question";
+import { QuestionType } from "../../types/question";
 
 const faqs = [
   {

@@ -1,4 +1,4 @@
-import { useQuestionDetail } from "@/pages/comm/views/hook/useQuestionDetailContext";
+import { useQuestionDetail } from "@/pages/comm/hook/useQuestionDetailContext";
 import {
   ConcertAllInfo,
   ConcertSingleInfo,

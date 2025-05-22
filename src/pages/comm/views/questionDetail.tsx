@@ -1,9 +1,9 @@
 import { Breadcrumb } from "@/core/components/ui/breadcrumbs";
 import { Navigate, useSearchParams } from "react-router-dom";
-import { QuestionType, isValidQuestionType } from "./types/question";
+import { QuestionType, isValidQuestionType } from "../types/question";
 import QuestionDetailSidebar from "./components/questionDetailSidebar";
 import QuestionDetailContent from "./components/questionDetailContent";
-import { useQuestionDetail } from "./hook/useQuestionDetailContext";
+import { useQuestionDetail } from "../hook/useQuestionDetailContext";
 import QuestionDetailDropdown from "./components/QuestionDetailDropdown";
 
 export default function QuestionDetail() {
