@@ -1,6 +1,6 @@
 import { Button } from "@/core/components/ui/button";
 import { Link } from "react-router-dom";
-import { useQuestionDetail } from "../hook/useQuestionDetailContext";
+import { useQuestionDetail } from "../../hook/useQuestionDetailContext";
 export default function QuestionButtonGroup() {
   const { setActiveQuestion } = useQuestionDetail();
   const handleClick = () => {

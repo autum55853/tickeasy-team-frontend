@@ -1,7 +1,7 @@
 import { Text } from "@radix-ui/themes";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import { QuestionType } from "@/pages/comm/views/types/question";
+import { QuestionType } from "@/pages/comm/types/question";
 interface BreadcrumbItem {
   label: string;
   path: string;
