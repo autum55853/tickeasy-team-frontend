@@ -2,7 +2,7 @@ import { Button } from "@/core/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { useCreateOrganizer } from "../hook/useCreateOrganizerContext";
 
-export default function BannerSection() {
+export default function BannerSection({ companyCount }: { companyCount: number }) {
   const { isCreateOrganize, setIsCreateOrganize } = useCreateOrganizer();
   return (
     <div className="h-[150px] w-full bg-neutral-200/80 lg:h-[100px]">
@@ -13,7 +13,7 @@ export default function BannerSection() {
       >
         <div className="text-2xl font-bold">{isCreateOrganize ? "建立主辦方" : "選擇主辦方"}</div>
 
-        {!isCreateOrganize && (
+        {!isCreateOrganize && companyCount < 5 && (
           <Button className="bg-primary my-2 rounded-full text-white" onClick={() => setIsCreateOrganize(true)}>
             建立主辦方
             <PlusIcon />
