@@ -7,30 +7,90 @@ import { Checkbox } from "@/core/components/ui/checkbox";
 import documentAdd from "@/assets/images/documentAdd.jpg";
 import { useCreateOrganizer } from "../hook/useCreateOrganizerContext";
 import { TermsDialog } from "@/core/components/global/termsDialog";
+import { useRequest } from "@/core/hooks/useRequest";
+import { useToast } from "@/core/hooks/useToast";
+import { CreateOrganizeData } from "../types/company";
+
 // 定義表單驗證 schema
 const formSchema = z.object({
-  companyName: z.string().min(1, "公司名稱為必填"),
-  contactName: z.string().min(1, "聯絡人姓名為必填"),
-  companyAddress: z.string().min(1, "公司地址為必填"),
-  contactPhone: z.string().min(1, "聯絡人電話為必填"),
-  email: z
-    .string()
-    .email("請輸入有效的電子郵件")
-    .refine((val) => val.endsWith("@example.com"), {
-      message: "電子郵件必須是 @example.com 結尾",
-    }),
-  companyPhone: z
-    .string()
-    .min(9, "公司電話必須為9碼")
-    .max(9, "公司電話必須為9碼")
-    .regex(/^\d{9}$/, "公司電話必須為9碼且只能包含數字"),
-  websiteUrl: z.string().optional(),
+  orgName: z.string().min(1, "公司名稱為必填"),
+  orgContact: z.string().min(1, "聯絡人姓名為必填"),
+  orgAddress: z.string().min(1, "公司地址為必填"),
+  orgMobile: z.string().min(1, "聯絡人電話為必填"),
+  orgMail: z.string().email("請輸入有效的電子郵件"),
+  orgPhone: z.string().regex(/^0\d{1}-\d{7}$/, "公司電話必須為 0X-XXXXXXX 格式"),
+  orgWebsite: z.string().optional(),
   agreementService: z.boolean().refine((val) => val === true, {
     message: "請同意服務條款及隱私政策",
   }),
 });
 type FormValues = z.infer<typeof formSchema>;
+
+interface CreateOrganizeResponse {
+  organization: CreateOrganizeData;
+}
+
+type FormFieldName = keyof FormValues;
+
+const formItems: {
+  type: string;
+  id: FormFieldName;
+  label: string;
+  placeholder: string;
+  required?: boolean;
+}[] = [
+  {
+    type: "text",
+    id: "orgName",
+    label: "公司名稱",
+    placeholder: "想放假無限公司",
+    required: true,
+  },
+  {
+    type: "text",
+    id: "orgContact",
+    label: "聯絡人姓名",
+    placeholder: "小明",
+    required: true,
+  },
+  {
+    type: "text",
+    id: "orgAddress",
+    label: "公司地址",
+    placeholder: "台北市中山區XXXXX",
+    required: true,
+  },
+  {
+    type: "tel",
+    id: "orgMobile",
+    label: "聯絡人電話",
+    placeholder: "請輸入聯絡人電話",
+    required: true,
+  },
+  {
+    type: "email",
+    id: "orgMail",
+    label: "電子郵件",
+    placeholder: "abcdefg@xx.com",
+    required: true,
+  },
+  {
+    type: "tel",
+    id: "orgPhone",
+    label: "公司電話",
+    placeholder: "02-12345678",
+    required: true,
+  },
+  {
+    type: "text",
+    id: "orgWebsite",
+    label: "公司網站",
+    placeholder: "(選填)",
+  },
+];
+
 export default function FormCreateOrganize() {
+  const { toast } = useToast();
   const { setIsCreateOrganize } = useCreateOrganizer();
   const {
     register,
@@ -39,72 +99,48 @@ export default function FormCreateOrganize() {
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyName: "",
-      contactName: "",
-      companyAddress: "",
-      contactPhone: "",
-      email: "",
-      companyPhone: "",
-      websiteUrl: "",
+      orgName: "",
+      orgContact: "",
+      orgAddress: "",
+      orgMobile: "",
+      orgMail: "",
+      orgPhone: "",
+      orgWebsite: "",
       agreementService: false,
+    },
+  });
+  // 串接 建立舉辦者的API
+  const { useCreate: requestCreateOrganize } = useRequest({
+    queryKey: ["organizations"],
+    url: "/api/v1/organizations",
+  });
+
+  const requestCreateOrganizeMutation = requestCreateOrganize({
+    onSuccess: (response) => {
+      const res = response as CreateOrganizeResponse;
+      if (res.organization) {
+        toast({
+          title: "成功",
+          description: "建立成功",
+        });
+        setIsCreateOrganize(false);
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "建立失敗，請稍後再試",
+      });
     },
   });
   const onSubmit = (data: FormValues) => {
     console.log("Form Data:", data);
     console.log("Form Errors:", errors);
     // 在這裡處理表單提交邏輯
+    requestCreateOrganizeMutation.mutate(data);
   };
 
-  const formItems = [
-    {
-      type: "text",
-      id: "companyName",
-      label: "公司名稱",
-      placeholder: "想放假無限公司",
-      required: true,
-    },
-    {
-      type: "text",
-      id: "contactName",
-      label: "聯絡人姓名",
-      placeholder: "小明",
-      required: true,
-    },
-    {
-      type: "text",
-      id: "companyAddress",
-      label: "公司地址",
-      placeholder: "台北市中山區XXXXX",
-      required: true,
-    },
-    {
-      type: "tel",
-      id: "contactPhone",
-      label: "聯絡人電話",
-      placeholder: "請輸入聯絡人電話",
-      required: true,
-    },
-    {
-      type: "email",
-      id: "email",
-      label: "電子郵件",
-      placeholder: "abcdefg@xx.com",
-      required: true,
-    },
-    {
-      type: "tel",
-      id: "companyPhone",
-      label: "公司電話",
-      placeholder: "02-12345678",
-      required: true,
-    },
-    {
-      type: "text",
-      id: "websiteUrl",
-      label: "公司網站",
-      placeholder: "(選填)",
-    },
-  ];
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, ""); // 移除所有非數字字符
     if (value.length > 1) {
@@ -133,7 +169,7 @@ export default function FormCreateOrganize() {
                     {...register(item.id, { required: item.required })}
                     error={!!errors[item.id as keyof FormValues]}
                     errorMessage={errors[item.id as keyof FormValues]?.message}
-                    onChange={item.id === "companyPhone" ? handlePhoneChange : undefined}
+                    onChange={item.id === "orgPhone" ? handlePhoneChange : undefined}
                   />
                 </div>
               ))}
@@ -144,7 +180,6 @@ export default function FormCreateOrganize() {
                   <>
                     我已閱讀並同意
                     <TermsDialog
-                      title="服務條款"
                       trigger={
                         <Button variant="link" className="text-primary text-md h-auto p-0 hover:underline">
                           服務條款
@@ -154,7 +189,6 @@ export default function FormCreateOrganize() {
                     ></TermsDialog>
                     及
                     <TermsDialog
-                      title="隱私政策"
                       trigger={
                         <Button variant="link" className="text-primary text-md h-auto p-0 hover:underline">
                           隱私政策

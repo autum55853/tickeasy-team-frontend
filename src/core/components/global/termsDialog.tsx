@@ -3,9 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { TermService } from "./termService";
 import { TermPrivacy } from "./termPrivacy";
 interface TermsDialogProps {
-  title: string;
   trigger: React.ReactNode;
-  children: React.ReactNode;
+  type: "service" | "privacy";
 }
 const terms = {
   service: {
@@ -17,7 +16,7 @@ const terms = {
     content: <TermPrivacy />,
   },
 };
-export const TermsDialog: React.FC<TermsDialogProps> = ({ title, trigger, type }) => {
+export const TermsDialog: React.FC<TermsDialogProps> = ({ trigger, type }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
