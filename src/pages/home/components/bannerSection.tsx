@@ -1,20 +1,51 @@
-import Banner1 from "@/assets/images/banner1.jpg";
-import Banner2 from "@/assets/images/banner2.jpg";
-import Banner3 from "@/assets/images/banner3.jpg";
 import HomeCarousel from "./bannerCarousel";
+import { useRequest } from "@/core/hooks/useRequest";
+import { useToast } from "@/core/hooks/useToast";
+import { useState, useEffect } from "react";
+import { BannerData, BannerItem } from "../types/bannerSection";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 export default function BannerSection() {
-  // 前端要自己加上圖片索引 確保頁嵌更新一致
-  const bannerList = [
-    { id: 0, image: Banner1, title: "ONE OK ROCK《Luxury Disease》亞洲巡迴演唱會" },
-    { id: 1, image: Banner2, title: "第二個活動標題" },
-    { id: 2, image: Banner3, title: "第三個活動標題" },
-  ];
+  const { toast } = useToast();
+  const [bannerList, setBannerList] = useState<BannerItem[]>([]);
+
+  // 取得 Banner 列表
+  const { data, error, refetch } = useRequest<BannerData[]>({
+    queryKey: ["concerts", "banners"],
+    url: "/api/v1/concerts/banners",
+  }).useGet();
+
+  useEffect(() => {
+    if (data) {
+      // 前端要自己加上圖片索引 確保頁嵌更新一致，Key值要轉換(與CarouselItem的id一致)
+      const covertData = data.map((item, index) => {
+        return {
+          id: index,
+          image: item.imgBanner,
+          title: item.conTitle,
+        };
+      });
+      setBannerList(covertData);
+    }
+  }, [data]);
+
+  // 處理錯誤
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "發生錯誤，請稍後再試",
+      });
+    }
+  }, [error, toast]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   return (
     <section className="relative mx-0 w-full">
-      <div className="relative mx-1 sm:mx-8">
-        <HomeCarousel bannerList={bannerList} />
-      </div>
+      <div className="relative mx-1 sm:mx-8">{bannerList.length > 0 ? <HomeCarousel bannerList={bannerList} /> : <LoadingSpin />}</div>
     </section>
   );
 }

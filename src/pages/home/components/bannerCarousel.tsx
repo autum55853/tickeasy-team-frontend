@@ -4,11 +4,7 @@ import { Button } from "@/core/components/ui/button";
 import React from "react";
 import { CarouselApi } from "@/core/components/ui/Carousel";
 import { useNavigate } from "react-router-dom";
-interface BannerItem {
-  id: number;
-  image: string;
-  title: string;
-}
+import { BannerItem } from "../types/bannerSection";
 
 interface HomeCarouselProps {
   bannerList: BannerItem[];
