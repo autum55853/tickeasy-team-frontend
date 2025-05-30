@@ -11,6 +11,7 @@ import { useToast } from "@/core/hooks/useToast";
 import { CreateOrganizeData } from "../types/company";
 import { ConfirmDialog } from "@/core/components/global/confirmDialog";
 import { useNavigate } from "react-router-dom";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 // 定義表單驗證 schema
 const formSchema = z.object({
   orgName: z.string().min(1, "公司名稱為必填"),
@@ -170,9 +171,7 @@ export default function CompanyInfoSection({
     <div className="mx-auto h-full w-full">
       <div className="border-grey-500 rounded-xl border-2 p-8 lg:p-12">
         {isLoading ? (
-          <div className="flex h-40 items-center justify-center">
-            <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
-          </div>
+          <LoadingSpin />
         ) : (
           <>
             <div className="flex justify-between">

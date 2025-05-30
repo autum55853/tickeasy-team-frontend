@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { CompanyData } from "../types/company";
-
+import LoadingSpin from "@/core/components/global/loadingSpin";
 interface CompanyResponse {
   organizations: CompanyData[];
 }
@@ -57,11 +57,7 @@ function PageContent() {
 
   const renderContent = () => {
     if (isLoading) {
-      return (
-        <div className="flex h-40 items-center justify-center">
-          <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
-        </div>
-      );
+      return <LoadingSpin />;
     }
     if (isCreateOrganize) {
       return <CreateOrganizer />;

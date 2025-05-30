@@ -11,7 +11,7 @@ export default function CategorySelect({ options, selectedCategory, setSelectedC
   return (
     <div className="mx-2 flex w-full max-w-[400px] items-center justify-center rounded-lg bg-slate-100 py-2">
       <Select
-        value={selectedCategory?.value}
+        value={selectedCategory?.value || ""}
         onValueChange={(value) => {
           const selected = options.find((option) => option.value === value) || null;
           setSelectedCategory(selected);

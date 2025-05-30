@@ -1,10 +1,3 @@
-export interface TrendCardProps {
-  title: string;
-  image: string;
-  bgImage: string;
-  description: string;
-  link: string;
-}
 interface SessionData {
   sessionId: string;
   concertId: string;
@@ -13,12 +6,18 @@ interface SessionData {
   sessionEnd: string;
   sessionTitle: string;
 }
-export interface TrendData {
+export interface BannerData {
   concertId: string;
   conTitle: string;
   conIntroduction: string;
   imgBanner: string;
   visitCount: number;
-  promotion: string | null;
+  promotion: null;
   sessions: SessionData[];
+}
+
+export interface BannerItem {
+  id: number;
+  image: string;
+  title: string;
 }
