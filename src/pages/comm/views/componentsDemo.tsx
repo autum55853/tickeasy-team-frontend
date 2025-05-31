@@ -5,6 +5,7 @@ import { useToast } from "@/core/hooks/useToast";
 import { Button } from "@/core/components/ui/button";
 import { Toaster } from "@/core/components/ui/toaster";
 import { ConfirmDialog } from "@/core/components/global/confirmDialog";
+import LexicalEditor from "@/core/components/global/lexicalEditor";
 
 const TOTAL_ITEMS = 200; // 假設總共有N筆資料
 const ITEMS_PER_PAGE = 10;
@@ -95,6 +96,16 @@ export default function PaginationDemo() {
           <div className="bg-card rounded-lg p-4 shadow-sm">
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={goToPage} />
           </div>
+        </div>
+
+        {/* LexicalEditor Demo Section */}
+        <div className="w-full max-w-2xl space-y-4">
+          <h2 className="text-xl font-semibold">Rich Text Editor Demo</h2>
+          <LexicalEditor
+            onChange={(content) => console.log("Editor content:", content)}
+            placeholder="Start writing your content here..."
+            className="min-h-[200px] rounded-lg border bg-white p-4"
+          />
         </div>
       </div>
       <Toaster />
