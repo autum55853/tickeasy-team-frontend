@@ -7,11 +7,13 @@ import { useMemo } from "react";
 
 export default function LastestSection({ rawConcertList }: { rawConcertList: RawConertData[] }) {
   const data = useMemo(() => {
-    const rawData = rawConcertList.sort((a, b) => {
-      const dateA = new Date(a.eventStartDate);
-      const dateB = new Date(b.eventStartDate);
-      return dateA.getTime() - dateB.getTime();
-    });
+    const rawData = rawConcertList
+      .sort((a, b) => {
+        const dateA = new Date(a.eventStartDate);
+        const dateB = new Date(b.eventStartDate);
+        return dateA.getTime() - dateB.getTime();
+      })
+      .slice(0, 9); // 只取前9筆;
     return rawData.map((item, index) => {
       return {
         idx: index,
@@ -49,7 +51,7 @@ export default function LastestSection({ rawConcertList }: { rawConcertList: Raw
           className="absolute top-0 left-1/2 z-0 h-full min-w-[1200px] -translate-x-1/2 scale-x-[1.2] scale-y-[1.1] object-cover lg:min-h-[1050px]"
         />
         {/* cardContainer */}
-        <div className="mx-auto mt-16 grid w-[96%] max-w-[1600px] grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="mx-auto mt-20 grid w-[96%] max-w-[1300px] grid-cols-1 gap-4 lg:grid-cols-3">
           {data.map((item) => (
             <LastestCard key={item.id} {...item} />
           ))}
