@@ -1,49 +1,120 @@
 import MobileTitle from "./mobileTitle";
 import CategorySelect from "./CategorySelect";
-import { CategoryOptions } from "../types/CategoryOptions";
-import { useState } from "react";
+import { CategoryOptions, MusicTag } from "../types/CategoryOptions";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/core/components/ui/button";
 import CategoryTab from "./CategoryTab";
-import { CategoryDemoApiData } from "./CategoryDemoApiData";
-import { CategoryCardProps } from "../types/CategoryCard";
 import CategoryCard from "./CategoryCard";
 import { useNavigate } from "react-router-dom";
-export default function CategorySection() {
+import { RawConertData } from "../types/RawConertData";
+import { useRequest } from "@/core/hooks/useRequest";
+import { useToast } from "@/core/hooks/useToast";
+
+const musicTagClassify: Record<string, CategoryOptions> = {
+  rock: {
+    label: "搖滾音樂",
+    value: "A",
+    subLabel: "Rock",
+  },
+  electronic: {
+    label: "電子音樂",
+    value: "B",
+    subLabel: "Electronic",
+  },
+  "hip-hop/rap": {
+    label: "嘻哈/饒舌",
+    value: "C",
+    subLabel: "Hip-Hop/Rap",
+  },
+  "jazz/blues": {
+    label: "爵士/藍調",
+    value: "D",
+    subLabel: "Jazz/Blues",
+  },
+  "classical/symphony": {
+    label: "古典/交響樂",
+    value: "E",
+    subLabel: "Classical/Symphony",
+  },
+  others: {
+    label: "其他",
+    value: "F",
+    subLabel: "Others",
+  },
+};
+export default function CategorySection({ rawConcertList }: { rawConcertList: RawConertData[] }) {
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const options: CategoryOptions[] = [
-    {
-      label: "療癒系音樂",
-      value: "A",
-      subLabel: "Pop",
-    },
-    {
-      label: "搖滾音樂",
-      value: "B",
-      subLabel: "Rock",
-    },
-    {
-      label: "電子音樂",
-      value: "C",
-      subLabel: "Electronic",
-    },
-    {
-      label: "嘻哈/饒舌",
-      value: "D",
-      subLabel: "Hip-Hop/Rap",
-    },
-    {
-      label: "古典/交響樂",
-      value: "E",
-      subLabel: "Classical/Symphony",
-    },
-  ];
-  const [selectedCategory, setSelectedCategory] = useState<CategoryOptions | null>(options[0]);
+  const [options, setOptions] = useState<CategoryOptions[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryOptions | null>(null);
 
-  // 模擬的資料
-  const cardList: CategoryCardProps[] = [...CategoryDemoApiData()];
+  // 取得 Music Tag 列表
+  const {
+    data: musicTagsData,
+    error,
+    refetch,
+  } = useRequest<MusicTag[]>({
+    queryKey: ["music-tags"],
+    url: "/api/v1/concerts/music-tags",
+  }).useGet();
 
-  // 根據選中的類別過濾卡片
-  const filteredCards = cardList.filter((card) => card.type === selectedCategory?.value);
+  useEffect(() => {
+    if (musicTagsData) {
+      const covertOptions = musicTagsData
+        .map((item) => {
+          return musicTagClassify[item.musicTagName];
+        })
+        .filter(Boolean);
+      setOptions(covertOptions);
+      setSelectedCategory(covertOptions[0]);
+    }
+  }, [musicTagsData]);
+
+  // 處理錯誤
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "發生錯誤，請稍後再試",
+      });
+    }
+  }, [error, toast]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  const covertCardList = useMemo(() => {
+    if (!rawConcertList) {
+      return [];
+    }
+
+    const data = [...rawConcertList];
+
+    const mappedData = data.map((item) => {
+      return {
+        type: item.musicTagName,
+        title: item.conTitle,
+        image: item.imgBanner,
+        chips: [item.musicTagName, item.venueName],
+        link: `/concerts/${item.concertId}`,
+      };
+    });
+
+    return mappedData;
+  }, [rawConcertList]);
+
+  const cardList = useMemo(() => {
+    return covertCardList;
+  }, [covertCardList]);
+
+  const filteredCards = useMemo(() => {
+    if (!selectedCategory || !cardList.length) return [];
+    return cardList.filter((card) => {
+      return card.type === selectedCategory.subLabel.toLowerCase();
+    });
+  }, [selectedCategory, cardList]);
 
   return (
     <section className="mt-12 min-h-[100px] lg:mt-60">
@@ -54,14 +125,16 @@ export default function CategorySection() {
           <CategorySelect options={options} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         </div>
         {/* 電腦版 Tab */}
-        <div className="mt-8 hidden lg:block">
+        <div className="my-8 hidden lg:block">
           <CategoryTab tabs={options} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
         </div>
         {/* card content */}
         <div className="mx-4 mb-8 grid max-w-[1400px] grid-cols-2 gap-4 lg:mt-4 lg:grid-cols-3 xl:mx-auto">
-          {filteredCards.map((card, index) => (
-            <CategoryCard key={index} {...card} />
-          ))}
+          {filteredCards.length > 0 ? (
+            filteredCards.map((card) => <CategoryCard key={`${card.type}-${card.title}`} {...card} />)
+          ) : (
+            <div className="col-span-full text-center text-lg">目前沒有任何活動</div>
+          )}
         </div>
 
         {/* 搜尋按鈕 */}

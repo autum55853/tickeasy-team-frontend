@@ -4,11 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import "@/core/styles/global.css";
 import App from "./App.tsx";
 import "@/core/icons/register";
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Theme>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Theme>
   </StrictMode>
 );

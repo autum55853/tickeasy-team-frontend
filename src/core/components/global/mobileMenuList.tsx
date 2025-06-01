@@ -42,6 +42,9 @@ export default function MobileMenuList({
                 <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user")}>
                   會員中心
                 </li>
+                <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => navigate("/company")}>
+                  舉辦演唱會
+                </li>
                 <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/history")}>
                   查看參與的演唱會
                 </li>

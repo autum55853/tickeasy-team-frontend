@@ -204,3 +204,7 @@
 .lk {
   outline: 1px solid red;
 }
+
+.radix-themes {
+  --default-font-family: var(--font-mono);
+}

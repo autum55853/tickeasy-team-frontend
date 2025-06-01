@@ -21,7 +21,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       queryKey: id ? [...queryKey, id] : queryKey,
       queryFn: async () => {
         try {
-          const response = await axiosInstance.get<T[]>(id ? `${url}/${id}` : url);
+          const response = await axiosInstance.get<T>(id ? `${url}/${id}` : url);
           return response.data;
         } catch (error) {
           if (error instanceof AxiosError) {

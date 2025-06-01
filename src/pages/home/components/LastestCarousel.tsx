@@ -10,7 +10,7 @@ interface LastestCarouselProps {
 
 export default function LastestCarousel({ cardList }: LastestCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
-  const [activeIndex, setActiveIndex] = React.useState(cardList[0].idx);
+  const [activeIndex, setActiveIndex] = React.useState(cardList[0]?.idx);
   // 添加計時器的 ref
   const autoplayRef = React.useRef<NodeJS.Timeout | null>(null);
 

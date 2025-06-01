@@ -1,6 +1,7 @@
 import { Input } from "@/core/components/ui/input";
 import { Button } from "@/core/components/ui/button";
 import { Checkbox } from "@/core/components/ui/checkbox";
+import { TermsDialog } from "@/core/components/global/termsDialog";
 import { useState, useEffect, useCallback } from "react";
 import { useEmailValidation } from "@/core/hooks/useEmailValidation";
 import { useRequest } from "@/core/hooks/useRequest";
@@ -190,7 +191,30 @@ export function SignupSection() {
       </div>
       <div className="flex w-full flex-col items-center justify-center">
         <Checkbox
-          label="我已閱讀並同意服務條款及隱私政策"
+          label={
+            <>
+              我已閱讀並同意
+              <TermsDialog
+                title="服務條款"
+                trigger={
+                  <Button variant="link" className="text-primary text-md h-auto p-0 hover:underline">
+                    服務條款
+                  </Button>
+                }
+                type="service"
+              ></TermsDialog>
+              及
+              <TermsDialog
+                title="隱私政策"
+                trigger={
+                  <Button variant="link" className="text-primary text-md h-auto p-0 hover:underline">
+                    隱私政策
+                  </Button>
+                }
+                type="privacy"
+              ></TermsDialog>
+            </>
+          }
           id="agreementService"
           required
           checked={signupData.agreementService}
