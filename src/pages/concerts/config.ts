@@ -4,7 +4,7 @@ export default {
   views: [
     {
       path: "/concerts",
-      component: lazy(() => import("./views/search")),
+      component: lazy(() => import("./views/allConcertsPage")),
       meta: { title: "演唱會收尋" },
       needLogin: false,
     },
