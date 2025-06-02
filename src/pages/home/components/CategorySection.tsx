@@ -10,38 +10,6 @@ import { RawConertData } from "../types/RawConertData";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 
-const musicTagClassify: Record<string, CategoryOptions> = {
-  rock: {
-    label: "搖滾音樂",
-    value: "A",
-    subLabel: "Rock",
-  },
-  electronic: {
-    label: "電子音樂",
-    value: "B",
-    subLabel: "Electronic",
-  },
-  "hip-hop/rap": {
-    label: "嘻哈/饒舌",
-    value: "C",
-    subLabel: "Hip-Hop/Rap",
-  },
-  "jazz/blues": {
-    label: "爵士/藍調",
-    value: "D",
-    subLabel: "Jazz/Blues",
-  },
-  "classical/symphony": {
-    label: "古典/交響樂",
-    value: "E",
-    subLabel: "Classical/Symphony",
-  },
-  others: {
-    label: "其他",
-    value: "F",
-    subLabel: "Others",
-  },
-};
 export default function CategorySection({ rawConcertList }: { rawConcertList: RawConertData[] }) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -62,7 +30,11 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
     if (musicTagsData) {
       const covertOptions = musicTagsData
         .map((item) => {
-          return musicTagClassify[item.musicTagName];
+          return {
+            label: item.musicTagName,
+            value: item.musicTagName,
+            subLabel: item.subLabel,
+          };
         })
         .filter(Boolean);
       setOptions(covertOptions);
@@ -111,9 +83,12 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
 
   const filteredCards = useMemo(() => {
     if (!selectedCategory || !cardList.length) return [];
-    return cardList.filter((card) => {
-      return card.type === selectedCategory.subLabel.toLowerCase();
-    });
+    console.log(" filteredCards cardList", cardList, "selectedCategory", selectedCategory);
+    return cardList
+      .filter((card) => {
+        return card.type === selectedCategory.value;
+      })
+      .slice(0, 6);
   }, [selectedCategory, cardList]);
 
   return (

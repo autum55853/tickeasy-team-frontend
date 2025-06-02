@@ -3,7 +3,13 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  overflow-x: hidden;
+}
 :root {
   --font-mono: "Noto Sans TC", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --background: #ffffff;
@@ -146,6 +152,8 @@
     @apply bg-background text-foreground;
     font-size: var(--text-body);
     line-height: 1.5;
+    height: 100%;
+    overflow-y: hidden;
   }
 
   /* Hide scrollbar but keep scrolling functionality */
@@ -201,6 +209,7 @@
     line-height: 1.4;
   }
 }
+
 .lk {
   outline: 1px solid red;
 }
