@@ -14,13 +14,16 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpin from "@/core/components/global/loadingSpin";
 // 定義表單驗證 schema
 const formSchema = z.object({
-  orgName: z.string().min(1, "公司名稱為必填"),
-  orgContact: z.string().min(1, "聯絡人姓名為必填"),
-  orgAddress: z.string().min(1, "公司地址為必填"),
-  orgMobile: z.string().min(1, "聯絡人電話為必填"),
+  orgName: z.string().trim().min(1, "公司名稱為必填"),
+  orgContact: z.string().trim().min(1, "聯絡人姓名為必填"),
+  orgAddress: z.string().trim().min(1, "公司地址為必填"),
+  orgMobile: z.string().trim().min(1, "聯絡人電話為必填"),
   orgMail: z.string().email("請輸入有效的電子郵件"),
-  orgPhone: z.string().regex(/^0\d{1}-\d{7}$/, "公司電話必須為 0X-XXXXXXX 格式"),
-  orgWebsite: z.string().optional(),
+  orgPhone: z
+    .string()
+    .trim()
+    .regex(/^0\d{1}-\d{9,10}$/, "必須為 0X-XXXXXXX 格式, 共10碼或11碼"),
+  orgWebsite: z.string().trim().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
