@@ -10,7 +10,9 @@ export default function ConcertCard(data: ConcertCardProps) {
           <img src={data.image} alt={data.title} className="h-full w-full object-cover" />
         </div>
         <div className="h-[30%] w-full space-y-1 px-4 py-4">
-          <p className="text-base text-neutral-600">{data.date}</p>
+          <p className="text-base text-neutral-600">
+            {data.startDate} - {data.endDate}
+          </p>
           <p className="text-lg font-bold">{data.title}</p>
           <p className="text-primary align-center flex items-center text-sm">
             <Icon icon="my-map-pin" className="mt-1 mr-1" />
@@ -22,7 +24,6 @@ export default function ConcertCard(data: ConcertCardProps) {
             >
               {data.location}
             </a>
-            <span className="text-sm text-neutral-600">{data.category}</span>
           </p>
           <div
             onClick={() => navigate(`/concerts/${data.id}`)}
