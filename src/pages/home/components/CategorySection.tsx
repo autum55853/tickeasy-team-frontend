@@ -83,7 +83,6 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
 
   const filteredCards = useMemo(() => {
     if (!selectedCategory || !cardList.length) return [];
-    console.log(" filteredCards cardList", cardList, "selectedCategory", selectedCategory);
     return cardList
       .filter((card) => {
         return card.type === selectedCategory.value;
@@ -92,8 +91,8 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
   }, [selectedCategory, cardList]);
 
   return (
-    <section className="mt-12 min-h-[100px] lg:mt-60">
-      <div className="mx-auto lg:w-[96%]">
+    <section className="mt-12 min-h-[80vh] lg:mt-20">
+      <div className="mx-auto h-full lg:w-[96%]">
         <MobileTitle title="活動分類" subtitle="Event Categories" deskTopShow={true} />
         {/* 手機 select */}
         <div className="my-10 flex items-center justify-center lg:hidden">

@@ -64,7 +64,7 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         <CarouselContent>
           {bannerList.map((banner) => (
             <CarouselItem key={banner.id} className="w-full">
-              <CustomCarouselItem imageUrl={banner.image} title={banner.title} />
+              <CustomCarouselItem imageUrl={banner.image} title={banner.title} description={banner.description} />
             </CarouselItem>
           ))}
         </CarouselContent>
