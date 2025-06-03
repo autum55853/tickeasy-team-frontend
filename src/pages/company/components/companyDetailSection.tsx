@@ -98,8 +98,12 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
           </Button>
         </div>
         <div className="col-span-3 lg:col-span-2">
-          {activeTab === "companyInfo" && <CompanyInfoSection companyInfoData={companyInfoData} handleGoToConcertList={handleGoToConcertList} />}
-          {activeTab === "concertList" && <CompanyConcertSection />}
+          {companyInfoData && (
+            <>
+              {activeTab === "companyInfo" && <CompanyInfoSection companyInfoData={companyInfoData} handleGoToConcertList={handleGoToConcertList} />}
+              {activeTab === "concertList" && <CompanyConcertSection companyInfoData={companyInfoData} />}
+            </>
+          )}
         </div>
         <div className="col-span-3 mt-4 block lg:hidden">
           <Button

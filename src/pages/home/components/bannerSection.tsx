@@ -22,6 +22,7 @@ export default function BannerSection() {
           id: index,
           image: item.imgBanner,
           title: item.conTitle,
+          description: item.conIntroduction,
         };
       });
       setBannerList(covertData);

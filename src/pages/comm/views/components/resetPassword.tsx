@@ -15,10 +15,10 @@ export function ResetPassword({ passwordError }: ResetPasswordProps) {
   const handleSetItems = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     if (id === "newPassword") {
-      setPassword(value);
-      checkPasswordFormat(value);
+      setPassword(value.trim());
+      checkPasswordFormat(value.trim());
     } else if (id === "reNewPassword") {
-      setConfirmPassword(value);
+      setConfirmPassword(value.trim());
     }
     setResetPasswordData((prev) => ({
       ...prev,

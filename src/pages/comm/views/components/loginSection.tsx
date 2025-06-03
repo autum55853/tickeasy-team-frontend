@@ -79,7 +79,11 @@ export function LoginSection() {
           id="account"
           placeholder="輸入帳號(Email)"
           value={email}
-          onBlur={() => setTouched(true)}
+          onBlur={(e) => {
+            // 在失去焦點時進行 trim
+            handleEmailChange(e.target.value.trim());
+            setTouched(true);
+          }}
           onChange={(e) => {
             handleEmailChange(e.target.value);
             setTouched(true);

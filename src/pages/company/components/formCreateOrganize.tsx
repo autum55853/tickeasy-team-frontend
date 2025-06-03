@@ -13,13 +13,16 @@ import { CreateOrganizeData } from "../types/company";
 
 // 定義表單驗證 schema
 const formSchema = z.object({
-  orgName: z.string().min(1, "公司名稱為必填"),
-  orgContact: z.string().min(1, "聯絡人姓名為必填"),
-  orgAddress: z.string().min(1, "公司地址為必填"),
-  orgMobile: z.string().min(1, "聯絡人電話為必填"),
-  orgMail: z.string().email("請輸入有效的電子郵件"),
-  orgPhone: z.string().regex(/^0\d{1}-\d{7}$/, "公司電話必須為 0X-XXXXXXX 格式"),
-  orgWebsite: z.string().optional(),
+  orgName: z.string().trim().min(1, "公司名稱為必填"),
+  orgContact: z.string().trim().min(1, "聯絡人姓名為必填"),
+  orgAddress: z.string().trim().min(1, "公司地址為必填"),
+  orgMobile: z.string().trim().min(1, "聯絡人電話為必填"),
+  orgMail: z.string().trim().email("請輸入有效的電子郵件"),
+  orgPhone: z
+    .string()
+    .trim()
+    .regex(/^0\d{1}-\d{9,10}$/, "必須為 0X-XXXXXXX 格式, 共10碼或11碼"),
+  orgWebsite: z.string().trim().optional(),
   agreementService: z.boolean().refine((val) => val === true, {
     message: "請同意服務條款及隱私政策",
   }),
@@ -135,8 +138,6 @@ export default function FormCreateOrganize() {
     },
   });
   const onSubmit = (data: FormValues) => {
-    console.log("Form Data:", data);
-    console.log("Form Errors:", errors);
     // 在這裡處理表單提交邏輯
     requestCreateOrganizeMutation.mutate(data);
   };

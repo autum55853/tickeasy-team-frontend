@@ -40,9 +40,14 @@ export default function Login() {
             label=""
             id="email"
             value={email}
+            onBlur={(e) => {
+              setEmail(e.target.value.trim());
+              context?.setEmail?.(e.target.value.trim());
+              setTouched(true);
+            }}
             onChange={(e) => {
-              setEmail(e.target.value);
-              context?.setEmail?.(e.target.value);
+              setEmail(e.target.value.trim());
+              context?.setEmail?.(e.target.value.trim());
               setTouched(true);
             }}
             placeholder="請輸入註冊信箱"

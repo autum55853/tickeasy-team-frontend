@@ -1,7 +1,8 @@
 export interface ConcertCardProps {
   idx: number;
   id: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   title: string;
   image: string;
   location: string;
