@@ -13,7 +13,8 @@ export default {
       path: "/companyDetail",
       component: lazy(() => import("./views/companyDetail")),
       meta: { title: "公司詳細資訊" },
-      needLogin: true,
+      // needLogin: true,
+      needLogin: false,
     },
   ],
 };
