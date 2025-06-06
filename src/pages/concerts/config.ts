@@ -9,8 +9,7 @@ export default {
       needLogin: false,
     },
     {
-      // path: "/concerts/:id",
-      path: "/concert/test",
+      path: "/concerts/:concertId",
       component: lazy(() => import("./views/singleConcertPage")),
       meta: { title: "演唱會詳細資訊" },
       needLogin: false,
