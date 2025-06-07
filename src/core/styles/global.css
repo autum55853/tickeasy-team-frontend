@@ -3,13 +3,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-html,
-body,
-#root,
-.app {
-  height: 100%;
-  overflow-x: hidden;
-}
+
 :root {
   --font-mono: "Noto Sans TC", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --background: #ffffff;
@@ -209,11 +203,43 @@ body,
     line-height: 1.4;
   }
 }
-
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  overflow-x: hidden;
+}
 .lk {
   outline: 1px solid red;
 }
 
 .radix-themes {
   --default-font-family: var(--font-mono);
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
 }

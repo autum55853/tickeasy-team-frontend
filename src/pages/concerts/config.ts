@@ -5,7 +5,7 @@ export default {
     {
       path: "/concerts",
       component: lazy(() => import("./views/allConcertsPage")),
-      meta: { title: "演唱會收尋" },
+      meta: { title: "演唱會搜尋" },
       needLogin: false,
     },
     {
@@ -25,6 +25,19 @@ export default {
       component: lazy(() => import("./views/createConSessionsAndTicketsPage")),
       meta: { title: "建立演唱會-設定場次及票種" },
       needLogin: false,
+    },
+    {
+      // path: "/concert/buyTicket/:id",
+      path: "/concert/buyTicket/test",
+      component: lazy(() => import("./views/buyTickerPage")),
+      meta: { title: "購買演唱會票券" },
+      needLogin: true,
+    },
+    {
+      path: "/concert/paymentResult",
+      component: lazy(() => import("./views/paymentResultPage")),
+      meta: { title: "購買演唱會票券結果" },
+      needLogin: true,
     },
   ],
 };
