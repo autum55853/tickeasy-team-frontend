@@ -5,7 +5,7 @@ import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
 import { Button } from "@/core/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import "@/core/styles/singleConcertPage.css";
-import { ConcertResponse } from "@/pages/concerts/types/concert";
+import { ConcertResponse } from "@/pages/comm/types/Concert";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 

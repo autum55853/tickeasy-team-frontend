@@ -1,74 +1,89 @@
 import { useState } from "react";
 import Footer from "@/core/components/global/footer";
 import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
-import { Upload } from "lucide-react";
 import Header from "@/core/components/global/header";
 import { Button } from "@/core/components/ui/button";
 import { Pencil, Trash2, Save, Calendar } from "lucide-react";
 import { useConcertDraftStore } from "../store/useConcertDraftStore";
 import { useNavigate } from "react-router-dom";
-
-type Ticket = {
-  id: number;
-  name: string;
-  saleStart: string; // ISO string or "YYYY-MM-DDTHH:mm"
-  saleEnd: string;
-  price: string;
-  quantity: string;
-  entryMethod: string;
-  ticketType: string;
-  refundPolicy: string;
-};
-type Session = {
-  id: number;
-  name: string;
-  date: string; // ISO string or "YYYY-MM-DDTHH:mm"
-  tickets: Ticket[];
-};
+import { useSeattableUpload } from "../hook/useSeattableUpload";
+import { Session, TicketType } from "@/pages/comm/types/Concert";
+import { DateTimePicker } from "@/core/components/ui/datetimePicker";
+import dayjs from "dayjs";
+import { TicketTypeTable } from "../components/TicketTypeTable";
+import { useSaveDraft } from "../hook/useSaveDraft";
 
 export default function CreateConSessionsAndTicketsPage() {
-  const { sessions, setSessions, updateSession } = useConcertDraftStore();
-  const [expandedSessionId, setExpandedSessionId] = useState<number | null>(null);
-  const [editingSessionId, setEditingSessionId] = useState<number | null>(null);
-  const [editBuffer, setEditBuffer] = useState<{ name: string; date: string }>({ name: "", date: "" });
-  const [expandedTicketId, setExpandedTicketId] = useState<number | null>(null);
-  const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
-  const [ticketEditBuffer, setTicketEditBuffer] = useState<Partial<Ticket>>({});
+  const { sessions } = useConcertDraftStore();
+  const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [editBuffer, setEditBuffer] = useState<{ sessionTitle: string; sessionDate: string; sessionStart: string; sessionEnd: string }>({
+    sessionTitle: "",
+    sessionDate: "",
+    sessionStart: "",
+    sessionEnd: "",
+  });
+  const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
+  const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
+  const [ticketEditBuffer, setTicketEditBuffer] = useState<Partial<TicketType>>({});
   const navigate = useNavigate();
+  const { handleUploadSeattable } = useSeattableUpload();
+  const { handleSaveDraft, handleSaveSession, handleTicketSave, handleAddSession, handleAddTicketType, handleDeleteSession, handleDeleteTicket } =
+    useSaveDraft();
 
   const handleEdit = (s: Session) => {
-    setEditingSessionId(s.id);
-    setEditBuffer({ name: s.name, date: s.date });
+    setEditingSessionId(s.sessionId);
+    setEditBuffer({
+      sessionTitle: s.sessionTitle,
+      sessionDate: s.sessionDate,
+      sessionStart: s.sessionStart,
+      sessionEnd: s.sessionEnd,
+    });
   };
 
-  const handleSave = (id: number) => {
-    const session = sessions.find((s) => s.id === id);
-    if (!session) return;
-
-    updateSession({
-      ...session,
-      name: editBuffer.name,
-      date: editBuffer.date,
-    });
+  const handleSave = (id: string) => {
+    handleSaveSession(id, editBuffer);
     setEditingSessionId(null);
   };
 
-  const handleTicketEdit = (t: Ticket) => {
-    setEditingTicketId(t.id);
-    setTicketEditBuffer({ ...t });
+  const handleTicketEdit = (t: TicketType) => {
+    setEditingTicketId(t.ticketTypeId);
+    setTicketEditBuffer({
+      ticketTypeId: t.ticketTypeId,
+      concertSessionId: t.concertSessionId,
+      ticketTypeName: t.ticketTypeName,
+      sellBeginDate: t.sellBeginDate,
+      sellEndDate: t.sellEndDate,
+      ticketTypePrice: t.ticketTypePrice,
+      totalQuantity: t.totalQuantity,
+      entranceType: t.entranceType,
+      ticketBenefits: t.ticketBenefits,
+      ticketRefundPolicy: t.ticketRefundPolicy,
+    });
   };
 
-  const handleTicketSave = (sessionId: number, ticketId: number) => {
-    const session = sessions.find((s) => s.id === sessionId);
-    if (!session) return;
-
-    const updatedTickets = session.tickets.map((t) => (t.id === ticketId ? { ...t, ...ticketEditBuffer } : t));
-
-    updateSession({
-      ...session,
-      tickets: updatedTickets,
-    });
+  const handleTicketSaveWrapper = (sessionId: string, ticketId: string) => {
+    handleTicketSave(sessionId, ticketId, ticketEditBuffer);
     setEditingTicketId(null);
+  };
+
+  const handleAddSessionWrapper = () => {
+    const newId = handleAddSession();
+    setEditingSessionId(newId);
+  };
+
+  const handleAddTicketTypeWrapper = (sessionId: string) => {
+    const newTicketId = handleAddTicketType(sessionId);
+    setEditingTicketId(newTicketId);
+    setExpandedTicketId(newTicketId);
+  };
+
+  const handleDeleteSessionWrapper = (sessionId: string) => {
+    handleDeleteSession(sessionId);
+  };
+
+  const handleDeleteTicketWrapper = (sessionId: string, ticketId: string) => {
+    handleDeleteTicket(sessionId, ticketId);
   };
 
   return (
@@ -90,7 +105,7 @@ export default function CreateConSessionsAndTicketsPage() {
         <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
           {/* 新增場次 */}
           <div className="absolute top-8 right-8">
-            <Button variant="outline" className="rounded border border-[#2986cc] font-bold text-[#2986cc]">
+            <Button variant="outline" className="rounded border border-[#2986cc] font-bold text-[#2986cc]" onClick={handleAddSessionWrapper}>
               新增場次
             </Button>
           </div>
@@ -108,31 +123,37 @@ export default function CreateConSessionsAndTicketsPage() {
               <tbody>
                 {sessions.map((s, idx) => (
                   <>
-                    <tr key={s.id} className="border-b">
+                    <tr key={s.sessionId} className="border-b">
                       <td className="py-3">{String(idx + 1).padStart(2, "0")}</td>
                       <td>
-                        {editingSessionId === s.id ? (
+                        {editingSessionId === s.sessionId ? (
                           <input
                             className="w-[120px] rounded border px-4 py-1 text-center"
-                            value={editBuffer.name}
-                            onChange={(e) => setEditBuffer((buf) => ({ ...buf, name: e.target.value }))}
+                            value={editBuffer.sessionTitle}
+                            onChange={(e) => setEditBuffer((buf) => ({ ...buf, sessionTitle: e.target.value }))}
                           />
                         ) : (
-                          <span className="inline-block w-[120px] rounded border px-4 py-1 text-center">{s.name}</span>
+                          <span className="inline-block w-[120px] rounded border px-4 py-1 text-center">{s.sessionTitle}</span>
                         )}
                       </td>
                       <td>
-                        {editingSessionId === s.id ? (
-                          <input
-                            type="datetime-local"
-                            className="w-[200px] rounded border px-4 py-1"
-                            value={editBuffer.date}
-                            onChange={(e) => setEditBuffer((buf) => ({ ...buf, date: e.target.value }))}
+                        {editingSessionId === s.sessionId ? (
+                          <DateTimePicker
+                            date={editBuffer.sessionDate ? new Date(editBuffer.sessionDate) : null}
+                            setDate={(date) =>
+                              setEditBuffer((buf) => ({
+                                ...buf,
+                                sessionDate: date ? dayjs(date).format("YYYY/MM/DD HH:mm") : "",
+                              }))
+                            }
+                            placeholder="選擇日期時間"
+                            inputClassName="w-[200px]"
+                            format="YYYY-MM-DD HH:mm"
                           />
                         ) : (
-                          <span className="inline-flex w-[200px] items-center rounded border px-4 py-1">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            {s.date}
+                          <span className="inline-flex w-[200px] items-center justify-around rounded border px-4 py-1">
+                            <Calendar className="h-4 w-4" />
+                            {s.sessionDate}
                           </span>
                         )}
                       </td>
@@ -141,12 +162,12 @@ export default function CreateConSessionsAndTicketsPage() {
                           <Button
                             variant="outline"
                             className="border-black px-3 py-1 text-black"
-                            onClick={() => setExpandedSessionId(expandedSessionId === s.id ? null : s.id)}
+                            onClick={() => setExpandedSessionId(expandedSessionId === s.sessionId ? null : s.sessionId)}
                           >
-                            票種設定 <span className="ml-1">{expandedSessionId === s.id ? "⌃" : "⌄"}</span>
+                            票種設定 <span className="ml-1">{expandedSessionId === s.sessionId ? "⌃" : "⌄"}</span>
                           </Button>
-                          {editingSessionId === s.id ? (
-                            <Button variant="ghost" className="p-2" onClick={() => handleSave(s.id)}>
+                          {editingSessionId === s.sessionId ? (
+                            <Button variant="ghost" className="p-2" onClick={() => handleSave(s.sessionId)}>
                               <Save className="h-5 w-5" />
                             </Button>
                           ) : (
@@ -154,167 +175,37 @@ export default function CreateConSessionsAndTicketsPage() {
                               <Pencil className="h-5 w-5" />
                             </Button>
                           )}
-                          <Button variant="ghost" className="p-2">
+                          <Button variant="ghost" className="p-2" onClick={() => handleDeleteSessionWrapper(s.sessionId)}>
                             <Trash2 className="h-5 w-5" />
                           </Button>
                         </div>
                       </td>
                     </tr>
-                    {expandedSessionId === s.id && (
+                    {expandedSessionId === s.sessionId && (
                       <tr>
-                        <td colSpan={4} className="p-0">
-                          {/* 票種表格 */}
-                          <div className="m-4 border border-black">
-                            <table className="w-full">
-                              <thead>
-                                <tr>
-                                  <th className="border-b p-2 text-left">票種名稱</th>
-                                  <th className="border-b p-2 text-left">販售時間</th>
-                                  <th className="border-b p-2 text-left">價格</th>
-                                  <th className="border-b p-2 text-left">數量</th>
-                                  <th className="border-b p-2"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {s.tickets.map((t) => (
-                                  <>
-                                    <tr key={t.id}>
-                                      <td className="p-2 text-blue-700">
-                                        {editingTicketId === t.id ? (
-                                          <input
-                                            type="text"
-                                            className="w-[80px] rounded border px-2 py-1"
-                                            value={ticketEditBuffer.name}
-                                            onChange={(e) => setTicketEditBuffer((buf) => ({ ...buf, name: e.target.value }))}
-                                          />
-                                        ) : (
-                                          t.name
-                                        )}
-                                      </td>
-                                      <td className="p-2">
-                                        {editingTicketId === t.id ? (
-                                          <div className="flex gap-2">
-                                            <input
-                                              type="datetime-local"
-                                              className="w-[150px] rounded border px-2 py-1"
-                                              value={ticketEditBuffer.saleStart}
-                                              onChange={(e) => setTicketEditBuffer((buf) => ({ ...buf, saleStart: e.target.value }))}
-                                            />
-                                            <span>~</span>
-                                            <input
-                                              type="datetime-local"
-                                              className="w-[150px] rounded border px-2 py-1"
-                                              value={ticketEditBuffer.saleEnd}
-                                              onChange={(e) => setTicketEditBuffer((buf) => ({ ...buf, saleEnd: e.target.value }))}
-                                            />
-                                          </div>
-                                        ) : (
-                                          `${t.saleStart} ~ ${t.saleEnd}`
-                                        )}
-                                      </td>
-                                      <td className="p-2">
-                                        {editingTicketId === t.id ? (
-                                          <input
-                                            type="text"
-                                            className="w-[80px] rounded border px-2 py-1"
-                                            value={ticketEditBuffer.price}
-                                            onChange={(e) => setTicketEditBuffer((buf) => ({ ...buf, price: e.target.value }))}
-                                          />
-                                        ) : (
-                                          <>NT$ {t.price}</>
-                                        )}
-                                      </td>
-                                      <td className="p-2">
-                                        {editingTicketId === t.id ? (
-                                          <input
-                                            type="text"
-                                            className="w-[60px] rounded border px-2 py-1"
-                                            value={ticketEditBuffer.quantity}
-                                            onChange={(e) => setTicketEditBuffer((buf) => ({ ...buf, quantity: e.target.value }))}
-                                          />
-                                        ) : (
-                                          t.quantity
-                                        )}
-                                      </td>
-                                      <td className="flex items-center gap-2 p-2">
-                                        {editingTicketId === t.id ? (
-                                          <Button variant="ghost" className="p-2" onClick={() => handleTicketSave(s.id, t.id)}>
-                                            <Save className="h-5 w-5" />
-                                          </Button>
-                                        ) : (
-                                          <Button variant="ghost" className="p-2" onClick={() => handleTicketEdit(t)}>
-                                            <Pencil className="h-5 w-5" />
-                                          </Button>
-                                        )}
-                                        <Button variant="ghost" className="p-2">
-                                          <Trash2 className="h-5 w-5" />
-                                        </Button>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td colSpan={5} className="border-t p-2">
-                                        <div
-                                          className="mb-1 cursor-pointer font-medium select-none"
-                                          onClick={() => setExpandedTicketId(expandedTicketId === t.id ? null : t.id)}
-                                        >
-                                          票券資訊 <span className="ml-1">{expandedTicketId === t.id ? "⌃" : "⌄"}</span>
-                                        </div>
-                                        {expandedTicketId === t.id && (
-                                          <div className="border p-2">
-                                            {editingTicketId === t.id ? (
-                                              <div className="space-y-2">
-                                                <div>
-                                                  <label className="block text-sm font-medium">* 入場方式：</label>
-                                                  <input
-                                                    className="w-full rounded border px-2 py-1"
-                                                    value={ticketEditBuffer.entryMethod}
-                                                    onChange={(e) =>
-                                                      setTicketEditBuffer((buf: Partial<Ticket>) => ({ ...buf, entryMethod: e.target.value }))
-                                                    }
-                                                  />
-                                                </div>
-                                                <div>
-                                                  <label className="block text-sm font-medium">* 票券類型：</label>
-                                                  <input
-                                                    className="w-full rounded border px-2 py-1"
-                                                    value={ticketEditBuffer.ticketType}
-                                                    onChange={(e) =>
-                                                      setTicketEditBuffer((buf: Partial<Ticket>) => ({ ...buf, ticketType: e.target.value }))
-                                                    }
-                                                  />
-                                                </div>
-                                                <div>
-                                                  <label className="block text-sm font-medium">* 退換票須知：</label>
-                                                  <input
-                                                    className="w-full rounded border px-2 py-1"
-                                                    value={ticketEditBuffer.refundPolicy}
-                                                    onChange={(e) =>
-                                                      setTicketEditBuffer((buf: Partial<Ticket>) => ({ ...buf, refundPolicy: e.target.value }))
-                                                    }
-                                                  />
-                                                </div>
-                                              </div>
-                                            ) : (
-                                              <div className="space-y-1">
-                                                <div>* 入場方式：{t.entryMethod}</div>
-                                                <div>* 票券類型：{t.ticketType}</div>
-                                                <div>* 退換票須知：{t.refundPolicy}</div>
-                                              </div>
-                                            )}
-                                          </div>
-                                        )}
-                                      </td>
-                                    </tr>
-                                  </>
-                                ))}
-                              </tbody>
-                            </table>
-                            <div className="flex justify-end p-2">
-                              <Button variant="outline" className="border-black text-black">
-                                新增票種
-                              </Button>
-                            </div>
+                        <td colSpan={4} className="m-4">
+                          <div className="mb-4 flex flex-col items-center">
+                            {s.imgSeattable ? (
+                              <img src={s.imgSeattable} alt="座位圖" className="mb-2 h-32 w-auto rounded border object-contain" />
+                            ) : (
+                              <div className="my-4 text-gray-500">尚未上傳座位圖</div>
+                            )}
+                            <Button variant="outline" className="border-black text-black" onClick={() => handleUploadSeattable(s.sessionId)}>
+                              上傳座位圖
+                            </Button>
                           </div>
+                          <TicketTypeTable
+                            session={s}
+                            editingTicketId={editingTicketId}
+                            expandedTicketId={expandedTicketId}
+                            ticketEditBuffer={ticketEditBuffer}
+                            setTicketEditBuffer={setTicketEditBuffer}
+                            handleTicketEdit={handleTicketEdit}
+                            handleTicketSave={handleTicketSaveWrapper}
+                            handleDeleteTicket={handleDeleteTicketWrapper}
+                            handleAddTicketType={handleAddTicketTypeWrapper}
+                            setExpandedTicketId={setExpandedTicketId}
+                          />
                         </td>
                       </tr>
                     )}
@@ -327,7 +218,7 @@ export default function CreateConSessionsAndTicketsPage() {
               <Button variant="outline" className="rounded border border-black text-black" onClick={() => navigate("/concert/create/info")}>
                 上一步
               </Button>
-              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white">
+              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white" onClick={handleSaveDraft}>
                 儲存草稿
               </Button>
               <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white">

@@ -3,6 +3,7 @@ import { CompanyDetailData } from "../types/company";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/core/components/ui/tab";
 import CompanyConcertCard from "./companyConcertCard";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function CompanyConcertSection({ companyInfoData }: { companyInfoData: CompanyDetailData }) {
   // const companyInfoData = {
@@ -19,6 +20,7 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
   // };
 
   const [activeTab, setActiveTab] = useState("draft");
+  const navigate = useNavigate();
 
   return (
     <div className="mx-auto h-full w-full">
@@ -26,7 +28,7 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
         <div className="flex justify-between">
           <div className="text-2xl font-bold">{companyInfoData.orgName}</div>
           <div className="flex justify-end gap-4">
-            <Button type="submit" variant="outline" className="my-2 flex rounded-full lg:w-[100px]">
+            <Button type="submit" variant="outline" className="my-2 flex rounded-full lg:w-[100px]" onClick={() => navigate("/concert/create/info")}>
               辦演唱會
             </Button>
           </div>
