@@ -65,7 +65,7 @@ export default function Header() {
                 探索頁面
               </p>
               {isLogin && (
-                <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100" onClick={() => navigate("/user/history")}>
+                <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100" onClick={() => navigate("/user/about/history")}>
                   查看票券
                 </p>
               )}
