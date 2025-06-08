@@ -36,7 +36,7 @@ export default function PaymentResultSection() {
           <Button variant="outline" className="lg:w-1/3 lg:text-lg" onClick={() => navigate("/concerts")}>
             查看其他活動
           </Button>
-          <Button variant="outline" className="lgw-1/3 lg:text-lg" onClick={() => navigate("/user/history")}>
+          <Button variant="outline" className="lgw-1/3 lg:text-lg" onClick={() => navigate("/user/about/history")}>
             查看購買紀錄
           </Button>
         </div>

@@ -27,7 +27,7 @@ export default function MobileMenuList({
         {isLogin ? (
           /* 已登入 */
           <ul className="flex flex-col space-y-4">
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/history")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/about/history")}>
               查看票券
             </li>
             <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/concerts")}>
