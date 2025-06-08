@@ -6,10 +6,69 @@ import Header from "@/core/components/global/header";
 import { Button } from "@/core/components/ui/button";
 import { useConcertDraftStore } from "../store/useConcertDraftStore";
 import { useNavigate } from "react-router-dom";
+import { SingleDatePicker } from "@/core/components/ui/singleDatePicker";
+import dayjs from "dayjs";
+import { useToast } from "@/core/hooks/useToast";
+import { useSaveDraft } from "../hook/useSaveDraft";
 
 export default function CreateConInfoPage() {
   const { info, setInfo } = useConcertDraftStore();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { handleSaveDraft } = useSaveDraft();
+
+  const regions = ["北部", "南部", "東部", "中部", "離島", "海外"];
+  const musicTypes = ["流行音樂", "搖滾", "電子音樂", "嘻哈", "爵士藍調", "古典音樂", "其他"];
+
+  const handleFileChange = async (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      // 檢查檔案格式
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "錯誤",
+          description: "只支援 JPEG、PNG、GIF 或 WebP 格式",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 檢查檔案大小 (1MB = 1024 * 1024 bytes)
+      const maxSize = 1024 * 1024;
+      if (file.size > maxSize) {
+        toast({
+          title: "錯誤",
+          description: "檔案大小不能超過 1MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      try {
+        await useConcertDraftStore.getState().uploadImage(file, "CONCERT_BANNER");
+        toast({
+          title: "成功",
+          description: "圖片上傳成功",
+        });
+      } catch (error) {
+        toast({
+          title: "錯誤",
+          description: "圖片上傳失敗",
+          variant: "destructive",
+        });
+        console.error(error);
+      }
+    }
+  };
+
+  const handleUploadClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png,image/gif,image/webp";
+    input.onchange = handleFileChange;
+    input.click();
+  };
 
   return (
     <>
@@ -28,10 +87,19 @@ export default function CreateConInfoPage() {
 
       {/* 上傳主視覺圖片 */}
       <div className="flex items-center justify-center py-4">
-        <div className="flex h-[350px] w-[800px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
-          <Upload className="mb-4 h-12 w-12 text-blue-500" />
-          <div className="mb-1 text-lg font-medium text-gray-700">上傳主視覺圖片</div>
-          <div className="text-sm text-gray-500">(1080*540)4MB</div>
+        <div
+          className="flex h-[350px] w-[800px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50"
+          onClick={handleUploadClick}
+        >
+          {info.imgBanner ? (
+            <img src={info.imgBanner} alt="banner" className="h-full w-full rounded-lg object-cover" />
+          ) : (
+            <>
+              <Upload className="mb-4 h-12 w-12 text-blue-500" />
+              <div className="mb-1 text-lg font-medium text-gray-700">上傳主視覺圖片</div>
+              <div className="text-sm text-gray-500">(1080*540) 1MB</div>
+            </>
+          )}
         </div>
       </div>
 
@@ -42,34 +110,36 @@ export default function CreateConInfoPage() {
             <div>
               <div className="mb-4 flex flex-col md:flex-row md:items-center md:gap-8">
                 {/* 演唱會名稱 */}
-                <div className="mb-2 flex-1 md:mb-0">
-                  <label className="mb-1 block font-medium text-gray-700">
+                <div className="mb-5 flex-1 md:mb-0">
+                  <label className="mb-4 block font-medium text-gray-700">
                     演唱會名稱<span className="ml-1 text-red-500">*</span>
                   </label>
                   <input
                     className="w-full rounded border border-gray-300 p-2"
                     placeholder="請輸入演唱會名稱"
-                    value={info.eventName}
-                    onChange={(e) => setInfo({ eventName: e.target.value })}
+                    value={info.conTitle}
+                    onChange={(e) => setInfo({ conTitle: e.target.value })}
                   />
                 </div>
                 {/* 演唱會時間 */}
                 <div className="flex flex-1 items-center">
                   <div className="w-full">
-                    <label className="mb-1 block font-medium text-gray-700">演唱會時間</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        className="w-full rounded border border-gray-300 p-2"
-                        placeholder="yyyy/mm/dd"
-                        value={info.eventStartDate}
-                        onChange={(e) => setInfo({ eventStartDate: e.target.value })}
+                    <label className="mb-4 block font-medium text-gray-700">演唱會時間</label>
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                      <SingleDatePicker
+                        date={info.eventStartDate ? new Date(info.eventStartDate) : null}
+                        setDate={(date) => setInfo({ eventStartDate: date ? dayjs(date).format("YYYY/MM/DD") : "" })}
+                        placeholder="請選擇開始日期"
+                        inputClassName="w-full"
+                        format="YYYY/MM/DD"
                       />
-                      <span className="text-gray-400">~</span>
-                      <input
-                        className="w-full rounded border border-gray-300 p-2"
-                        placeholder="yyyy/mm/dd"
-                        value={info.eventEndDate}
-                        onChange={(e) => setInfo({ eventEndDate: e.target.value })}
+                      <span className="text-gray-400 md:mx-2">~</span>
+                      <SingleDatePicker
+                        date={info.eventEndDate ? new Date(info.eventEndDate) : null}
+                        setDate={(date) => setInfo({ eventEndDate: date ? dayjs(date).format("YYYY/MM/DD") : "" })}
+                        placeholder="請選擇結束日期"
+                        inputClassName="w-full"
+                        format="YYYY/MM/DD"
                       />
                     </div>
                   </div>
@@ -89,8 +159,8 @@ export default function CreateConInfoPage() {
                         rows={4}
                         maxLength={3000}
                         placeholder="請輸入演唱會簡介"
-                        value={info.eventDescription}
-                        onChange={(e) => setInfo({ eventDescription: e.target.value })}
+                        value={info.conIntroduction}
+                        onChange={(e) => setInfo({ conIntroduction: e.target.value })}
                       />
                     </div>
                     {/* 演唱會地點 */}
@@ -99,8 +169,8 @@ export default function CreateConInfoPage() {
                       <input
                         className="w-full rounded border border-gray-300 p-3"
                         placeholder="請選擇場地"
-                        value={info.eventVenue}
-                        onChange={(e) => setInfo({ eventVenue: e.target.value })}
+                        value={info.conLocation}
+                        onChange={(e) => setInfo({ conLocation: e.target.value })}
                       />
                     </div>
                     {/* 詳細地址 */}
@@ -109,8 +179,8 @@ export default function CreateConInfoPage() {
                       <input
                         className="w-full rounded border border-gray-300 p-3"
                         placeholder="請輸入地址"
-                        value={info.eventAddress}
-                        onChange={(e) => setInfo({ eventAddress: e.target.value })}
+                        value={info.conAddress}
+                        onChange={(e) => setInfo({ conAddress: e.target.value })}
                       />
                     </div>
                     {/* 演唱會標籤 */}
@@ -118,14 +188,32 @@ export default function CreateConInfoPage() {
                       <div className="mb-4 font-medium text-gray-800">演唱會標籤</div>
                       <div className="mb-4">
                         <label className="mb-1 block font-medium text-gray-700">地區</label>
-                        <select className="w-full rounded border border-gray-300 p-3 text-gray-800">
-                          <option>請選擇</option>
+                        <select
+                          className="w-full rounded border border-gray-300 p-3 text-gray-800"
+                          value={info.locationTagId || ""}
+                          onChange={(e) => setInfo({ locationTagId: e.target.value })}
+                        >
+                          <option value="">請選擇</option>
+                          {regions.map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div>
                         <label className="mb-1 block font-medium text-gray-700">音樂類型</label>
-                        <select className="w-full rounded border border-gray-300 p-3 text-gray-800">
-                          <option>請選擇</option>
+                        <select
+                          className="w-full rounded border border-gray-300 p-3 text-gray-800"
+                          value={info.musicTagId || ""}
+                          onChange={(e) => setInfo({ musicTagId: e.target.value })}
+                        >
+                          <option value="">請選擇</option>
+                          {musicTypes.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
@@ -145,8 +233,8 @@ export default function CreateConInfoPage() {
                 <span className="text-sm text-gray-400">上限1,000字</span>
               </div>
               <LexicalEditor
-                initialContent={info.eventTicket}
-                onChange={(val) => setInfo({ eventTicket: val })}
+                initialContent={info.ticketPurchaseMethod}
+                onChange={(val) => setInfo({ ticketPurchaseMethod: JSON.stringify(val) })}
                 placeholder="請輸入購票方式"
                 className="min-h-[120px] rounded-lg border bg-white p-4 shadow"
               />
@@ -158,8 +246,8 @@ export default function CreateConInfoPage() {
                 <span className="text-sm text-gray-400">上限2,000字</span>
               </div>
               <LexicalEditor
-                initialContent={info.eventNotice}
-                onChange={(val) => setInfo({ eventNotice: val })}
+                initialContent={info.precautions}
+                onChange={(val) => setInfo({ precautions: JSON.stringify(val) })}
                 placeholder="請輸入注意事項"
                 className="min-h-[120px] rounded-lg border bg-white p-4 shadow"
               />
@@ -171,15 +259,15 @@ export default function CreateConInfoPage() {
                 <span className="text-sm text-gray-400">上限1,000字</span>
               </div>
               <LexicalEditor
-                initialContent={info.eventSuperNotice}
-                onChange={(val) => setInfo({ eventSuperNotice: val })}
+                initialContent={info.refundPolicy}
+                onChange={(val) => setInfo({ refundPolicy: JSON.stringify(val) })}
                 placeholder="請輸入退票注意事項"
                 className="min-h-[120px] rounded-lg border bg-white p-4 shadow"
               />
             </div>
             {/* 按鈕 */}
             <div className="mt-8 flex items-center justify-between">
-              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white">
+              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white" onClick={handleSaveDraft}>
                 儲存草稿
               </Button>
               <Button
