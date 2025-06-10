@@ -12,8 +12,8 @@ export const axiosInstance = axios.create({
 // 請求攔截器
 axiosInstance.interceptors.request.use(
   (config) => {
-    // 從 localStorage 獲取 token
-    const token = useAuthStore.getState().token;
+    // 獲取 token
+    const token = useAuthStore.getState().getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,8 +31,10 @@ axiosInstance.interceptors.response.use(
     // 統一錯誤處理
     if (error.response?.status === 401) {
       // 處理未授權情況
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      // Token 過期
+      const store = useAuthStore.getState();
+      store.logout();
+      throw new Error("Token expired");
     }
     return Promise.reject(error);
   }

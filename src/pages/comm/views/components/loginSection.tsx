@@ -14,10 +14,12 @@ interface LoginResponse {
   token: string;
   user: {
     email: string;
+    role: string;
   };
 }
 export function LoginSection() {
   const setAuth = useAuthStore((state) => state.setAuth);
+  const setCookie = useAuthStore((state) => state.setCookie);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { loginData, setLoginData, setIsModalForgotPasswordActive } = useContext(ModalStatusContext)!; // 使用 context
@@ -33,7 +35,11 @@ export function LoginSection() {
     onSuccess: (response) => {
       const res = response as LoginResponse;
       console.log("res:", res);
-      setAuth(res.token, res.user.email); // ✅ 存進 authStore
+      // 將 token 存在 cookie 中
+      setCookie(res.token);
+
+      // 只將非敏感資訊存在 localStorage
+      setAuth(res.user.email, res.user.role); // ✅ 存進 authStore
 
       toast({
         title: "登入成功",
