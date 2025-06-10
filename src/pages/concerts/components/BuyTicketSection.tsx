@@ -4,16 +4,16 @@ import { BuyTicketDemoData } from "./BuyTicketDemoData";
 import ConcertSessionSection from "./ConcertSessionSection";
 import PrecautionAndNeedtoKnow from "./PrecautionAndNeedtoKnow";
 import InsertBuyerInfoSection from "./InsertBuyerInfoSection";
-import InsertCreditCardSection from "./InsertCreditCardSection";
+// import InsertCreditCardSection from "./InsertCreditCardSection";
 import { Button } from "@/core/components/ui/button";
 import Separator from "@/core/components/ui/separator";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 export default function BuyTicketSection() {
-  const navigate = useNavigate();
-  const { selectedSession, selectedTickets, buyerInfo, creditCardInfo, validateBuyerInfo, validateCreditCardInfo } = useBuyTicketContext();
-  // chooseSession+TicketType 選擇場次及票種 --> insertBuyerInfo 填寫購票人資訊 --> insertCreditCard 填寫信用卡資訊
+  // const navigate = useNavigate();
+  const { selectedSession, selectedTickets, buyerInfo, validateBuyerInfo } = useBuyTicketContext();
+  // chooseSession+TicketType 選擇場次及票種 --> insertBuyerInfo 填寫購票人資訊
   const [buyTicketStep, setBuyTicketStep] = useState("chooseSession");
   const [totalPrice, setTotalPrice] = useState(0);
   const concertData = BuyTicketDemoData();
@@ -28,15 +28,10 @@ export default function BuyTicketSection() {
       // 驗證購票人資訊
       const buyerValidation = validateBuyerInfo();
       isValid = buyerValidation.success;
-    } else if (currentStep === "insertCreditCard") {
-      // 驗證信用卡資訊
-      const creditCardValidation = validateCreditCardInfo();
-      isValid = creditCardValidation.success;
     }
     const failedValidation = {
       chooseSession: "請選擇場次及票券",
       insertBuyerInfo: "請填寫完整購票人資訊",
-      insertCreditCard: "請填寫完整信用卡資訊",
     };
     if (!isValid) {
       // 可以加入錯誤提示
@@ -46,10 +41,7 @@ export default function BuyTicketSection() {
     if (currentStep === "chooseSession") {
       setBuyTicketStep("insertBuyerInfo");
     } else if (currentStep === "insertBuyerInfo") {
-      setBuyTicketStep("insertCreditCard");
-    } else if (currentStep === "insertCreditCard") {
-      setBuyTicketStep("paymentResult");
-      navigate("/concert/paymentResult");
+      // navigate("/concert/paymentResult");
     }
   };
   useEffect(() => {
@@ -57,13 +49,8 @@ export default function BuyTicketSection() {
   }, [buyTicketStep]);
 
   useEffect(() => {
-    console.log("useContext");
-    console.log("selectedSession:", selectedSession);
-    console.log("selectedTickets:", selectedTickets);
-    console.log("buyerInfo:", buyerInfo);
-    console.log("creditCardInfo:", creditCardInfo);
     setTotalPrice(selectedTickets.reduce((acc, ticket) => acc + ticket.ticketPrice * ticket.quantity, 0));
-  }, [selectedSession, selectedTickets, buyerInfo, creditCardInfo]);
+  }, [selectedSession, selectedTickets, buyerInfo]);
 
   return (
     <div className="flex h-full flex-col items-center gap-2 px-4 lg:gap-8 lg:px-12">
@@ -89,8 +76,6 @@ export default function BuyTicketSection() {
             )}
             {/* 購票人資訊 */}
             {buyTicketStep === "insertBuyerInfo" && <InsertBuyerInfoSection />}
-            {/* 信用卡資訊 */}
-            {buyTicketStep === "insertCreditCard" && <InsertCreditCardSection totalPrice={totalPrice} />}
           </div>
         </div>
       </div>
@@ -103,7 +88,7 @@ export default function BuyTicketSection() {
       </div>
       <div className="flex w-[90%] justify-center">
         <Button variant="outline" className="w-[80%] lg:w-[30%]" onClick={() => handleBuyTicketStep(buyTicketStep)}>
-          {buyTicketStep === "insertCreditCard" ? "立即付款" : "下一步"}
+          {buyTicketStep === "insertBuyerInfo" ? "立即付款" : "下一步"}
         </Button>
       </div>
     </div>

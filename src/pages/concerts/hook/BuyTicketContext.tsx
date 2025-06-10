@@ -19,15 +19,6 @@ const buyerInfoSchema = z.object({
 
 type BuyerInfo = z.infer<typeof buyerInfoSchema>;
 
-// 定義驗證 creditCardInfo schema
-const creditCardInfoSchema = z.object({
-  cardNumber: z.string().trim().min(1, "信用卡號為必填"),
-  cardExpirationDate: z.string().trim().min(1, "信用卡有效期限為必填"),
-  cardCvv: z.string().trim().min(1, "信用卡安全碼為必填"),
-});
-
-type CreditCardInfo = z.infer<typeof creditCardInfoSchema>;
-
 export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedSession, setSelectedSession] = useState<sessionItem | null>(null);
   const [selectedTickets, setSelectedTickets] = useState<SelectedTicket[]>([]);
@@ -36,11 +27,6 @@ export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     email: "",
     mobilePhone: "",
     paymentMethod: "",
-  });
-  const [creditCardInfo, setCreditCardInfo] = useState<CreditCardInfo>({
-    cardNumber: "",
-    cardExpirationDate: "",
-    cardCvv: "",
   });
   const validateBuyerInfo = (field?: keyof BuyerInfo) => {
     if (field) {
@@ -68,32 +54,7 @@ export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     return { success: true };
   };
-  const validateCreditCardInfo = (field?: keyof CreditCardInfo) => {
-    if (field) {
-      // 只驗證特定欄位
-      const result = creditCardInfoSchema.shape[field].safeParse(creditCardInfo[field]);
-      if (!result.success) {
-        return {
-          success: false,
-          errors: { [field]: result.error.errors[0].message },
-        };
-      }
-      return { success: true };
-    }
 
-    // 驗證所有欄位
-    const result = buyerInfoSchema.safeParse(buyerInfo);
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          errors[err.path[0].toString()] = err.message;
-        }
-      });
-      return { success: false, errors };
-    }
-    return { success: true };
-  };
   return (
     <BuyTicketContext.Provider
       value={{
@@ -103,10 +64,7 @@ export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setSelectedTickets,
         buyerInfo,
         setBuyerInfo,
-        creditCardInfo,
-        setCreditCardInfo,
         validateBuyerInfo,
-        validateCreditCardInfo,
       }}
     >
       {children}

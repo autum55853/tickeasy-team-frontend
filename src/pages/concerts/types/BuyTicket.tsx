@@ -9,8 +9,3 @@ export interface BuyerInfo {
   mobilePhone: string;
   paymentMethod: string;
 }
-export interface CreditCardInfo {
-  cardNumber: string;
-  cardExpirationDate: string;
-  cardCvv: string;
-}
