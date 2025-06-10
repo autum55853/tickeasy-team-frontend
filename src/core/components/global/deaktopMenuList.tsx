@@ -1,10 +1,13 @@
 import { useEffect, useState, RefObject, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/core/hooks/useLogout";
+import { useAuthStore } from "@/store/authStore";
+
 export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOpen: boolean; accountButtonRef: RefObject<HTMLDivElement | null> }) {
   const [position, setPosition] = useState({ top: -1000, right: 0 });
   const { handleLogout } = useLogout();
   const navigate = useNavigate();
+  const role = useAuthStore((state) => state.role);
   const handleNavigation = useCallback(
     (path: string) => {
       if (menuOpen) {
@@ -47,9 +50,16 @@ export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOp
         <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/company")}>
           舉辦演唱會
         </li>
-        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/user/history")}>
+        <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/user/about/history")}>
           查看參與的演唱會
         </li>
+        {role === "admin" && (
+          <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100">
+            <a href="https://tickeasy-dashboard.onrender.com/dashboard" target="_blank" rel="noopener noreferrer">
+              後台管理
+            </a>
+          </li>
+        )}
         <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={handleLogout}>
           登出
         </li>

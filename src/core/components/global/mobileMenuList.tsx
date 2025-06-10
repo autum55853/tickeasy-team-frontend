@@ -2,6 +2,7 @@ import User from "@/assets/images/user.png";
 import MobileSearchBar from "./mobileSearchBar";
 import { useLogout } from "@/core/hooks/useLogout";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 export default function MobileMenuList({
   menuOpen,
   isLogin,
@@ -17,6 +18,7 @@ export default function MobileMenuList({
 }) {
   const { handleLogout } = useLogout();
   const navigate = useNavigate();
+  const role = useAuthStore((state) => state.role);
   return (
     <div
       className={`fixed top-18 left-0 z-10 h-screen w-full transition-all duration-100 ease-in-out lg:hidden ${
@@ -42,12 +44,19 @@ export default function MobileMenuList({
                 <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user")}>
                   會員中心
                 </li>
-                <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => navigate("/company")}>
+                <li className="cursor-pointer p-2 hover:bg-neutral-100" onClick={() => navigate("/company")}>
                   舉辦演唱會
                 </li>
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/history")}>
+                <li className="cursor-pointer rounded-md p-2 text-start hover:bg-blue-100" onClick={() => navigate("/user/about/history")}>
                   查看參與的演唱會
                 </li>
+                {role === "admin" && (
+                  <li className="cursor-pointer p-2 hover:bg-neutral-100">
+                    <a href="https://tickeasy-dashboard.onrender.com/dashboard" target="_blank" rel="noopener noreferrer">
+                      後台管理
+                    </a>
+                  </li>
+                )}
                 <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={handleLogout}>
                   登出
                 </li>
