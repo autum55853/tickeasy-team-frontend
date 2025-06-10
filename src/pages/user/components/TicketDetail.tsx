@@ -1,6 +1,6 @@
-import { QrCode } from "lucide-react";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
 import Separator from "@/core/components/ui/separator";
+import QRCode from "react-qr-code";
 export const TicketDetail = () => {
   return (
     <div className="grid grid-rows-2 gap-4 lg:grid-cols-2 lg:grid-rows-none">
@@ -12,8 +12,8 @@ export const TicketDetail = () => {
         <p>
           日期: <span className="ml-4 font-bold">2025.03.28 (五) 20:00</span>
         </p>
-        <div className="mt-2 flex items-center">
-          <QrCode className="h-[60%] w-[60%]" />
+        <div className="mt-4 flex items-center">
+          <QRCode value="A123456927" style={{ height: "auto", width: "60%" }} />
         </div>
       </div>
       <div className="row-span-1 lg:col-span-1">
