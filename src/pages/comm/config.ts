@@ -15,12 +15,6 @@ export default {
       needLogin: false,
     },
     {
-      path: "/origanization/concerts",
-      component: lazy(() => import("./views/orgConcertsList")),
-      meta: { title: "演唱會清單" },
-      needLogin: false,
-    },
-    {
       path: "/callback",
       component: lazy(() => import("./views/googleAuthCallbackPage")),
       meta: { title: "Google OAuth callback" },
@@ -50,12 +44,6 @@ export default {
       path: "/404",
       component: lazy(() => import("./views/404")),
       meta: { title: "404 找不到頁面" },
-      needLogin: false,
-    },
-    {
-      path: "/componentsDemo",
-      component: lazy(() => import("./views/componentsDemo")),
-      meta: { title: "Components Demo" },
       needLogin: false,
     },
   ],

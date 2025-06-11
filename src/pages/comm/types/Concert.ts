@@ -23,6 +23,7 @@ export interface Concert {
   updatedAt: string;
   createdAt: string;
   sessions: Session[];
+  venue: Venue;
 }
 
 export interface Session {
@@ -44,12 +45,27 @@ export interface TicketType {
   entranceType: string;
   ticketBenefits: string;
   ticketRefundPolicy: string;
-  ticketTypePrice: string;
+  ticketTypePrice: number;
   totalQuantity: number;
   remainingQuantity: number;
   sellBeginDate: string;
   sellEndDate: string;
   createdAt: string;
+}
+
+export interface Venue {
+  venueId: string;
+  venueName: string;
+  venueDescription: string;
+  venueAddress: string;
+  venueCapacity: number;
+  venueImageUrl: string;
+  googleMapUrl: string;
+  isAccessible: boolean;
+  hasParking: boolean;
+  hasTransit: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ConcertResponse {

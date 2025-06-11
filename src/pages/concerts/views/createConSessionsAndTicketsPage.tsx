@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "@/core/components/global/footer";
 import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
 import Header from "@/core/components/global/header";
 import { Button } from "@/core/components/ui/button";
 import { Pencil, Trash2, Save, Calendar } from "lucide-react";
-import { useConcertDraftStore } from "../store/useConcertDraftStore";
-import { useNavigate } from "react-router-dom";
+import { useConcertStore } from "../store/useConcertStore";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSeattableUpload } from "../hook/useSeattableUpload";
 import { Session, TicketType } from "@/pages/comm/types/Concert";
 import { DateTimePicker } from "@/core/components/ui/datetimePicker";
 import dayjs from "dayjs";
 import { TicketTypeTable } from "../components/TicketTypeTable";
-import { useSaveDraft } from "../hook/useSaveDraft";
+import { useToast } from "@/core/hooks/useToast";
 
 export default function CreateConSessionsAndTicketsPage() {
-  const { sessions } = useConcertDraftStore();
+  const { sessions, info, setInfo, updateSession, addSession, deleteSession, addTicket, deleteTicket, saveDraft } = useConcertStore();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const concertId = searchParams.get("concertId");
+  const companyId = searchParams.get("companyId");
+
+  // UI 狀態
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editBuffer, setEditBuffer] = useState<{ sessionTitle: string; sessionDate: string; sessionStart: string; sessionEnd: string }>({
@@ -26,11 +33,31 @@ export default function CreateConSessionsAndTicketsPage() {
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
   const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
   const [ticketEditBuffer, setTicketEditBuffer] = useState<Partial<TicketType>>({});
-  const navigate = useNavigate();
   const { handleUploadSeattable } = useSeattableUpload();
-  const { handleSaveDraft, handleSaveSession, handleTicketSave, handleAddSession, handleAddTicketType, handleDeleteSession, handleDeleteTicket } =
-    useSaveDraft();
 
+  useEffect(() => {
+    if (!concertId) {
+      toast({
+        title: "錯誤",
+        description: "請先儲存草稿再設定場次",
+        variant: "destructive",
+      });
+      navigate(`/concert/create/info?companyId=${companyId}`);
+      return;
+    }
+
+    if (concertId !== info.concertId) {
+      setInfo({ concertId });
+    }
+  }, [concertId, companyId, info.concertId, navigate, setInfo, toast]);
+
+  useEffect(() => {
+    if (concertId) {
+      useConcertStore.getState().getConcert(concertId);
+    }
+  }, [concertId]);
+
+  // UI 處理函數
   const handleEdit = (s: Session) => {
     setEditingSessionId(s.sessionId);
     setEditBuffer({
@@ -42,7 +69,10 @@ export default function CreateConSessionsAndTicketsPage() {
   };
 
   const handleSave = (id: string) => {
-    handleSaveSession(id, editBuffer);
+    updateSession({
+      sessionId: id,
+      ...editBuffer,
+    });
     setEditingSessionId(null);
   };
 
@@ -62,28 +92,89 @@ export default function CreateConSessionsAndTicketsPage() {
     });
   };
 
-  const handleTicketSaveWrapper = (sessionId: string, ticketId: string) => {
-    handleTicketSave(sessionId, ticketId, ticketEditBuffer);
+  const handleTicketSave = (sessionId: string, ticketId: string) => {
+    const session = sessions.find((s) => s.sessionId === sessionId);
+    if (!session) return;
+
+    const updatedTickets = session.ticketTypes.map((t) => (t.ticketTypeId === ticketId ? { ...t, ...ticketEditBuffer } : t));
+
+    updateSession({
+      sessionId,
+      ticketTypes: updatedTickets,
+    });
     setEditingTicketId(null);
   };
 
   const handleAddSessionWrapper = () => {
-    const newId = handleAddSession();
-    setEditingSessionId(newId);
+    const newSession: Session = {
+      sessionId: `tmp-${Date.now()}`,
+      concertId: info.concertId,
+      sessionTitle: "",
+      sessionDate: "",
+      sessionStart: "",
+      sessionEnd: "",
+      imgSeattable: "",
+      createdAt: new Date().toISOString(),
+      ticketTypes: [],
+    };
+    addSession(newSession);
+    setEditingSessionId(newSession.sessionId);
   };
 
   const handleAddTicketTypeWrapper = (sessionId: string) => {
-    const newTicketId = handleAddTicketType(sessionId);
+    const newTicketId = `tmp-${Date.now()}`;
+    const newTicket: TicketType = {
+      ticketTypeId: newTicketId,
+      concertSessionId: sessionId,
+      ticketTypeName: "",
+      sellBeginDate: "",
+      sellEndDate: "",
+      ticketTypePrice: 0,
+      totalQuantity: 0,
+      entranceType: "",
+      ticketBenefits: "",
+      ticketRefundPolicy: "",
+      remainingQuantity: 0,
+      createdAt: new Date().toISOString(),
+    };
+    addTicket(sessionId, newTicket);
     setEditingTicketId(newTicketId);
     setExpandedTicketId(newTicketId);
   };
 
-  const handleDeleteSessionWrapper = (sessionId: string) => {
-    handleDeleteSession(sessionId);
+  const handleBack = () => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const companyId = queryParams.get("companyId");
+    const newQueryParams = new URLSearchParams();
+
+    if (companyId) {
+      newQueryParams.set("companyId", companyId);
+    }
+    if (info.concertId) {
+      newQueryParams.set("concertId", info.concertId);
+    }
+
+    navigate(`/concert/create/info?${newQueryParams.toString()}`);
   };
 
-  const handleDeleteTicketWrapper = (sessionId: string, ticketId: string) => {
-    handleDeleteTicket(sessionId, ticketId);
+  const handleSaveDraftWrapper = async () => {
+    try {
+      const result = await saveDraft();
+      if (result?.concertId) {
+        const queryParams = new URLSearchParams(window.location.search);
+        const companyId = queryParams.get("companyId");
+        const newQueryParams = new URLSearchParams();
+
+        if (companyId) {
+          newQueryParams.set("companyId", companyId);
+        }
+        newQueryParams.set("concertId", result.concertId);
+
+        window.history.replaceState({}, "", `?${newQueryParams.toString()}`);
+      }
+    } catch (error) {
+      console.error("儲存草稿失敗:", error);
+    }
   };
 
   return (
@@ -175,7 +266,7 @@ export default function CreateConSessionsAndTicketsPage() {
                               <Pencil className="h-5 w-5" />
                             </Button>
                           )}
-                          <Button variant="ghost" className="p-2" onClick={() => handleDeleteSessionWrapper(s.sessionId)}>
+                          <Button variant="ghost" className="p-2" onClick={() => deleteSession(s.sessionId)}>
                             <Trash2 className="h-5 w-5" />
                           </Button>
                         </div>
@@ -201,8 +292,8 @@ export default function CreateConSessionsAndTicketsPage() {
                             ticketEditBuffer={ticketEditBuffer}
                             setTicketEditBuffer={setTicketEditBuffer}
                             handleTicketEdit={handleTicketEdit}
-                            handleTicketSave={handleTicketSaveWrapper}
-                            handleDeleteTicket={handleDeleteTicketWrapper}
+                            handleTicketSave={handleTicketSave}
+                            handleDeleteTicket={deleteTicket}
                             handleAddTicketType={handleAddTicketTypeWrapper}
                             setExpandedTicketId={setExpandedTicketId}
                           />
@@ -215,10 +306,10 @@ export default function CreateConSessionsAndTicketsPage() {
             </table>
             {/* 按鈕 */}
             <div className="mt-8 flex items-center justify-between">
-              <Button variant="outline" className="rounded border border-black text-black" onClick={() => navigate("/concert/create/info")}>
+              <Button variant="outline" className="rounded border border-black text-black" onClick={handleBack}>
                 上一步
               </Button>
-              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white" onClick={handleSaveDraft}>
+              <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white" onClick={handleSaveDraftWrapper}>
                 儲存草稿
               </Button>
               <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white">

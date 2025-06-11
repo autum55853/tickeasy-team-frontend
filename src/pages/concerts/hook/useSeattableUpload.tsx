@@ -1,8 +1,8 @@
-import { useConcertDraftStore } from "../store/useConcertDraftStore";
+import { useConcertStore } from "../store/useConcertStore";
 import { useToast } from "@/core/hooks/useToast";
 
 export function useSeattableUpload() {
-  const { updateSession, uploadImage } = useConcertDraftStore();
+  const { updateSession, uploadImage } = useConcertStore();
   const { toast } = useToast();
 
   const handleUploadSeattable = async (sessionId: string) => {
