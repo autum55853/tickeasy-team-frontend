@@ -19,7 +19,6 @@ interface LexicalEditorProps {
   className?: string;
 }
 
-// Plugin to set initial content
 function InitialContentPlugin({ content }: { content?: string }) {
   const [editor] = useLexicalComposerContext();
 

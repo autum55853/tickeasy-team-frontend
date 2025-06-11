@@ -1,0 +1,379 @@
+import { create } from "zustand";
+import axios, { AxiosResponse } from "axios";
+import { ConcertResponse, Session, TicketType, Venue } from "@/pages/comm/types/Concert";
+import { getAuthToken } from "./authToken";
+
+// ========== 型別定義 ==========
+type UploadContext = "USER_AVATAR" | "VENUE_PHOTO" | "CONCERT_SEATING_TABLE" | "CONCERT_BANNER";
+
+interface VenueListItem {
+  venueId: string;
+  venueName: string;
+  venueAddress: string;
+  googleMapUrl: string;
+}
+
+interface VenuesResponse {
+  status: string;
+  data: VenueListItem[];
+}
+
+type ConcertState = {
+  // 狀態
+  info: {
+    [key: string]: unknown;
+    concertId: string;
+    organizationId: string;
+    venueId: string;
+    locationTagId: string;
+    musicTagId: string;
+    conTitle: string;
+    conIntroduction: string;
+    conLocation: string;
+    conAddress: string;
+    eventStartDate: string;
+    eventEndDate: string;
+    ticketPurchaseMethod: string;
+    precautions: string;
+    refundPolicy: string;
+    conInfoStatus: string;
+    imgBanner: string;
+    reviewStatus: string;
+    reviewNote: string | null;
+    visitCount: number;
+    promotion: string | null;
+    cancelledAt: string | null;
+    updatedAt: string;
+    createdAt: string;
+    sessions: (Omit<Session, "ticketTypes"> & { ticketTypes: TicketType[] })[];
+  };
+  sessions: Session[];
+  venue: Venue | null;
+  venues: VenueListItem[];
+
+  // 基本操作
+  setInfo: (info: Partial<ConcertState["info"]>) => void;
+  clearConcertId: () => void;
+
+  // 場次管理
+  setSessions: (sessions: Session[]) => void;
+  updateSession: (session: Partial<Session> & { sessionId: string }) => void;
+  addSession: (session: Session) => void;
+  deleteSession: (sessionId: string) => void;
+
+  // 票券管理
+  addTicket: (sessionId: string, ticket: TicketType) => void;
+  deleteTicket: (sessionId: string, ticketId: string) => void;
+
+  // API 操作
+  saveDraft: () => Promise<{ concertId: string } | undefined>;
+  uploadImage: (file: File, uploadContext: UploadContext) => Promise<string>;
+  getConcert: (concertId: string) => Promise<void>;
+  getVenues: () => Promise<void>;
+};
+
+// ========== 工具函數 ==========
+// 從 localStorage 取得儲存的 concertId
+const getStoredConcertId = () => {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem("concertId") || "";
+};
+
+// ========== 初始資料 ==========
+const sessionData: Session[] = [];
+
+// ========== Store 實現 ==========
+export const useConcertStore = create<ConcertState>((set, get) => ({
+  // ========== 初始狀態 ==========
+  info: {
+    concertId: getStoredConcertId(),
+    organizationId: "",
+    venueId: "",
+    locationTagId: "",
+    musicTagId: "",
+    conTitle: "",
+    conIntroduction: "",
+    conLocation: "",
+    conAddress: "",
+    eventStartDate: "",
+    eventEndDate: "",
+    ticketPurchaseMethod: "",
+    precautions: "",
+    refundPolicy: "",
+    conInfoStatus: "draft",
+    imgBanner: "",
+    reviewStatus: "",
+    reviewNote: null,
+    visitCount: 0,
+    promotion: null,
+    cancelledAt: null,
+    updatedAt: "",
+    createdAt: "",
+    sessions: [],
+  },
+  sessions: sessionData,
+  venue: null,
+  venues: [],
+
+  // ========== 基本操作 ==========
+  setInfo: (info) =>
+    set((state) => {
+      const newInfo = { ...state.info, ...info };
+      // 當 concertId 變更時，更新 localStorage
+      if (info.concertId) {
+        localStorage.setItem("concertId", info.concertId);
+      }
+      return { info: newInfo };
+    }),
+
+  clearConcertId: () => {
+    localStorage.removeItem("concertId");
+    set((state) => ({
+      info: {
+        ...state.info,
+        concertId: "",
+      },
+    }));
+  },
+
+  // ========== 場次管理 ==========
+  setSessions: (sessions) => set({ sessions }),
+
+  updateSession: (session) => {
+    console.log("updateSession called with", session);
+    set((state) => ({
+      sessions: state.sessions.map((s) => (s.sessionId === session.sessionId ? { ...s, ...session } : s)),
+    }));
+  },
+
+  addSession: (session) =>
+    set((state) => ({
+      sessions: [...state.sessions, session],
+    })),
+
+  deleteSession: (sessionId) =>
+    set((state) => ({
+      sessions: state.sessions.filter((s) => s.sessionId !== sessionId),
+    })),
+
+  // ========== 票券管理 ==========
+  addTicket: (sessionId, ticket) =>
+    set((state) => ({
+      sessions: state.sessions.map((s) => (s.sessionId === sessionId ? { ...s, ticketTypes: [...s.ticketTypes, ticket] } : s)),
+    })),
+
+  deleteTicket: (sessionId, ticketId) =>
+    set((state) => ({
+      sessions: state.sessions.map((s) =>
+        s.sessionId === sessionId ? { ...s, ticketTypes: s.ticketTypes.filter((t) => t.ticketTypeId !== ticketId) } : s
+      ),
+    })),
+
+  // ========== API 操作 ==========
+  saveDraft: async (): Promise<{ concertId: string } | undefined> => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return Promise.reject(new Error("未登入"));
+      }
+
+      const { info, sessions } = get();
+
+      // 只檢查 conTitle
+      if (!info.conTitle?.trim()) {
+        return Promise.reject(new Error("演唱會名稱為必填"));
+      }
+
+      // 嘗試從多個來源取得 organizationId
+      let organizationId = info.organizationId; // 先從 store 中取得
+
+      if (!organizationId) {
+        // 如果 store 中沒有，再從網址取得 companyId
+        const params = new URLSearchParams(window.location.search);
+        const companyId = params.get("companyId");
+        if (companyId) {
+          organizationId = companyId;
+        }
+      }
+
+      if (!organizationId) {
+        return Promise.reject(new Error("無法取得組織ID"));
+      }
+
+      // 動態組 payload
+      const payload: Record<string, unknown> = {
+        conTitle: info.conTitle.trim(),
+        conInfoStatus: info.conInfoStatus || "draft",
+        organizationId,
+        imgBanner: info.imgBanner, // 確保 imgBanner 被包含在 payload 中
+      };
+
+      // 這三個欄位要 stringify
+      ["ticketPurchaseMethod", "precautions", "refundPolicy"].forEach((key) => {
+        if (info[key]) payload[key] = typeof info[key] === "string" ? info[key] : JSON.stringify(info[key]);
+      });
+
+      // 其他欄位直接丟
+      ["conIntroduction", "conLocation", "conAddress", "eventStartDate", "eventEndDate", "locationTagId", "musicTagId", "venueId"].forEach((key) => {
+        if (info[key]) payload[key] = info[key];
+      });
+
+      // sessions 處理
+      payload.sessions = sessions.map((s) => ({
+        ...(s.sessionTitle && { sessionTitle: s.sessionTitle }),
+        ...(s.sessionDate && { sessionDate: s.sessionDate }),
+        ...(s.sessionStart && { sessionStart: s.sessionStart }),
+        ...(s.sessionEnd && { sessionEnd: s.sessionEnd }),
+        ...(s.imgSeattable && { imgSeattable: s.imgSeattable }),
+        ticketTypes: s.ticketTypes.map((t) => ({
+          ...(t.ticketTypeName && { ticketTypeName: t.ticketTypeName }),
+          ...(t.entranceType && { entranceType: t.entranceType }),
+          ...(t.ticketBenefits && { ticketBenefits: t.ticketBenefits }),
+          ...(t.ticketRefundPolicy && { ticketRefundPolicy: t.ticketRefundPolicy }),
+          ...(t.ticketTypePrice && { ticketTypePrice: Number(t.ticketTypePrice) }),
+          ...(t.totalQuantity && { totalQuantity: t.totalQuantity }),
+          ...(t.sellBeginDate && { sellBeginDate: t.sellBeginDate }),
+          ...(t.sellEndDate && { sellEndDate: t.sellEndDate }),
+        })),
+      }));
+
+      console.log("[saveDraft] 準備發送的 payload:", JSON.stringify(payload, null, 2));
+
+      let response: AxiosResponse<ConcertResponse>;
+      if (info.concertId) {
+        // 如果已有 concertId，使用 PUT 更新
+        response = await axios.put<ConcertResponse>(`http://localhost:3000/api/v1/concerts/${info.concertId}`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        // 如果沒有 concertId，使用 POST 新增
+        response = await axios.post<ConcertResponse>(`http://localhost:3000/api/v1/concerts/`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+
+      console.log("[saveDraft] API 回傳資料:", response.data);
+      console.log("[saveDraft] 回傳的 imgBanner:", response.data.data.imgBanner);
+
+      const concertData = response.data.data;
+      if (concertData.concertId) {
+        // 確保使用 API 回傳的新 imgBanner
+        const updatedInfo = {
+          ...concertData,
+          imgBanner: concertData.imgBanner || "", // 強制使用 API 回傳的 imgBanner
+        };
+
+        console.log("[saveDraft] 更新前的 store info:", get().info);
+        console.log("[saveDraft] 準備更新的 info:", updatedInfo);
+
+        set((state) => ({
+          info: {
+            ...state.info,
+            ...updatedInfo,
+          },
+          sessions: concertData.sessions,
+          venue: concertData.venue,
+        }));
+
+        console.log("[saveDraft] 更新後的 store info:", get().info);
+        localStorage.setItem("concertId", concertData.concertId);
+        return { concertId: concertData.concertId };
+      }
+      return undefined;
+    } catch (error) {
+      console.error("saveDraft error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  uploadImage: async (file: File, uploadContext: UploadContext): Promise<string> => {
+    const token = getAuthToken();
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("uploadContext", uploadContext);
+
+    const response = await axios.post<{ status: string; message: string; data: string }>(`http://localhost:3000/api/v1/upload/image`, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.data.status === "success") {
+      return response.data.data; // 直接回傳 string
+    }
+    throw new Error(response.data.message || "上傳失敗");
+  },
+
+  getConcert: async (concertId: string) => {
+    try {
+      const response = await axios.get<ConcertResponse>(`http://localhost:3000/api/v1/concerts/${concertId}`);
+
+      if (response.data.status === "success" && response.data.data) {
+        const concertData = response.data.data;
+
+        // 處理 ticketTypePrice 從字串轉數字
+        const processedSessions = concertData.sessions.map((session) => ({
+          ...session,
+          ticketTypes: session.ticketTypes.map((ticket) => ({
+            ...ticket,
+            ticketTypePrice: Number(ticket.ticketTypePrice),
+          })),
+        }));
+
+        set((state) => ({
+          info: {
+            ...state.info,
+            concertId: concertData.concertId,
+            organizationId: concertData.organizationId,
+            venueId: concertData.venueId,
+            locationTagId: concertData.locationTagId,
+            musicTagId: concertData.musicTagId,
+            conTitle: concertData.conTitle,
+            conIntroduction: concertData.conIntroduction,
+            conLocation: concertData.conLocation,
+            conAddress: concertData.conAddress,
+            eventStartDate: concertData.eventStartDate,
+            eventEndDate: concertData.eventEndDate,
+            ticketPurchaseMethod: concertData.ticketPurchaseMethod,
+            precautions: concertData.precautions,
+            refundPolicy: concertData.refundPolicy,
+            conInfoStatus: concertData.conInfoStatus,
+            imgBanner: concertData.imgBanner,
+            reviewStatus: concertData.reviewStatus,
+            reviewNote: concertData.reviewNote,
+            visitCount: concertData.visitCount,
+            promotion: concertData.promotion,
+            cancelledAt: concertData.cancelledAt,
+            updatedAt: concertData.updatedAt,
+            createdAt: concertData.createdAt,
+          },
+          sessions: processedSessions,
+          venue: concertData.venue,
+        }));
+
+        localStorage.setItem("concertId", concertData.concertId);
+      } else {
+        return Promise.reject(new Error("取得演唱會資料失敗"));
+      }
+    } catch (error) {
+      console.error("getConcert error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  getVenues: async () => {
+    try {
+      const response = await axios.get<VenuesResponse>(`http://localhost:3000/api/v1/concerts/venues`);
+
+      if (response.data.status === "success") {
+        set({ venues: response.data.data });
+      } else {
+        return Promise.reject(new Error("取得場館列表失敗"));
+      }
+    } catch (error) {
+      console.error("getVenues error", error);
+      return Promise.reject(error);
+    }
+  },
+}));

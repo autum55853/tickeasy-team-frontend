@@ -2,7 +2,7 @@ import { Button } from "@/core/components/ui/button";
 import { CompanyDetailData } from "../types/company";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/core/components/ui/tab";
 import CompanyConcertCard from "./companyConcertCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CompanyConcertSection({ companyInfoData }: { companyInfoData: CompanyDetailData }) {
@@ -22,13 +22,27 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
   const [activeTab, setActiveTab] = useState("draft");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const organizationId = params.get("companyId");
+
+    if (!organizationId) {
+      navigate("/");
+    }
+  }, [navigate]);
+
   return (
     <div className="mx-auto h-full w-full">
       <div className="border-grey-500 rounded-xl border-2 p-12">
         <div className="flex justify-between">
           <div className="text-2xl font-bold">{companyInfoData.orgName}</div>
           <div className="flex justify-end gap-4">
-            <Button type="submit" variant="outline" className="my-2 flex rounded-full lg:w-[100px]" onClick={() => navigate("/concert/create/info")}>
+            <Button
+              type="submit"
+              variant="outline"
+              className="my-2 flex rounded-full lg:w-[100px]"
+              onClick={() => navigate(`/concert/create/info?companyId=${companyInfoData.organizationId}`)}
+            >
               辦演唱會
             </Button>
           </div>
