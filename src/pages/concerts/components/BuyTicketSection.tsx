@@ -4,7 +4,7 @@ import { BuyTicketDemoData } from "./BuyTicketDemoData";
 import ConcertSessionSection from "./ConcertSessionSection";
 import PrecautionAndNeedtoKnow from "./PrecautionAndNeedtoKnow";
 import InsertBuyerInfoSection from "./InsertBuyerInfoSection";
-// import InsertCreditCardSection from "./InsertCreditCardSection";
+import ConfirmOrderSection from "./ConfirmOrderSection";
 import { Button } from "@/core/components/ui/button";
 import Separator from "@/core/components/ui/separator";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
@@ -32,6 +32,7 @@ export default function BuyTicketSection() {
     const failedValidation = {
       chooseSession: "請選擇場次及票券",
       insertBuyerInfo: "請填寫完整購票人資訊",
+      confirmOrder: "請確認訂單資訊",
     };
     if (!isValid) {
       // 可以加入錯誤提示
@@ -41,6 +42,7 @@ export default function BuyTicketSection() {
     if (currentStep === "chooseSession") {
       setBuyTicketStep("insertBuyerInfo");
     } else if (currentStep === "insertBuyerInfo") {
+      setBuyTicketStep("confirmOrder");
       // navigate("/concert/paymentResult");
     }
   };
@@ -76,6 +78,7 @@ export default function BuyTicketSection() {
             )}
             {/* 購票人資訊 */}
             {buyTicketStep === "insertBuyerInfo" && <InsertBuyerInfoSection />}
+            {buyTicketStep === "confirmOrder" && <ConfirmOrderSection totalPrice={totalPrice} />}
           </div>
         </div>
       </div>
@@ -88,7 +91,7 @@ export default function BuyTicketSection() {
       </div>
       <div className="flex w-[90%] justify-center">
         <Button variant="outline" className="w-[80%] lg:w-[30%]" onClick={() => handleBuyTicketStep(buyTicketStep)}>
-          {buyTicketStep === "insertBuyerInfo" ? "立即付款" : "下一步"}
+          {buyTicketStep === "confirmOrder" ? "立即付款" : "下一步"}
         </Button>
       </div>
     </div>

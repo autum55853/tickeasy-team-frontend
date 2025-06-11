@@ -40,8 +40,9 @@ export default function InsertCreditCardSection() {
   return (
     <>
       <div className="flex w-full flex-col">
-        <div className="mb-4 pl-4 text-lg">請輸入購買資訊</div>
-        <div className="flex flex-col rounded-lg border border-gray-300 p-8">
+        <div className="relative rounded-lg border border-gray-300 p-8">
+          <div className="absolute top-0 left-0 translate-x-1/4 -translate-y-1/2 bg-white px-2 text-2xl font-bold">請輸入購買資訊</div>
+
           <div>
             <Checkbox
               id="buyerSameAsMember"
