@@ -17,9 +17,9 @@ export default function PrecautionAndNeedtoKnow() {
       </div>
       <div>
         <p>請於時限內完成購買資訊，否則視為放棄該購票權益</p>
-        <p className="text-destructive">
+        {/* <p className="text-destructive">
           剩餘時間: <strong>10:00</strong>
-        </p>
+        </p> */}
       </div>
     </>
   );

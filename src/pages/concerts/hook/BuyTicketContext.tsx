@@ -1,7 +1,7 @@
 import { BuyTicketContext } from "@/context/buyTicketContext";
 import { useState } from "react";
 import { sessionItem } from "../types/ConcertData";
-import { SelectedTicket } from "../types/BuyTicket";
+import { SelectedTicket, CreateOrderData } from "../types/BuyTicket";
 
 import { z } from "zod";
 
@@ -27,6 +27,10 @@ export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     email: "",
     mobilePhone: "",
     paymentMethod: "",
+  });
+  const [newOrderInfo, setNewOrderInfo] = useState<CreateOrderData>({
+    lockExpireTime: "",
+    orderId: "",
   });
   const validateBuyerInfo = (field?: keyof BuyerInfo) => {
     if (field) {
@@ -65,6 +69,8 @@ export const BuyTicketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         buyerInfo,
         setBuyerInfo,
         validateBuyerInfo,
+        newOrderInfo,
+        setNewOrderInfo,
       }}
     >
       {children}

@@ -5,7 +5,7 @@ export type ticketTypeItem = {
   entranceType: string;
   ticketBenefits: string;
   ticketRefundPolicy: string;
-  ticketTypePrice: string;
+  ticketTypePrice: number;
   totalQuantity: number;
   remainingQuantity: number;
   sellBeginDate: string;

@@ -1,6 +1,6 @@
 import { sessionItem } from "@/pages/concerts/types/ConcertData";
 import { createContext } from "react";
-import { SelectedTicket, BuyerInfo } from "@/pages/concerts/types/BuyTicket";
+import { SelectedTicket, BuyerInfo, CreateOrderData } from "@/pages/concerts/types/BuyTicket";
 
 export type BuyTicketContextType = {
   selectedSession: sessionItem | null;
@@ -8,6 +8,8 @@ export type BuyTicketContextType = {
   selectedTickets: SelectedTicket[];
   setSelectedTickets: (v: SelectedTicket[]) => void;
   buyerInfo: BuyerInfo;
+  newOrderInfo: CreateOrderData;
+  setNewOrderInfo: (v: CreateOrderData) => void;
   setBuyerInfo: (v: BuyerInfo) => void;
   validateBuyerInfo: (field?: keyof BuyerInfo) => { success: boolean; errors?: Record<string, string> };
 };
@@ -23,6 +25,11 @@ export const BuyTicketContext = createContext<BuyTicketContextType>({
     mobilePhone: "",
     paymentMethod: "",
   },
+  newOrderInfo: {
+    lockExpireTime: "",
+    orderId: "",
+  },
+  setNewOrderInfo: () => {},
   setBuyerInfo: () => {},
   validateBuyerInfo: () => ({ success: false, errors: {} }),
 });

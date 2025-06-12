@@ -6,12 +6,14 @@ export function TicketStepper({
   max = 1,
   ticketTypeId,
   ticketPrice,
+  ticketTypeName,
 }: {
   initial?: number;
   min?: number;
   max?: number;
   ticketTypeId: string;
   ticketPrice: number;
+  ticketTypeName: string;
 }) {
   const [count, setCount] = useState(initial);
   const { selectedTickets, setSelectedTickets } = useBuyTicketContext();
@@ -23,10 +25,10 @@ export function TicketStepper({
 
       if (existingTicketIndex !== -1) {
         const updatedTickets = [...selectedTickets];
-        updatedTickets[existingTicketIndex] = { ticketTypeId, quantity: count, ticketPrice };
+        updatedTickets[existingTicketIndex] = { ticketTypeId, quantity: count, ticketPrice, ticketTypeName };
         setSelectedTickets(updatedTickets);
       } else {
-        setSelectedTickets([...selectedTickets, { ticketTypeId, quantity: count, ticketPrice }]);
+        setSelectedTickets([...selectedTickets, { ticketTypeId, quantity: count, ticketPrice, ticketTypeName }]);
       }
     }
   }, [count]);

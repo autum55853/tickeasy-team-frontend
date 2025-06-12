@@ -34,7 +34,6 @@ export function LoginSection() {
   const requestLoginMutation = requestLogin({
     onSuccess: (response) => {
       const res = response as LoginResponse;
-      console.log("res:", res);
       // 將 token 存在 cookie 中
       setCookie(res.token);
 

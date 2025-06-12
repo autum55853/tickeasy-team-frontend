@@ -1,9 +1,17 @@
 import { Button } from "@/core/components/ui/button";
-import { sessionData, sessionItem } from "@/pages/concerts/types/ConcertData";
+import { sessionData, sessionItem, ticketTypeItem } from "@/pages/concerts/types/ConcertData";
 import Separator from "@/core/components/ui/separator";
 import TicketTypeAccordion from "./TicketTypeAccordion";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
-export default function ConcertSessionSection({ sessionData, refundPolicy }: { sessionData: sessionData; refundPolicy: string }) {
+export default function ConcertSessionSection({
+  sessionData,
+  refundPolicy,
+  sessionTicketData,
+}: {
+  sessionData: sessionData;
+  refundPolicy: string;
+  sessionTicketData: ticketTypeItem[];
+}) {
   const { selectedSession, setSelectedSession } = useBuyTicketContext();
   return (
     <>
@@ -25,7 +33,7 @@ export default function ConcertSessionSection({ sessionData, refundPolicy }: { s
             ))}
           </div>
           <Separator />
-          <TicketTypeAccordion ticketTypes={sessionData[0].ticketTypes} refundPolicy={refundPolicy} />
+          <TicketTypeAccordion ticketTypes={sessionTicketData} refundPolicy={refundPolicy} />
         </div>
       </div>
     </>
