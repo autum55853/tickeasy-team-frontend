@@ -8,14 +8,29 @@ import { ConcertLocationSection } from "../components/ConcertLocationSection";
 import { ConcertTagsSection } from "../components/ConcertTagsSection";
 import { ConcertDetailsSection } from "../components/ConcertDetailsSection";
 import { ConcertFormActions } from "../components/ConcertFormActions";
+import { BackToListButton } from "../components/BackToListButton";
 import dayjs from "dayjs";
 import { useToast } from "@/core/hooks/useToast";
+import { useParams, useLocation, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function CreateConInfoPage() {
-  const { info, setInfo, saveDraft } = useConcertStore();
+  const { info, setInfo, saveDraft, getConcert } = useConcertStore();
   const { locationTags, loading: locationLoading, error: locationError } = useLocationTags();
   const { musicTags, loading: musicLoading, error: musicError } = useMusicTags();
   const { toast } = useToast();
+  const { concertId } = useParams();
+  const location = useLocation();
+  const isEditMode = location.pathname.includes("/edit/");
+  const [searchParams] = useSearchParams();
+  const companyId = searchParams.get("companyId");
+
+  // 如果是編輯模式，就載入現有資料
+  useEffect(() => {
+    if (isEditMode && concertId && !info.concertId) {
+      getConcert(concertId);
+    }
+  }, [isEditMode, concertId, getConcert, info.concertId]);
 
   const handleSaveAndNext = async () => {
     let concertId: string | undefined = info.concertId;
@@ -32,14 +47,20 @@ export default function CreateConInfoPage() {
       }
       setInfo({ concertId });
     }
-    window.location.href = `/concert/create/sessions-and-tickets?concertId=${concertId}`;
+    const nextPath = isEditMode ? `/concert/edit/${concertId}/sessions-and-tickets` : `/concert/create/sessions-and-tickets?concertId=${concertId}`;
+    window.location.href = nextPath;
   };
 
   return (
     <Layout>
       {/* Breadcrumb */}
       <div className="mt-6 w-full bg-[#f3f3f3] px-4 py-6">
-        <h1 className="mx-auto max-w-7xl text-left text-2xl font-bold">舉辦演唱會</h1>
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-4">
+            <BackToListButton companyId={companyId} isEditMode={isEditMode} />
+            <h1 className="text-left text-2xl font-bold">{isEditMode ? "編輯演唱會" : "舉辦演唱會"}</h1>
+          </div>
+        </div>
       </div>
       <div className="mx-auto max-w-7xl px-4 pt-8 pb-4">
         <nav className="flex items-center space-x-2 text-sm">
@@ -116,7 +137,7 @@ export default function CreateConInfoPage() {
               onRefundPolicyChange={(value) => setInfo({ refundPolicy: value })}
             />
 
-            <ConcertFormActions onSaveAndNext={handleSaveAndNext} />
+            <ConcertFormActions onSaveAndNext={handleSaveAndNext} isEditMode={isEditMode} />
           </div>
         </div>
       </div>
