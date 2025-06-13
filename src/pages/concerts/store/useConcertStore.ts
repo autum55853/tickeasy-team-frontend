@@ -1,10 +1,14 @@
 import { create } from "zustand";
 import axios, { AxiosResponse } from "axios";
 import { ConcertResponse, Session, TicketType, Venue } from "@/pages/comm/types/Concert";
-import { getAuthToken } from "./authToken";
+import { useAuthStore } from "@/store/authStore";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // ========== 型別定義 ==========
 type UploadContext = "USER_AVATAR" | "VENUE_PHOTO" | "CONCERT_SEATING_TABLE" | "CONCERT_BANNER";
+
+export type ConInfoStatus = "draft" | "reviewing" | "published" | "rejected" | "finished";
 
 interface VenueListItem {
   venueId: string;
@@ -16,6 +20,43 @@ interface VenueListItem {
 interface VenuesResponse {
   status: string;
   data: VenueListItem[];
+}
+
+interface OrganizationConcert {
+  concertId: string;
+  organizationId: string;
+  venueId: string | null;
+  locationTagId: string | null;
+  musicTagId: string | null;
+  conTitle: string;
+  conIntroduction: string;
+  conLocation: string;
+  conAddress: string;
+  imgBanner: string;
+  ticketPurchaseMethod: string | null;
+  precautions: string | null;
+  refundPolicy: string | null;
+  conInfoStatus: string;
+  reviewStatus: string;
+  visitCount: number;
+  promotion: number;
+  createdAt: string;
+  updatedAt: string;
+  sessions: Session[];
+}
+
+interface OrganizationConcertsResponse {
+  status: string;
+  message: string;
+  data: {
+    concerts: OrganizationConcert[];
+    pagination: {
+      totalCount: number;
+      totalPages: number;
+      currentPage: number;
+      limit: number;
+    };
+  };
 }
 
 type ConcertState = {
@@ -50,6 +91,13 @@ type ConcertState = {
   sessions: Session[];
   venue: Venue | null;
   venues: VenueListItem[];
+  organizationConcerts: OrganizationConcert[];
+  organizationConcertsPagination: {
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  } | null;
 
   // 基本操作
   setInfo: (info: Partial<ConcertState["info"]>) => void;
@@ -70,6 +118,11 @@ type ConcertState = {
   uploadImage: (file: File, uploadContext: UploadContext) => Promise<string>;
   getConcert: (concertId: string) => Promise<void>;
   getVenues: () => Promise<void>;
+  getOrganizationConcerts: (organizationId: string, page?: number, status?: ConInfoStatus) => Promise<OrganizationConcert[]>;
+  cancelConcert: (concertId: string) => Promise<void>;
+  deleteConcert: (concertId: string) => Promise<void>;
+  getConcertStatus: (concertId: string) => ConInfoStatus | null;
+  getConcertStatusCounts: () => Record<ConInfoStatus, number>;
 };
 
 // ========== 工具函數 ==========
@@ -114,6 +167,8 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   sessions: sessionData,
   venue: null,
   venues: [],
+  organizationConcerts: [],
+  organizationConcertsPagination: null,
 
   // ========== 基本操作 ==========
   setInfo: (info) =>
@@ -172,7 +227,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   // ========== API 操作 ==========
   saveDraft: async (): Promise<{ concertId: string } | undefined> => {
     try {
-      const token = getAuthToken();
+      const token = useAuthStore.getState().getAuthToken();
       if (!token) {
         return Promise.reject(new Error("未登入"));
       }
@@ -242,14 +297,14 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       let response: AxiosResponse<ConcertResponse>;
       if (info.concertId) {
         // 如果已有 concertId，使用 PUT 更新
-        response = await axios.put<ConcertResponse>(`http://localhost:3000/api/v1/concerts/${info.concertId}`, payload, {
+        response = await axios.put<ConcertResponse>(`${API_BASE_URL}/api/v1/concerts/${info.concertId}`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
       } else {
         // 如果沒有 concertId，使用 POST 新增
-        response = await axios.post<ConcertResponse>(`http://localhost:3000/api/v1/concerts/`, payload, {
+        response = await axios.post<ConcertResponse>(`${API_BASE_URL}/api/v1/concerts/`, payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -291,23 +346,23 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   },
 
   uploadImage: async (file: File, uploadContext: UploadContext): Promise<string> => {
-    const token = getAuthToken();
+    const token = useAuthStore.getState().getAuthToken();
     const formData = new FormData();
     formData.append("file", file);
     formData.append("uploadContext", uploadContext);
 
-    const response = await axios.post<{ status: string; message: string; data: string }>(`http://localhost:3000/api/v1/upload/image`, formData, {
+    const response = await axios.post<{ status: string; message: string; data: string }>(`${API_BASE_URL}/api/v1/upload/image`, formData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.data.status === "success") {
-      return response.data.data; // 直接回傳 string
+      return response.data.data;
     }
     throw new Error(response.data.message || "上傳失敗");
   },
 
   getConcert: async (concertId: string) => {
     try {
-      const response = await axios.get<ConcertResponse>(`http://localhost:3000/api/v1/concerts/${concertId}`);
+      const response = await axios.get<ConcertResponse>(`${API_BASE_URL}/api/v1/concerts/${concertId}`);
 
       if (response.data.status === "success" && response.data.data) {
         const concertData = response.data.data;
@@ -364,7 +419,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
 
   getVenues: async () => {
     try {
-      const response = await axios.get<VenuesResponse>(`http://localhost:3000/api/v1/concerts/venues`);
+      const response = await axios.get<VenuesResponse>(`${API_BASE_URL}/api/v1/concerts/venues`);
 
       if (response.data.status === "success") {
         set({ venues: response.data.data });
@@ -375,5 +430,115 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       console.error("getVenues error", error);
       return Promise.reject(error);
     }
+  },
+
+  getOrganizationConcerts: async (organizationId: string, page = 1, status?: ConInfoStatus) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const statusQuery = status ? `&status=${status}` : "";
+      const response = await axios.get<OrganizationConcertsResponse>(
+        `${API_BASE_URL}/api/v1/organizations/${organizationId}/concerts?page=${page}${statusQuery}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.status === "success") {
+        const concerts = response.data.data.concerts;
+        set({
+          organizationConcerts: concerts,
+          organizationConcertsPagination: response.data.data.pagination,
+        });
+        return concerts;
+      } else {
+        return Promise.reject(new Error("取得組織演唱會列表失敗"));
+      }
+    } catch (error) {
+      console.error("getOrganizationConcerts error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  cancelConcert: async (concertId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/v1/concerts/${concertId}/cancel`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error("刪除失敗");
+      }
+
+      // 重新取得組織的演唱會列表
+      const info = get().info;
+      if (info.organizationId) {
+        await get().getOrganizationConcerts(info.organizationId);
+      }
+    } catch (error) {
+      console.error("cancelConcert error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  deleteConcert: async (concertId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/v1/concerts/${concertId}/cancel`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error("刪除失敗");
+      }
+
+      // 重新取得組織的演唱會列表
+      const info = get().info;
+      if (info.organizationId) {
+        await get().getOrganizationConcerts(info.organizationId);
+      }
+    } catch (error) {
+      console.error("deleteConcert error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  getConcertStatus: (concertId: string) => {
+    const concert = get().organizationConcerts.find((c) => c.concertId === concertId);
+    return concert ? (concert.conInfoStatus as ConInfoStatus) : null;
+  },
+
+  getConcertStatusCounts: () => {
+    const counts: Record<ConInfoStatus, number> = {
+      draft: 0,
+      reviewing: 0,
+      rejected: 0,
+      published: 0,
+      finished: 0,
+    };
+
+    // 只計算當前頁面的實際數量
+    get().organizationConcerts.forEach((concert) => {
+      const status = concert.conInfoStatus as ConInfoStatus;
+      if (status in counts) {
+        counts[status]++;
+      }
+    });
+
+    return counts;
   },
 }));

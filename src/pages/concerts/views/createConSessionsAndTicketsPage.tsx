@@ -5,12 +5,13 @@ import Header from "@/core/components/global/header";
 import { Button } from "@/core/components/ui/button";
 import { Pencil, Trash2, Save, Calendar } from "lucide-react";
 import { useConcertStore } from "../store/useConcertStore";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation, useParams } from "react-router-dom";
 import { useSeattableUpload } from "../hook/useSeattableUpload";
 import { Session, TicketType } from "@/pages/comm/types/Concert";
 import { DateTimePicker } from "@/core/components/ui/datetimePicker";
 import dayjs from "dayjs";
 import { TicketTypeTable } from "../components/TicketTypeTable";
+import { BackToListButton } from "../components/BackToListButton";
 import { useToast } from "@/core/hooks/useToast";
 
 export default function CreateConSessionsAndTicketsPage() {
@@ -18,7 +19,10 @@ export default function CreateConSessionsAndTicketsPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const concertId = searchParams.get("concertId");
+  const location = useLocation();
+  const { concertId: urlConcertId } = useParams();
+  const isEditMode = location.pathname.includes("/edit/");
+  const concertId = isEditMode ? urlConcertId : searchParams.get("concertId");
   const companyId = searchParams.get("companyId");
 
   // UI 狀態
@@ -42,14 +46,15 @@ export default function CreateConSessionsAndTicketsPage() {
         description: "請先儲存草稿再設定場次",
         variant: "destructive",
       });
-      navigate(`/concert/create/info?companyId=${companyId}`);
+      const backPath = isEditMode ? `/concert/edit/${urlConcertId}/info` : `/concert/create/info?companyId=${companyId}`;
+      navigate(backPath);
       return;
     }
 
     if (concertId !== info.concertId) {
       setInfo({ concertId });
     }
-  }, [concertId, companyId, info.concertId, navigate, setInfo, toast]);
+  }, [concertId, companyId, info.concertId, navigate, setInfo, toast, isEditMode, urlConcertId]);
 
   useEffect(() => {
     if (concertId) {
@@ -142,21 +147,6 @@ export default function CreateConSessionsAndTicketsPage() {
     setExpandedTicketId(newTicketId);
   };
 
-  const handleBack = () => {
-    const queryParams = new URLSearchParams(window.location.search);
-    const companyId = queryParams.get("companyId");
-    const newQueryParams = new URLSearchParams();
-
-    if (companyId) {
-      newQueryParams.set("companyId", companyId);
-    }
-    if (info.concertId) {
-      newQueryParams.set("concertId", info.concertId);
-    }
-
-    navigate(`/concert/create/info?${newQueryParams.toString()}`);
-  };
-
   const handleSaveDraftWrapper = async () => {
     try {
       const result = await saveDraft();
@@ -177,18 +167,31 @@ export default function CreateConSessionsAndTicketsPage() {
     }
   };
 
+  const handleBack = () => {
+    const backPath = isEditMode
+      ? `/concert/edit/${concertId}/info`
+      : `/concert/create/info?${new URLSearchParams({ concertId: info.concertId || "", companyId: companyId || "" }).toString()}`;
+    navigate(backPath);
+  };
+
   return (
     <>
       <Header />
       {/* Breadcrumb */}
       <div className="mt-24 w-full bg-[#f3f3f3] px-4 py-6">
-        <h1 className="mx-auto max-w-7xl text-left text-2xl font-bold">舉辦演唱會</h1>
+        <div className="mx-auto max-w-7xl">
+          <div className="flex items-center gap-6">
+            <BackToListButton companyId={companyId} isEditMode={isEditMode} />
+            <div className="h-6 border-l border-gray-300" />
+            <h1 className="text-2xl font-bold text-gray-900">{isEditMode ? "編輯演唱會" : "舉辦演唱會"}</h1>
+          </div>
+        </div>
       </div>
-      <div className="mx-auto max-w-7xl px-4 pt-8 pb-4">
+      <div className="mx-auto max-w-7xl px-4 pt-6 pb-4">
         <nav className="flex items-center space-x-2 text-sm">
           <span className="font-medium text-blue-600">設定演唱會資料</span>
           <span className="text-gray-400">/</span>
-          <span className="text-black">設定場次及票種</span>
+          <span className="text-gray-600">設定場次及票種</span>
         </nav>
       </div>
 
@@ -310,7 +313,7 @@ export default function CreateConSessionsAndTicketsPage() {
                 上一步
               </Button>
               <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white" onClick={handleSaveDraftWrapper}>
-                儲存草稿
+                {isEditMode ? "儲存變更" : "儲存草稿"}
               </Button>
               <Button variant="outline" className="rounded border-[#2986cc] bg-[#2986cc] text-white">
                 送審

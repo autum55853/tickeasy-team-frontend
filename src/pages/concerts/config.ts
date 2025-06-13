@@ -21,9 +21,21 @@ export default {
       needLogin: true,
     },
     {
+      path: "/concert/edit/:concertId/info",
+      component: lazy(() => import("./views/createConInfoPage")),
+      meta: { title: "編輯演唱會-基本資料" },
+      needLogin: true,
+    },
+    {
       path: "/concert/create/sessions-and-tickets",
       component: lazy(() => import("./views/createConSessionsAndTicketsPage")),
       meta: { title: "建立演唱會-設定場次及票種" },
+      needLogin: true,
+    },
+    {
+      path: "/concert/edit/:concertId/sessions-and-tickets",
+      component: lazy(() => import("./views/createConSessionsAndTicketsPage")),
+      meta: { title: "編輯演唱會-設定場次及票種" },
       needLogin: true,
     },
     {
