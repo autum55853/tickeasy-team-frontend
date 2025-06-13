@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
-
 export function TicketStepper({
   initial = 0,
   min = 0,
   max = 1,
   ticketTypeId,
   ticketPrice,
+  ticketTypeName,
 }: {
   initial?: number;
   min?: number;
   max?: number;
   ticketTypeId: string;
   ticketPrice: number;
+  ticketTypeName: string;
 }) {
   const [count, setCount] = useState(initial);
   const { selectedTickets, setSelectedTickets } = useBuyTicketContext();
@@ -24,10 +25,10 @@ export function TicketStepper({
 
       if (existingTicketIndex !== -1) {
         const updatedTickets = [...selectedTickets];
-        updatedTickets[existingTicketIndex] = { ticketTypeId, quantity: count, ticketPrice };
+        updatedTickets[existingTicketIndex] = { ticketTypeId, quantity: count, ticketPrice, ticketTypeName };
         setSelectedTickets(updatedTickets);
       } else {
-        setSelectedTickets([...selectedTickets, { ticketTypeId, quantity: count, ticketPrice }]);
+        setSelectedTickets([...selectedTickets, { ticketTypeId, quantity: count, ticketPrice, ticketTypeName }]);
       }
     }
   }, [count]);
@@ -35,8 +36,12 @@ export function TicketStepper({
     <div className="flex flex-col items-center">
       {count === 0 ? (
         // 只顯示加號
+
         <button
-          className="hover:bg-primary hover:text-secondary h-10 w-10 cursor-pointer rounded-full border border-blue-400 text-2xl text-blue-400"
+          className={`hover:bg-primary hover:text-secondary h-10 w-10 rounded-full border border-blue-400 text-2xl text-blue-400 ${
+            selectedTickets.length > 0 ? "cursor-not-allowed" : "cursor-pointer"
+          }`}
+          disabled={selectedTickets.length > 0}
           onClick={() => setCount(1)}
         >
           +
@@ -46,7 +51,7 @@ export function TicketStepper({
         <div className="flex items-center rounded-full bg-blue-400 p-2">
           <button
             disabled={count === max}
-            className="mb-1 h-8 w-8 cursor-pointer rounded-full bg-blue-100 text-2xl"
+            className="mb-1 h-8 w-8 cursor-not-allowed rounded-full bg-blue-100 text-2xl"
             onClick={() => setCount(Math.min(count + 1, max))}
           >
             +

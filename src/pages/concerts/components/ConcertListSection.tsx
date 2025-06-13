@@ -21,10 +21,10 @@ export default function ConcertListSection() {
   }).useGet();
 
   useEffect(() => {
-    if (data) {
+    if (data && data.length > 0) {
       const convertData = data.map((item, index) => ({
         idx: index,
-        id: String(index + 1),
+        id: item.concertId,
         startDate: item.eventStartDate,
         endDate: item.eventEndDate,
         title: item.conTitle,

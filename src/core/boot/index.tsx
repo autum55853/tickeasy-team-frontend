@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+// import { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { routers } from "@/core/routers";
 import { RouteView } from "@/core/types/router";
@@ -23,9 +23,10 @@ const Boot = () => {
 
   return (
     <div className="h-[100vh] w-[100vw]">
-      <Suspense fallback={<div>Loading...</div>}>
+      {/* <Suspense fallback={<div>Loading...</div>}>
         <Routes>{renderRoutes(routers)}</Routes>
-      </Suspense>
+      </Suspense> */}
+      <Routes>{renderRoutes(routers)}</Routes>
     </div>
   );
 };

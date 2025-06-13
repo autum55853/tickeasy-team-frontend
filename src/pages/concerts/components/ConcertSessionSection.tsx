@@ -1,15 +1,24 @@
 import { Button } from "@/core/components/ui/button";
-import { sessionData, sessionItem } from "@/pages/concerts/types/ConcertData";
+import { sessionData, sessionItem, ticketTypeItem } from "@/pages/concerts/types/ConcertData";
 import Separator from "@/core/components/ui/separator";
 import TicketTypeAccordion from "./TicketTypeAccordion";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
-export default function ConcertSessionSection({ sessionData, refundPolicy }: { sessionData: sessionData; refundPolicy: string }) {
+export default function ConcertSessionSection({
+  sessionData,
+  refundPolicy,
+  sessionTicketData,
+}: {
+  sessionData: sessionData;
+  refundPolicy: string;
+  sessionTicketData: ticketTypeItem[];
+}) {
   const { selectedSession, setSelectedSession } = useBuyTicketContext();
   return (
     <>
       <div className="flex w-full flex-col">
-        <div className="mb-4 text-lg">請選擇場次與票券</div>
-        <div className="rounded-lg border border-gray-300 p-8">
+        <div className="relative rounded-lg border border-gray-300 p-8">
+          <div className="absolute top-0 left-0 translate-x-1/4 -translate-y-1/2 bg-white px-2 text-2xl font-bold">請選擇場次與票券</div>
+
           <div className="flex flex-col">
             {sessionData.map((session: sessionItem) => (
               <Button
@@ -24,7 +33,7 @@ export default function ConcertSessionSection({ sessionData, refundPolicy }: { s
             ))}
           </div>
           <Separator />
-          <TicketTypeAccordion ticketTypes={sessionData[0].ticketTypes} refundPolicy={refundPolicy} />
+          <TicketTypeAccordion ticketTypes={sessionTicketData} refundPolicy={refundPolicy} />
         </div>
       </div>
     </>

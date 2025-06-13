@@ -1,6 +1,8 @@
 import { Button } from "@/core/components/ui/button";
-import { QrCode, Ticket } from "lucide-react";
+import { Ticket } from "lucide-react";
 import { TicketDialog } from "./ticketDialog";
+import QRCode from "react-qr-code";
+
 interface Ticket {
   concertId: string;
   concertName: string;
@@ -62,7 +64,7 @@ export default function EticketCard({ ticketData }: EticketCardProps) {
         ></TicketDialog>
 
         <div className="flex items-center justify-center border-r-2 bg-gray-100 lg:col-span-3">
-          <QrCode className="h-[80%] w-[80%]" />
+          <QRCode value={ticketData.orderNumber} style={{ height: "auto", width: "80%" }} />
         </div>
         <div className="bg-gray-100 lg:col-span-8 lg:rounded-r-xl">
           <div className="grid justify-between lg:grid-cols-5">
@@ -90,14 +92,6 @@ export default function EticketCard({ ticketData }: EticketCardProps) {
               </div>
             </div>
             <div className="flex flex-col gap-3 p-4 lg:col-span-1">
-              <TicketDialog
-                trigger={
-                  <Button variant="outline" className="w-full">
-                    查看購票明細
-                  </Button>
-                }
-                type="ticketDetail"
-              ></TicketDialog>
               <TicketDialog
                 trigger={
                   <Button variant="outline" className="w-full">

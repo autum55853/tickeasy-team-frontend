@@ -27,8 +27,7 @@ export default {
       needLogin: true,
     },
     {
-      // path: "/concert/buyTicket/:id",
-      path: "/concert/buyTicket/test",
+      path: "/concert/buyTicket/:concertId",
       component: lazy(() => import("./views/buyTickerPage")),
       meta: { title: "購買演唱會票券" },
       needLogin: true,

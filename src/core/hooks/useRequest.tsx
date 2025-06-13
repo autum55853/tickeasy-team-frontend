@@ -16,7 +16,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
   const queryClient = useQueryClient();
 
   // 獲取數據
-  const useGet = (id?: string | number) => {
+  const useGet = (id?: string | number, enabled = true) => {
     return useQuery({
       queryKey: id ? [...queryKey, id] : queryKey,
       queryFn: async () => {
@@ -30,6 +30,7 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
+      enabled: enabled,
     });
   };
 

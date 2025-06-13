@@ -2,6 +2,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { ticketTypeItem } from "../types/ConcertData";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
 import { TicketStepper } from "./TicketStepper";
+import { formatLocalTime } from "@/utils/formatTime";
 export default function TicketTypeAccordion({ ticketTypes, refundPolicy }: { ticketTypes: ticketTypeItem[]; refundPolicy: string }) {
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -14,7 +15,14 @@ export default function TicketTypeAccordion({ ticketTypes, refundPolicy }: { tic
             </div>
             <div className="flex flex-col items-center gap-2">
               <p className="text-xl whitespace-nowrap">(餘{ticketType.remainingQuantity}張)</p>
-              <TicketStepper initial={0} min={0} max={1} ticketTypeId={ticketType.ticketTypeId} ticketPrice={Number(ticketType.ticketTypePrice)} />
+              <TicketStepper
+                initial={0}
+                min={0}
+                max={1}
+                ticketTypeId={ticketType.ticketTypeId}
+                ticketPrice={Number(ticketType.ticketTypePrice)}
+                ticketTypeName={ticketType.ticketTypeName}
+              />
             </div>
           </div>
           <AccordionTrigger>
@@ -26,13 +34,7 @@ export default function TicketTypeAccordion({ ticketTypes, refundPolicy }: { tic
                 <div className="flex flex-col gap-2">
                   <p className="text-lg font-bold">售票時間</p>
                   <p>
-                    {ticketType.sellBeginDate} - {ticketType.sellEndDate}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="text-lg font-bold">票券可以用時間</p>
-                  <p>
-                    {ticketType.sellBeginDate} - {ticketType.sellEndDate}
+                    {formatLocalTime(ticketType.sellBeginDate)} - {formatLocalTime(ticketType.sellEndDate)}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">

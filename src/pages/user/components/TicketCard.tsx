@@ -1,6 +1,7 @@
 import Separator from "@/core/components/ui/separator";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
-import { QrCode, CircleCheck, MapPin, CalendarDays, Ticket, CircleDollarSign } from "lucide-react";
+import { CircleCheck, MapPin, CalendarDays, Ticket, CircleDollarSign } from "lucide-react";
+import QRCode from "react-qr-code";
 interface Ticket {
   concertId: string;
   concertName: string;
@@ -29,7 +30,7 @@ export default function TicketCard({ ticketData, setPageStep }: TicketCardProps)
           </div>
 
           <div className="row-span-2 flex items-center justify-center border-r-2 bg-gray-100 lg:col-span-3">
-            <QrCode className="h-[80%] w-[80%]" />
+            <QRCode value={ticketData.orderNumber} style={{ height: "auto", width: "80%" }} />
           </div>
           <div className="row-span-2 bg-gray-100 lg:col-span-8 lg:rounded-r-xl">
             <div className="flex flex-col gap-2 px-4 py-4 lg:px-8">
@@ -69,7 +70,7 @@ export default function TicketCard({ ticketData, setPageStep }: TicketCardProps)
       ) : (
         <div className="row-span-3 grid w-full lg:h-full lg:grid-cols-12">
           <div className="row-span-1 flex items-center justify-center border-r-2 bg-gray-100 lg:col-span-3 lg:h-full lg:rounded-l-xl">
-            <QrCode className="h-[80%] w-[80%]" />
+            <QRCode value={ticketData.orderNumber} style={{ height: "auto", width: "80%" }} />
           </div>
           <div className="bg-gray-100 lg:col-span-9 lg:h-full lg:rounded-r-xl">
             <div className="flex flex-col gap-2 px-4 py-4 lg:px-8">
