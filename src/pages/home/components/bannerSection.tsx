@@ -20,6 +20,7 @@ export default function BannerSection() {
       const covertData = data.map((item, index) => {
         return {
           id: index,
+          concertId: item.concertId,
           image: item.imgBanner,
           title: item.conTitle,
           description: item.conIntroduction,

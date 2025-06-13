@@ -26,7 +26,7 @@ export default function LastestCard(data: LastestCardProps) {
             </p>
           </div>
           <div
-            onClick={() => navigate(`/concerts/${data.id}`)}
+            onClick={() => navigate(`/concert/${data.id}`)}
             className="border-primary flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1"
           >
             <Icon icon="my-arrow-right" className="text-primary text-xl" />

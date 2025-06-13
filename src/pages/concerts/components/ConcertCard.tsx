@@ -5,7 +5,10 @@ export default function ConcertCard(data: ConcertCardProps) {
   const navigate = useNavigate();
   return (
     <div className="mx-auto">
-      <div className="relative flex h-[365px] w-[351px] flex-col overflow-hidden rounded-2xl border-2 border-neutral-200 bg-white shadow-md lg:w-[416px]">
+      <div
+        onClick={() => navigate(`/concert/${data.id}`)}
+        className="relative flex h-[365px] w-[351px] cursor-pointer flex-col overflow-hidden rounded-2xl border-2 border-neutral-200 bg-white shadow-md transition-shadow hover:shadow-lg lg:w-[416px]"
+      >
         <div className="relative h-[60%] w-full">
           <img src={data.image} alt={data.title} className="h-full w-full object-cover" />
         </div>
@@ -25,10 +28,7 @@ export default function ConcertCard(data: ConcertCardProps) {
               {data.location}
             </a>
           </div>
-          <div
-            onClick={() => navigate(`/concert/${data.id}`)}
-            className="border-primary absolute right-4 bottom-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1"
-          >
+          <div className="border-primary absolute right-4 bottom-2 flex h-8 w-8 items-center justify-center rounded-full border-1">
             <Icon icon="my-arrow-right" className="text-primary text-xl" />
           </div>
         </div>
