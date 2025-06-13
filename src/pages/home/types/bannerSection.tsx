@@ -18,6 +18,7 @@ export interface BannerData {
 
 export interface BannerItem {
   id: number;
+  concertId: string;
   image: string;
   title: string;
   description: string;

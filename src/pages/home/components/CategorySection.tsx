@@ -70,7 +70,7 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
         title: item.conTitle,
         image: item.imgBanner,
         chips: [item.musicTagName, item.venueName],
-        link: `/concerts/${item.concertId}`,
+        link: `/concert/${item.concertId}`,
       };
     });
 

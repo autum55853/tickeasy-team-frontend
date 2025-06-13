@@ -6,11 +6,12 @@ import { Button } from "@/core/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import "@/core/styles/singleConcertPage.css";
 import { ConcertResponse } from "@/pages/comm/types/Concert";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function SingleConcertPage() {
   const { concertId } = useParams();
+  const navigate = useNavigate();
   const [concert, setConcert] = useState<ConcertResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,14 +26,16 @@ export default function SingleConcertPage() {
     const fetchConcert = async () => {
       try {
         const response = await axios.get<ConcertResponse>(`${import.meta.env.VITE_API_BASE_URL}/api/v1/concerts/${concertId}`);
-        if (response.data.status !== "success") {
-          throw new Error("API returned unsuccessful status");
+        if (response.data.status !== "success" || !response.data.data) {
+          navigate("/404");
+          return;
         }
         setConcert(response.data.data);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
-            setError("找不到演唱會資訊");
+            navigate("/404");
+            return;
           } else if (err.response?.status === 401) {
             setError("請先登入以查看演唱會資訊");
           } else if (err.code === "ECONNABORTED") {
@@ -52,7 +55,7 @@ export default function SingleConcertPage() {
     };
 
     fetchConcert();
-  }, [concertId]);
+  }, [concertId, navigate]);
 
   const tabOptions = [
     { label: "活動場次", ref: sessionsRef },
@@ -103,7 +106,10 @@ export default function SingleConcertPage() {
         </div>
       </div>
     );
-  if (!concert) return <div>演唱會資訊不存在</div>;
+  if (!concert) {
+    navigate("/404");
+    return null;
+  }
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("zh-TW", {
@@ -113,9 +119,16 @@ export default function SingleConcertPage() {
     });
   };
 
-  const formatTime = (timeStr: string) => {
+  const formatTime = (timeStr: string | null | undefined) => {
+    if (!timeStr) return "--:--";
     return timeStr.split(":").slice(0, 2).join(":");
   };
+
+  // eventStartDate 或 eventEndDate 缺失就導向 404
+  if (!concert.eventStartDate || !concert.eventEndDate) {
+    navigate("/404");
+    return null;
+  }
 
   return (
     <>
@@ -186,7 +199,7 @@ export default function SingleConcertPage() {
                   {Array.from(new Set(concert.sessions[0].ticketTypes.map((ticket) => `${ticket.ticketTypeName}-${ticket.ticketTypePrice}`))).map(
                     (ticketKey) => {
                       const [name, price] = ticketKey.split("-");
-                      const ticket = concert.sessions[0].ticketTypes.find((t) => t.ticketTypeName === name && t.ticketTypePrice === price);
+                      const ticket = concert.sessions[0].ticketTypes.find((t) => t.ticketTypeName === name && t.ticketTypePrice.toString() === price);
                       return (
                         <div key={ticket?.ticketTypeId} className="flex">
                           <span className="w-32 font-semibold">{name}：</span>

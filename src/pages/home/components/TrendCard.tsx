@@ -16,7 +16,7 @@ export default function TrendCard(data: TrendCardProps) {
             <h5 className="line-clamp-2 font-bold">{data.title}</h5>
             <p className="line-clamp-3 text-base text-gray-500">{data.description}</p>
             <Button
-              onClick={() => navigate(`/concerts/${data.link}`)}
+              onClick={() => navigate(`/concert/${data.link}`)}
               variant={"outline"}
               className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left"
             >
@@ -38,7 +38,7 @@ export default function TrendCard(data: TrendCardProps) {
             <h3 className="font-bold">{data.title}</h3>
             <p className="text-xl text-gray-500">{data.description}</p>
             <Button
-              onClick={() => navigate(`/concerts/${data.link}`)}
+              onClick={() => navigate(`/concert/${data.link}`)}
               variant={"outline"}
               className="w-[66%] max-w-[200px] rounded-full px-3 pl-10 text-left"
             >

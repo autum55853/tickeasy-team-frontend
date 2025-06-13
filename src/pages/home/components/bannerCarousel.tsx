@@ -13,20 +13,23 @@ interface HomeCarouselProps {
 export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = React.useState(bannerList[0].id);
+  const [activeConcertId, setActiveConcertId] = React.useState(bannerList[0].concertId);
   const navigate = useNavigate();
   // 監聽滑動變化
   React.useEffect(() => {
     if (!api) return;
 
     const onSelect = () => {
-      setActiveIndex(api.selectedScrollSnap());
+      const index = api.selectedScrollSnap();
+      setActiveIndex(index);
+      setActiveConcertId(bannerList[index].concertId);
     };
 
     api.on("select", onSelect);
     return () => {
       api.off("select", onSelect);
     };
-  }, [api]);
+  }, [api, bannerList]);
 
   // 添加自動輪播功能
   React.useEffect(() => {
@@ -109,7 +112,7 @@ export default function HomeCarousel({ bannerList }: HomeCarouselProps) {
         <Button
           variant={"gradientVertical"}
           className="absolute -bottom-6 left-[calc(50%-5px)] z-10 mx-2 flex h-[80px] w-[calc(75%-160px)] min-w-[200px] translate-x-[-50%] items-center text-center text-4xl text-white select-none sm:text-left lg:left-[calc(77%-20px)] lg:max-w-[250px] lg:translate-x-[-77%]"
-          onClick={() => navigate(`/concerts/${activeIndex}`)}
+          onClick={() => navigate(`/concert/${activeConcertId}`)}
         >
           <h4>報名!</h4>
         </Button>
