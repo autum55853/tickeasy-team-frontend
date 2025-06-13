@@ -14,9 +14,7 @@ import { ticketTypeItem } from "../types/ConcertData";
 import { Concert } from "@/pages/comm/types/Concert";
 import { CreateOrderData, PaymentResultResponse } from "../types/BuyTicket";
 import LoadingSpin from "@/core/components/global/loadingSpin";
-interface ticketData {
-  tickets: ticketTypeItem[];
-}
+import { AxiosResponse } from "axios";
 
 export default function BuyTicketSection({ concertData, concertSessionId }: { concertData: Concert; concertSessionId: string }) {
   const { selectedSession, selectedTickets, buyerInfo, validateBuyerInfo, newOrderInfo, setNewOrderInfo } = useBuyTicketContext();
@@ -29,6 +27,10 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
     setTotalPrice(selectedTickets.reduce((acc, ticket) => acc + ticket.ticketPrice * ticket.quantity, 0));
   }, [selectedSession, selectedTickets, buyerInfo]);
   // 取得 取得票券資訊
+  interface ticketData {
+    tickets: ticketTypeItem[];
+  }
+
   const { useGet } = useRequest<ticketData>({
     queryKey: concertSessionId ? [concertSessionId] : [],
     url: `/api/v1/ticket`,
@@ -37,10 +39,13 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
   const { data, error, isLoading } = useGet(concertSessionId, !!concertSessionId && concertSessionId !== "undefined");
 
   // 使用 useMemo 處理 sessionTicketData
-  const sessionTicketData = useMemo(
-    () => data?.tickets || [],
-    [data] // 只有當 data 改變時才重新計算
-  );
+  const sessionTicketData = useMemo(() => {
+    if (!data) return [];
+    if ("tickets" in data) return data.tickets;
+    if ("data" in data && "tickets" in (data.data as unknown as { tickets: ticketTypeItem[] }))
+      return (data.data as unknown as { tickets: ticketTypeItem[] }).tickets;
+    return [];
+  }, [data]);
 
   // 處理錯誤
   useEffect(() => {
@@ -82,36 +87,41 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
   });
 
   //處理付款
-  const { useCreate: requestHandlePayment } = useRequest({
-    queryKey: [newOrderInfo.orderId],
-    url: `/api/v1/payments/${newOrderInfo.orderId}`,
+  type MaybeHtmlResponse<T> = T | AxiosResponse<string>;
+  const { useGet: requestPayment } = useRequest<MaybeHtmlResponse<PaymentResultResponse>>({
+    queryKey: ["payment", newOrderInfo.orderId], // 絕對不要是空陣列！
+    url: `/api/v1/payments`,
   });
 
-  const { mutate: requestHandlePaymentMutation } = requestHandlePayment({
-    onSuccess: (response) => {
-      const res = response as unknown as PaymentResultResponse;
-      console.log("HandlePaymentMutation res", res);
-      toast({
-        title: res.message || "付款成功",
-      });
-    },
-    onError: (error: Error) => {
+  const paymentResponse = requestPayment(newOrderInfo.orderId, !!newOrderInfo.orderId && newOrderInfo.orderId !== "undefined") as unknown as {
+    data: string;
+    error: Error | null;
+  };
+
+  useEffect(() => {
+    if (
+      paymentResponse &&
+      paymentResponse.data &&
+      typeof paymentResponse.data === "object" &&
+      "data" in paymentResponse.data &&
+      newOrderInfo.orderId
+    ) {
+      const htmlString = (paymentResponse.data as { data: string }).data;
+      document.open();
+      document.write(htmlString);
+      document.close();
+    }
+  }, [paymentResponse, newOrderInfo.orderId]);
+  // 處理錯誤
+  useEffect(() => {
+    if (paymentResponse.error) {
       toast({
         variant: "destructive",
         title: "錯誤",
-        description: error.message || "付款失敗，請稍後再試",
-      });
-    },
-  });
-  useEffect(() => {
-    if (newOrderInfo.orderId) {
-      console.log("Run requestHandlePaymentMutation");
-      requestHandlePaymentMutation({
-        method: "credit_card",
-        provider: "ECPay",
+        description: paymentResponse.error.message || "發生錯誤，請稍後再試",
       });
     }
-  }, [newOrderInfo]);
+  }, [paymentResponse.error, toast]);
 
   const handleBuyTicketStep = (currentStep: string) => {
     // 驗證當前步驟的所有欄位
@@ -150,16 +160,7 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
       requestCreateOrderMutation(data);
     }
   };
-  useEffect(() => {
-    // 找到主要內容區域的容器
-    const pageTop = document.querySelector("#page-top");
-    if (pageTop) {
-      pageTop.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-  }, [buyTicketStep]);
+
   return (
     <div className="flex h-full flex-col items-center gap-2 px-4 lg:gap-8 lg:px-12">
       <div className="mx-auto grid h-[70%] w-full grid-cols-1 lg:w-[90%] lg:grid-cols-2">
@@ -205,7 +206,12 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
         </div>
       </div>
       <div className="flex w-[90%] justify-center">
-        <Button variant="outline" className="w-[80%] lg:w-[30%]" onClick={() => handleBuyTicketStep(buyTicketStep)}>
+        <Button
+          variant="outline"
+          className="w-[80%] lg:w-[30%]"
+          onClick={() => handleBuyTicketStep(buyTicketStep)}
+          disabled={buyTicketStep === "confirmOrder" && isCreateOrderLoading}
+        >
           {buyTicketStep === "confirmOrder" ? (isCreateOrderLoading ? "付款中..." : "立即付款") : "下一步"}
         </Button>
       </div>
