@@ -20,8 +20,8 @@ const initialState = {
 
 // 處理 Cookie 的輔助函數
 const setCookie = (token: string) => {
-  // 設定 cookie 過期時間為 1 小時
-  const expires = new Date(Date.now() + 60 * 60 * 1000);
+  // 設定 cookie 過期時間為 7 天
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   document.cookie = `auth_token=${token}; expires=${expires.toUTCString()}; path=/; secure; samesite=strict`;
 };
 const removeCookie = () => {

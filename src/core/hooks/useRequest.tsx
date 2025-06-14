@@ -19,8 +19,12 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
   const useGet = (id?: string | number, enabled = true) => {
     return useQuery({
       queryKey: id ? [...queryKey, id] : queryKey,
-      queryFn: async () => {
+      queryFn: async ({ queryKey }) => {
         try {
+          if (queryKey[0] === "payment") {
+            const response = await axiosInstance.get<T>(id ? `${url}/${id}` : url);
+            return { data: response };
+          }
           const response = await axiosInstance.get<T>(id ? `${url}/${id}` : url);
           return response.data;
         } catch (error) {
