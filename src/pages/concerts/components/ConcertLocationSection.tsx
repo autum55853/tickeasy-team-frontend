@@ -1,13 +1,7 @@
-import { Concert } from "@/pages/comm/types/Concert";
 import { useConcertStore } from "../store/useConcertStore";
 import { useEffect, useCallback } from "react";
 import { GoogleMap } from "@/core/components/global/googleMap";
-import Select, { StylesConfig, GroupBase } from "react-select";
-
-interface ConcertLocationSectionProps {
-  venueId: Concert["venueId"];
-  onVenueChange: (venueId: string, venueName: string, venueAddress: string) => void;
-}
+import Select, { StylesConfig, SingleValue, CSSObjectWithLabel, OptionProps } from "react-select";
 
 interface VenueOption {
   value: string;
@@ -15,8 +9,16 @@ interface VenueOption {
   address: string;
 }
 
-const customStyles: StylesConfig<VenueOption, false, GroupBase<VenueOption>> = {
-  control: (base) => ({
+interface TagOption {
+  value: string;
+  label: string;
+  subLabel: string;
+  locationTagName?: string;
+  musicTagName?: string;
+}
+
+const baseStyles = {
+  control: (base: CSSObjectWithLabel) => ({
     ...base,
     minHeight: "42px",
     borderColor: "#d1d5db",
@@ -24,6 +26,18 @@ const customStyles: StylesConfig<VenueOption, false, GroupBase<VenueOption>> = {
       borderColor: "#9ca3af",
     },
   }),
+  option: (base: CSSObjectWithLabel, state: OptionProps<VenueOption | TagOption, false>) => ({
+    ...base,
+    backgroundColor: state.isFocused ? "#f3f4f6" : "white",
+    color: "#1f2937",
+    "&:active": {
+      backgroundColor: "#e5e7eb",
+    },
+  }),
+};
+
+const venueStyles: StylesConfig<VenueOption, false> = {
+  control: baseStyles.control,
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isFocused ? "#f3f4f6" : "white",
@@ -34,25 +48,39 @@ const customStyles: StylesConfig<VenueOption, false, GroupBase<VenueOption>> = {
   }),
 };
 
-export function ConcertLocationSection({ venueId, onVenueChange }: ConcertLocationSectionProps) {
+export function ConcertLocationSection({
+  venueId,
+  onVenueChange,
+}: {
+  venueId: string;
+  onVenueChange: (venueId: string, venueName: string, venueAddress: string) => void;
+}) {
   const { venues, getVenues } = useConcertStore();
-  const fetchVenues = useCallback(() => getVenues().catch(console.error), [getVenues]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      await getVenues();
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  }, [getVenues]);
 
   useEffect(() => {
-    fetchVenues();
-  }, [fetchVenues]);
+    fetchData();
+  }, [fetchData]);
 
+  // 場館選項
   const venueOptions: VenueOption[] = venues.map((venue) => ({
     value: venue.venueId,
     label: venue.venueName,
     address: venue.venueAddress,
   }));
 
-  const selectedOption = venueOptions.find((option) => option.value === venueId);
+  const selectedVenueOption = venueOptions.find((option) => option.value === venueId);
 
-  const handleVenueChange = (option: VenueOption | null) => {
-    if (option) {
-      onVenueChange(option.value, option.label, option.address);
+  const handleVenueChange = (newValue: SingleValue<VenueOption>) => {
+    if (newValue) {
+      onVenueChange(newValue.value, newValue.label, newValue.address);
     }
   };
 
@@ -65,8 +93,8 @@ export function ConcertLocationSection({ venueId, onVenueChange }: ConcertLocati
       {/* 地點名稱 */}
       <div>
         <label className="mb-1 block font-medium text-gray-700">地點名稱</label>
-        <Select
-          value={selectedOption}
+        <Select<VenueOption>
+          value={selectedVenueOption}
           onChange={handleVenueChange}
           options={venueOptions}
           placeholder="請選擇場地"
@@ -75,7 +103,7 @@ export function ConcertLocationSection({ venueId, onVenueChange }: ConcertLocati
           classNamePrefix="react-select"
           noOptionsMessage={() => "找不到符合的場地"}
           loadingMessage={() => "載入中..."}
-          styles={customStyles}
+          styles={venueStyles}
         />
       </div>
 
@@ -89,7 +117,10 @@ export function ConcertLocationSection({ venueId, onVenueChange }: ConcertLocati
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueAddress)}`}
               target="_blank"
               rel="noopener noreferrer"
-            ></a>
+              className="bg-primary hover:bg-primary/90 inline-flex items-center rounded px-4 py-2 text-white"
+            >
+              開啟地圖
+            </a>
           )}
         </div>
       </div>

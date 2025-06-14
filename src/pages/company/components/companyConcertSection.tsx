@@ -13,31 +13,24 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { organizationConcerts, getOrganizationConcerts, organizationConcertsPagination, getConcertStatusCounts } = useConcertStore();
+  const { organizationConcerts, getAllOrganizationConcerts, getConcertStatusCounts, clearConcertId } = useConcertStore();
+  const ITEMS_PER_PAGE = 10;
 
+  // 取得所有演唱會資料
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const organizationId = params.get("companyId");
-
-    if (!organizationId) {
-      navigate("/");
+    if (!companyInfoData?.organizationId) {
       return;
     }
 
-    // 載入演唱會列表
-    getOrganizationConcerts(organizationId, currentPage).catch((error) => {
+    // 使用新方法取得所有資料
+    getAllOrganizationConcerts(companyInfoData.organizationId).catch((error) => {
       toast({
         title: "錯誤",
         description: error.message || "載入演唱會列表失敗",
         variant: "destructive",
       });
     });
-  }, [navigate, getOrganizationConcerts, toast, currentPage]);
-
-  // 當切換 tab 時重置頁碼
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab]);
+  }, [companyInfoData?.organizationId, getAllOrganizationConcerts, toast]);
 
   // 根據狀態分類演唱會
   const concertsByStatus = useMemo(() => {
@@ -59,6 +52,23 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
     return concertsByStatus[activeTab] || [];
   }, [concertsByStatus, activeTab]);
 
+  // 計算當前 tab 的分頁資料
+  const paginatedConcerts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return currentTabConcerts.slice(startIndex, endIndex);
+  }, [currentTabConcerts, currentPage]);
+
+  // 計算當前 tab 的總頁數
+  const totalPages = useMemo(() => {
+    return Math.ceil(currentTabConcerts.length / ITEMS_PER_PAGE);
+  }, [currentTabConcerts]);
+
+  // 當切換 tab 時重置頁碼
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
   // 取得各狀態的演唱會總數
   const statusCounts = getConcertStatusCounts();
 
@@ -77,7 +87,11 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
               type="submit"
               variant="outline"
               className="my-2 flex rounded-full lg:w-[100px]"
-              onClick={() => navigate(`/concert/create/info?companyId=${companyInfoData.organizationId}`)}
+              onClick={() => {
+                localStorage.removeItem("concertId");
+                clearConcertId();
+                navigate(`/concert/create/info?companyId=${companyInfoData.organizationId}`);
+              }}
             >
               辦演唱會
             </Button>
@@ -102,8 +116,8 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
             </TabsTrigger>
           </TabsList>
 
-          {/* 使用 currentTabConcerts 來顯示當前 tab 的演唱會列表 */}
-          {currentTabConcerts.map((concert) => (
+          {/* 使用分頁後的資料來顯示當前 tab 的演唱會列表 */}
+          {paginatedConcerts.map((concert) => (
             <CompanyConcertCard
               key={concert.concertId}
               concertId={concert.concertId}
@@ -115,9 +129,9 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
           ))}
 
           {/* 分頁控制 */}
-          {organizationConcertsPagination && (
+          {totalPages > 0 && (
             <div className="mt-4">
-              <Pagination currentPage={currentPage} totalPages={organizationConcertsPagination.totalPages} onPageChange={handlePageChange} />
+              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             </div>
           )}
         </Tabs>

@@ -1,6 +1,6 @@
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CompanyInfoSection from "./companyInfoSection";
 import CompanyConcertSection from "./companyConcertSection";
 import { useEffect, useState } from "react";
@@ -15,7 +15,21 @@ interface CompanyDetailResponse {
 export default function CompanyDetailSection({ companyId }: { companyId: string }) {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [companyInfoData, setCompanyInfoData] = useState<CompanyDetailData>();
+
+  // 從 URL 參數讀取初始 tab
+  const [activeTab, setActiveTab] = useState(() => searchParams.get("tab") || "companyInfo");
+
+  // 更新 tab 時同步更新 URL
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === "concertList") {
+      setSearchParams({ tab, page: "1", companyId });
+    } else {
+      setSearchParams({ tab, companyId });
+    }
+  };
 
   //串接 取得公司的詳細資料
   const { data, error, refetch } = useRequest<CompanyDetailResponse>({
@@ -24,8 +38,10 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
   }).useGet();
 
   useEffect(() => {
-    if (data?.organization) {
-      setCompanyInfoData(data.organization);
+    if (!data) return;
+    const responseData = "data" in data ? data.data.data : data;
+    if (responseData?.organization) {
+      setCompanyInfoData(responseData.organization);
     }
   }, [data]);
 
@@ -41,15 +57,12 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
   }, [error, toast]);
   useEffect(() => {
     refetch();
-  }, []); // 空依賴數組表示只在組件掛載時執行一次
+  }, [refetch]); // 加入 refetch 依賴
 
   const handleBackToCompanyList = () => {
     navigate("/company");
   };
-  const [activeTab, setActiveTab] = useState("companyInfo");
-  const handleGoToConcertList = (str: string) => {
-    setActiveTab(str);
-  };
+
   return (
     <div className="mx-auto h-full w-full lg:w-[70%]">
       <div className="grid grid-cols-3 lg:gap-4">
@@ -63,7 +76,7 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
             </li>
             <li
               className={`hover:bg-primary/10 hover:text-primary rounded-xs ${activeTab === "companyInfo" ? "bg-primary/10 text-primary" : "bg-gray-100"}`}
-              onClick={() => setActiveTab("companyInfo")}
+              onClick={() => handleTabChange("companyInfo")}
             >
               <Button variant="link" className={`w-full ${activeTab === "companyInfo" ? "text-primary" : "text-grey-500"}`}>
                 公司資訊
@@ -71,7 +84,7 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
             </li>
             <li
               className={`hover:bg-primary/10 hover:text-primary rounded-xs ${activeTab === "concertList" ? "bg-primary/10 text-primary" : "bg-gray-100"}`}
-              onClick={() => setActiveTab("concertList")}
+              onClick={() => handleTabChange("concertList")}
             >
               <Button variant="link" className={`w-full ${activeTab === "concertList" ? "text-primary" : "text-grey-500"}`}>
                 演唱會列表
@@ -79,12 +92,12 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
             </li>
           </ul>
         </div>
-        <div className="col-span-3 block flex items-center justify-between lg:hidden">
+        <div className="col-span-3 flex items-center justify-between lg:hidden">
           <Button
             variant="link"
             size="lg"
             className={`text-grey-500 h-full w-full rounded-none bg-gray-100 py-3 text-xl hover:font-bold hover:text-gray-500 ${activeTab === "companyInfo" ? "bg-primary text-white" : ""} `}
-            onClick={() => setActiveTab("companyInfo")}
+            onClick={() => handleTabChange("companyInfo")}
           >
             公司資訊
           </Button>
@@ -92,7 +105,7 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
             variant="link"
             size="lg"
             className={`text-grey-500 h-full w-full rounded-none bg-gray-100 py-3 text-xl hover:font-bold hover:text-gray-500 ${activeTab === "concertList" ? "bg-primary text-white" : ""} `}
-            onClick={() => setActiveTab("concertList")}
+            onClick={() => handleTabChange("concertList")}
           >
             演唱會列表
           </Button>
@@ -100,7 +113,9 @@ export default function CompanyDetailSection({ companyId }: { companyId: string 
         <div className="col-span-3 lg:col-span-2">
           {companyInfoData && (
             <>
-              {activeTab === "companyInfo" && <CompanyInfoSection companyInfoData={companyInfoData} handleGoToConcertList={handleGoToConcertList} />}
+              {activeTab === "companyInfo" && (
+                <CompanyInfoSection companyInfoData={companyInfoData} handleGoToConcertList={(tab) => handleTabChange(tab)} />
+              )}
               {activeTab === "concertList" && <CompanyConcertSection companyInfoData={companyInfoData} />}
             </>
           )}

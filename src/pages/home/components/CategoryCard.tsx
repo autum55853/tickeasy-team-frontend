@@ -1,10 +1,10 @@
 import { CategoryCardProps } from "../types/CategoryCard";
+import { Link } from "react-router-dom";
 
 export default function CategoryCard(data: CategoryCardProps) {
   return (
-    <>
-      {/* 這裡可以放置你的卡片組件 */}
-      <div className="relative h-full min-h-[280px] overflow-hidden rounded-lg border-2 border-neutral-200 select-none">
+    <Link to={data.link} className="block h-full">
+      <div className="hover:border-primary relative h-full min-h-[280px] overflow-hidden rounded-lg border-2 border-neutral-200 transition-transform select-none hover:scale-[1.02]">
         <div className="relative h-[60%] w-full lg:h-[70%]">
           <img className="h-full w-full object-cover" src={data.image} alt={data.title} />
         </div>
@@ -19,6 +19,6 @@ export default function CategoryCard(data: CategoryCardProps) {
           <p className="line-clamp-1 text-xs md:text-sm lg:text-base">{data.title}</p>
         </div>
       </div>
-    </>
+    </Link>
   );
 }
