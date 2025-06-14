@@ -24,7 +24,7 @@ export function BackToListButton({ companyId, isEditMode = false }: BackToListBu
       });
       return;
     }
-    navigate(`/companyDetail?companyId=${orgId}`);
+    navigate(`/companyDetail?companyId=${orgId}&tab=concertList`);
   };
 
   return (

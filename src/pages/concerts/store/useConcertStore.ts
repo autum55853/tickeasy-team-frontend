@@ -59,6 +59,30 @@ interface OrganizationConcertsResponse {
   };
 }
 
+interface LocationTag {
+  locationTagId: string;
+  locationTagName: string;
+  subLabel: string;
+}
+
+interface MusicTag {
+  musicTagId: string;
+  musicTagName: string;
+  subLabel: string;
+}
+
+interface LocationTagsResponse {
+  status: string;
+  message: string;
+  data: LocationTag[];
+}
+
+interface MusicTagsResponse {
+  status: string;
+  message: string;
+  data: MusicTag[];
+}
+
 type ConcertState = {
   // 狀態
   info: {
@@ -98,6 +122,8 @@ type ConcertState = {
     currentPage: number;
     limit: number;
   } | null;
+  locationTags: LocationTag[];
+  musicTags: MusicTag[];
 
   // 基本操作
   setInfo: (info: Partial<ConcertState["info"]>) => void;
@@ -119,10 +145,13 @@ type ConcertState = {
   getConcert: (concertId: string) => Promise<void>;
   getVenues: () => Promise<void>;
   getOrganizationConcerts: (organizationId: string, page?: number, status?: ConInfoStatus) => Promise<OrganizationConcert[]>;
+  getAllOrganizationConcerts: (organizationId: string) => Promise<OrganizationConcert[]>;
   cancelConcert: (concertId: string) => Promise<void>;
   deleteConcert: (concertId: string) => Promise<void>;
   getConcertStatus: (concertId: string) => ConInfoStatus | null;
   getConcertStatusCounts: () => Record<ConInfoStatus, number>;
+  getLocationTags: () => Promise<void>;
+  getMusicTags: () => Promise<void>;
 };
 
 // ========== 工具函數 ==========
@@ -169,6 +198,8 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   venues: [],
   organizationConcerts: [],
   organizationConcertsPagination: null,
+  locationTags: [],
+  musicTags: [],
 
   // ========== 基本操作 ==========
   setInfo: (info) =>
@@ -461,6 +492,59 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
     }
   },
 
+  getAllOrganizationConcerts: async (organizationId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      // 先取得第一頁來知道總頁數
+      const firstPageResponse = await axios.get<OrganizationConcertsResponse>(
+        `${API_BASE_URL}/api/v1/organizations/${organizationId}/concerts?page=1`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (firstPageResponse.data.status !== "success") {
+        return Promise.reject(new Error("取得組織演唱會列表失敗"));
+      }
+
+      const totalPages = firstPageResponse.data.data.pagination.totalPages;
+      let allConcerts = [...firstPageResponse.data.data.concerts];
+
+      // 如果有多頁，則取得其他頁的資料
+      if (totalPages > 1) {
+        const otherPagesPromises = Array.from({ length: totalPages - 1 }, (_, i) => {
+          const page = i + 2; // 從第二頁開始
+          return axios.get<OrganizationConcertsResponse>(`${API_BASE_URL}/api/v1/organizations/${organizationId}/concerts?page=${page}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        });
+
+        const otherPagesResponses = await Promise.all(otherPagesPromises);
+        otherPagesResponses.forEach((response) => {
+          if (response.data.status === "success") {
+            allConcerts = [...allConcerts, ...response.data.data.concerts];
+          }
+        });
+      }
+
+      // 更新 store
+      set({
+        organizationConcerts: allConcerts,
+        organizationConcertsPagination: {
+          ...firstPageResponse.data.data.pagination,
+          currentPage: 1,
+        },
+      });
+
+      return allConcerts;
+    } catch (error) {
+      console.error("getAllOrganizationConcerts error", error);
+      return Promise.reject(error);
+    }
+  },
+
   cancelConcert: async (concertId: string) => {
     try {
       const token = useAuthStore.getState().getAuthToken();
@@ -540,5 +624,33 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
     });
 
     return counts;
+  },
+
+  getLocationTags: async () => {
+    try {
+      const response = await axios.get<LocationTagsResponse>(`${API_BASE_URL}/api/v1/concerts/location-tags`);
+      if (response.data.status === "success") {
+        set({ locationTags: response.data.data });
+      } else {
+        return Promise.reject(new Error("取得地點標籤失敗"));
+      }
+    } catch (error) {
+      console.error("getLocationTags error", error);
+      return Promise.reject(error);
+    }
+  },
+
+  getMusicTags: async () => {
+    try {
+      const response = await axios.get<MusicTagsResponse>(`${API_BASE_URL}/api/v1/concerts/music-tags`);
+      if (response.data.status === "success") {
+        set({ musicTags: response.data.data });
+      } else {
+        return Promise.reject(new Error("取得音樂標籤失敗"));
+      }
+    } catch (error) {
+      console.error("getMusicTags error", error);
+      return Promise.reject(error);
+    }
   },
 }));

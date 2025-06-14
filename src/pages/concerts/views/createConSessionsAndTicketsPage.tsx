@@ -169,8 +169,8 @@ export default function CreateConSessionsAndTicketsPage() {
 
   const handleBack = () => {
     const backPath = isEditMode
-      ? `/concert/edit/${concertId}/info`
-      : `/concert/create/info?${new URLSearchParams({ concertId: info.concertId || "", companyId: companyId || "" }).toString()}`;
+      ? `/concert/edit/${concertId}/info?tab=concertList`
+      : `/concert/create/info?${new URLSearchParams({ concertId: info.concertId || "", companyId: companyId || "", tab: "concertList" }).toString()}`;
     navigate(backPath);
   };
 

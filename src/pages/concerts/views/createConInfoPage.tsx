@@ -70,7 +70,7 @@ export default function CreateConInfoPage() {
         </nav>
       </div>
 
-      <BannerUploadSection imgBanner={info.imgBanner} />
+      <BannerUploadSection imgBanner={info.imgBanner} onBannerChange={(url) => setInfo({ imgBanner: url })} />
 
       <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-lg bg-white shadow-lg">

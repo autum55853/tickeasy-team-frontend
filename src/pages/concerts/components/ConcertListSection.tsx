@@ -30,7 +30,7 @@ export default function ConcertListSection() {
         title: item.conTitle,
         image: item.imgBanner,
         location: item.conLocation,
-        link: `/concerts/${item.concertId}`,
+        link: `/concert/${item.concertId}`,
         category: item.musicTagName,
         locationTagName: item.locationTagName,
       }));
