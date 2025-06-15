@@ -9,6 +9,12 @@ export default {
       needLogin: false,
     },
     {
+      path: "/concert/verify-qrcode/:ticketId?",
+      component: lazy(() => import("./views/verifyQRCodePage")),
+      meta: { title: "票券 QRCode 驗證" },
+      needLogin: true,
+    },
+    {
       path: "/concert/:concertId",
       component: lazy(() => import("./views/singleConcertPage")),
       meta: { title: "演唱會詳細資訊" },
@@ -48,12 +54,6 @@ export default {
       path: "/concert/paymentResult",
       component: lazy(() => import("./views/paymentResultPage")),
       meta: { title: "購買演唱會票券結果" },
-      needLogin: true,
-    },
-    {
-      path: "/concert/verify-qrcode/:ticketId?",
-      component: lazy(() => import("./views/verifyQRCodePage")),
-      meta: { title: "票券 QRCode 驗證" },
       needLogin: true,
     },
   ],
