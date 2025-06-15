@@ -7,21 +7,30 @@ import { Pagination } from "@/core/components/ui/pagination";
 import { useFilterContext } from "../hook/useFilterContext";
 import { ConcertCardProps } from "../types/ConcertCard";
 import { RawConertData } from "../types/RawConertData";
+import { useSearchParams } from "react-router-dom";
+
 export default function ConcertListSection() {
   const { toast } = useToast();
   const { filterType, clearFilter, setClearFilter } = useFilterContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [previousData, setPreviousData] = useState<ConcertCardProps[]>([]);
   const [rawConcertList, setRawConcertList] = useState<ConcertCardProps[]>([]);
-
+  const [searchParams] = useSearchParams();
+  const searchText = searchParams.get("search") || "";
   // 取得 原始Convert 列表
+  // const { data, error, refetch } = useRequest<RawConertData[]>({
+  //   queryKey: [],
+  //   url: "/api/v1/concerts/search",
+  // }).useGet();
+  //處理搜尋
+  const apiUrl = searchText ? `/api/v1/concerts/search?keyword=${encodeURIComponent(searchText)}` : "/api/v1/concerts/search";
   const { data, error, refetch } = useRequest<RawConertData[]>({
-    queryKey: [],
-    url: "/api/v1/concerts/search",
+    queryKey: [searchText], // 讓 react-query 正確依 keyword 快取
+    url: apiUrl,
   }).useGet();
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       const convertData = data.map((item, index) => ({
         idx: index,
         id: item.concertId,
@@ -112,6 +121,9 @@ export default function ConcertListSection() {
     return previousData.slice(startIndex, endIndex);
   }, [currentPage, filteredCards]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, filterType, clearFilter]);
   return (
     <>
       <FilterSection />
