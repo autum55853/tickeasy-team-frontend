@@ -74,7 +74,7 @@ export default function Header() {
               <img className="mx-auto" src={Logo} alt="Logo" draggable={false} />
             </div>
             <div className="flex w-[200px] items-center gap-6">
-              <Icon onClick={() => toggleDesktopSearch(true)} icon="my-search" className="text-2xl" />
+              <Icon onClick={() => toggleDesktopSearch(true)} icon="my-search" className="cursor-pointer text-2xl" />
               {isLogin ? (
                 <div
                   ref={accountButtonRef}

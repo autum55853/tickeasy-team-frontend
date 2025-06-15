@@ -44,7 +44,10 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
       mutationFn: async (data: Partial<T>) => {
         try {
           const response = await axiosInstance.post<T>(url, data);
-          return response.data;
+          if (response && typeof response === "object" && "data" in response) {
+            return response.data;
+          }
+          return response;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message || "創建數據失敗");
@@ -52,12 +55,10 @@ export function useRequest<T>({ queryKey, url }: UseRequestOptions) {
           throw error;
         }
       },
-      onSuccess: (data: unknown) => {
+      ...options,
+      onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey });
         options?.onSuccess?.(data);
-      },
-      onError: (error: Error) => {
-        options?.onError?.(error);
       },
     });
   };

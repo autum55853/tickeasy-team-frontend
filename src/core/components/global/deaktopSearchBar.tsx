@@ -22,7 +22,7 @@ export default function DesktopSearchBar({
             </div>
             <div className="flex h-[66px] w-full flex-1 items-center justify-between gap-x-2 rounded-[100px] border-2 border-neutral-600 px-4">
               <input
-                placeholder="搜尋活動"
+                placeholder="搜尋演唱會"
                 className="h-full w-full text-xl focus:outline-none"
                 type="text"
                 value={searchText}

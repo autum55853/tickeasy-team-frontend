@@ -8,6 +8,7 @@ import { useRequest } from "@/core/hooks/useRequest";
 import AlertError from "../components/AlertError";
 import { UserResponse } from "../types/porfile";
 import { useToast } from "@/core/hooks/useToast";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 export default function Profile() {
   const [isEdit, setIsEdit] = useState(false);
   const { toast } = useToast();
@@ -51,7 +52,7 @@ export default function Profile() {
       // 使用 schema 驗證數據
       const validatedData = UpdateProfileSchema.parse(updatedData);
       await putProfileMutation.mutateAsync({ id: "", data: validatedData });
-      // 驗證通過後才執行更新
+      // // 驗證通過後才執行更新
       setProfileData(validatedData);
       setIsEdit(false);
       window.scrollTo(0, 0);
@@ -75,12 +76,10 @@ export default function Profile() {
   return (
     <>
       {isLoading ? (
-        <div className="flex min-h-[200px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
-        </div>
+        <LoadingSpin />
       ) : (
         <>
-          <div className="mt-10 flex h-[50px] items-center gap-4 lg:mt-0">
+          <div className="mx-auto mt-10 flex h-[50px] w-full items-center justify-around gap-4 lg:mt-0 lg:w-[70%] lg:justify-start">
             <h4 className="text-2xl font-bold">基本資料</h4>
             {!isEdit && (
               <Button variant="outline" onClick={() => setIsEdit(true)} disabled={putProfileMutation.isPending}>

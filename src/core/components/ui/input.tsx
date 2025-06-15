@@ -12,12 +12,17 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   labelClass?: string;
   inputClass?: string;
   required?: boolean;
+  height?: string | number;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ id, type, label, placeholder, disabled, maxLength, required, error, errorMessage, labelClass, inputClass, className, ...props }, ref) => {
+  (
+    { height = 80, id, type, label, placeholder, disabled, maxLength, required, error, errorMessage, labelClass, inputClass, className, ...props },
+    ref
+  ) => {
+    const heightStyle = height ? `${height}px` : "80px";
     return (
-      <div className={cn("m-1 flex h-[80px] w-full flex-col")}>
+      <div className={cn("m-1 flex w-full flex-col")} style={{ height: heightStyle }}>
         <label className={`${labelClass} pl-1`} htmlFor={id}>
           {label}
           {required && <span className="ml-1 text-lg text-red-500">*</span>}

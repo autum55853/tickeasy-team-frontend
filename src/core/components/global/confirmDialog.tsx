@@ -14,13 +14,15 @@ import {
 
 interface ConfirmDialogProps {
   title: string;
-  description: string;
-  trigger: React.ReactNode;
+  description: string | React.ReactNode; // 支援 string 或 React 元素;
+  trigger?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void | Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -32,9 +34,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onConfirm,
   onCancel,
   isLoading = false,
+  open,
+  onOpenChange,
 }) => {
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

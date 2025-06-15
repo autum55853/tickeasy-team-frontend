@@ -8,3 +8,7 @@ export const formatLocalTime = (dateString: string) => {
     hour12: false, // 使用24小時制
   }).format(new Date(dateString));
 };
+
+export const formatLocalTimeToDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString();
+};

@@ -67,7 +67,6 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
   const { mutate: requestCreateOrderMutation, isPending: isCreateOrderLoading } = requestCreateOrder({
     onSuccess: (response) => {
       const res = response as unknown as CreateOrderData;
-      console.log("res", res);
       toast({
         title: "訂單創建成功",
       });
@@ -75,7 +74,6 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
         lockExpireTime: res.lockExpireTime,
         orderId: res.orderId,
       });
-      console.log("setNewOrderInfo newOrderInfo:", newOrderInfo);
     },
     onError: (error: Error) => {
       toast({
