@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
 import { Camera, CameraOff, RefreshCw } from "lucide-react";
 
@@ -17,24 +17,17 @@ const parseQrCode = (decodedText: string): { isValid: boolean; ticketId?: string
 
 export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive }) => {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const lastErrorLogRef = useRef(0);
+  const initializingRef = useRef(false);
   const [isScanning, setIsScanning] = useState(false);
   const [hasCamera, setHasCamera] = useState(true);
   const [error, setError] = useState<string>("");
   const elementId = "qr-reader";
 
-  useEffect(() => {
-    if (isActive && !scannerRef.current) {
-      initializeScanner();
-    } else if (!isActive && scannerRef.current) {
-      stopScanner();
-    }
-
-    return () => {
-      stopScanner();
-    };
-  }, [isActive]);
-
-  const initializeScanner = async () => {
+  // ----- functions -----
+  const initializeScanner = useCallback(async () => {
+    if (scannerRef.current || initializingRef.current) return;
+    initializingRef.current = true;
     try {
       // 檢查相機權限
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -56,6 +49,8 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
         false
       );
 
+      scannerRef.current = scanner;
+
       scanner.render(
         (decodedText) => {
           // 成功掃描
@@ -70,13 +65,16 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
             onError?.(msg);
           }
         },
-        (errorMessage) => {
-          // 掃描失敗（這是正常的，當沒有 QR Code 時會觸發）
-          console.log("掃描中...", errorMessage);
+        () => {
+          // 掃描失敗（正常狀況），僅每 2 秒輸出一次 debug 訊息
+          const now = Date.now();
+          if (now - lastErrorLogRef.current > 2000) {
+            console.debug("掃描中...");
+            lastErrorLogRef.current = now;
+          }
         }
       );
 
-      scannerRef.current = scanner;
       setIsScanning(true);
     } catch (err: unknown) {
       const domErr = err as DOMException | null;
@@ -89,10 +87,12 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
       setHasCamera(false);
       setError(msg);
       onError?.(msg);
+    } finally {
+      initializingRef.current = false;
     }
-  };
+  }, []);
 
-  const stopScanner = () => {
+  const stopScanner = useCallback(() => {
     if (scannerRef.current) {
       try {
         scannerRef.current.clear();
@@ -102,7 +102,19 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
       scannerRef.current = null;
     }
     setIsScanning(false);
-  };
+    initializingRef.current = false;
+  }, []);
+
+  // ----- effect -----
+  useEffect(() => {
+    if (isActive) {
+      if (!scannerRef.current) initializeScanner();
+    } else if (scannerRef.current) {
+      stopScanner();
+    }
+
+    return () => stopScanner();
+  }, [isActive, initializeScanner, stopScanner]);
 
   const restartScanner = () => {
     stopScanner();

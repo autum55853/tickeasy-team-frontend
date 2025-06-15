@@ -2,30 +2,43 @@ import { Layout } from "@/pages/comm/views/layout";
 import { useToast } from "@/core/hooks/useToast";
 import QrScanner from "../components/QrScanner";
 import { useState } from "react";
+import { axiosInstance } from "@/core/lib/axios";
+
+// 驗票 API 回傳型別
+interface VerifyApiResponse<T = unknown> {
+  status: string;
+  message: string;
+  data: T;
+}
 
 export default function Page() {
   const { toast } = useToast();
-  const [scanResult, setScanResult] = useState<string | null>(null);
-  const [apiResult, setApiResult] = useState<{ status: string; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [scannerActive, setScannerActive] = useState(false);
 
-  // 暫時的模擬驗票 API，之後可替換為真實請求
-  const verifyQrCode = async (qrCode: string): Promise<{ status: string; message: string }> => {
-    return new Promise((resolve) => setTimeout(() => resolve({ status: "success", message: `模擬驗證成功：${qrCode}` }), 500));
+  // 真實驗票 API
+  const verifyQrCode = async (qrCode: string): Promise<VerifyApiResponse> => {
+    const data = (await axiosInstance.post("/api/v1/ticket/verify", { qrCode })) as VerifyApiResponse;
+    console.log("API result", data);
+    return data;
   };
 
   const handleScan = (qrCode: string) => {
-    setScanResult(qrCode);
     toast({ title: "掃描成功", description: qrCode });
-
-    // 呼叫驗證 API（目前為模擬）
+    setScannerActive(false);
     setLoading(true);
     verifyQrCode(qrCode)
       .then((res) => {
-        setApiResult(res);
+        console.log("API result", res);
+        toast({
+          title: res.status === "success" ? "驗證成功" : "驗證結果",
+          description: res.message,
+          variant: res.status === "success" ? "default" : "destructive",
+        });
       })
       .catch((err) => {
-        toast({ variant: "destructive", title: "API 錯誤", description: err?.message || "呼叫失敗" });
+        const msg = err?.response?.data?.message || err?.message || "呼叫失敗";
+        toast({ variant: "destructive", title: "API 錯誤", description: msg });
       })
       .finally(() => setLoading(false));
   };
@@ -39,27 +52,23 @@ export default function Page() {
       <section className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center gap-6 py-8">
         <h1 className="text-3xl font-bold">票券 QR Code 驗證</h1>
 
-        <QrScanner onScan={handleScan} onError={handleError} isActive={true} />
-
-        {scanResult && (
-          <div className="mt-4 w-full max-w-md rounded-lg border border-gray-200 p-4">
-            <h2 className="mb-2 font-medium text-gray-800">掃描結果</h2>
-            <p className="break-all text-gray-700">{scanResult}</p>
-          </div>
-        )}
+        <QrScanner onScan={handleScan} onError={handleError} isActive={scannerActive} />
 
         {loading && <p className="text-blue-600">驗證中...</p>}
 
-        {apiResult && (
-          <div
-            className={`mt-4 w-full max-w-md rounded-lg border p-4 ${
-              apiResult.status === "success" ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"
-            }`}
+        {/* API 結果已以 toast 顯示，若要顯示於畫面可在此處加入 */}
+
+        {/* {!scannerActive && (
+          <button
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            onClick={() => {
+              setApiResult(null);
+              setScannerActive(true);
+            }}
           >
-            <h2 className={`mb-2 font-medium ${apiResult.status === "success" ? "text-green-700" : "text-red-700"}`}>API 回應</h2>
-            <p className={`break-all ${apiResult.status === "success" ? "text-green-700" : "text-red-700"}`}>{apiResult.message}</p>
-          </div>
-        )}
+            再次掃描
+          </button>
+        )} */}
       </section>
     </Layout>
   );
