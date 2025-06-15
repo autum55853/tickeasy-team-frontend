@@ -34,6 +34,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.11",
     "embla-carousel-react": "^8.6.0",
+    "html5-qrcode": "^2.3.8",
     "lexical": "^0.31.2",
     "lucide-react": "^0.488.0",
     "react": "^19.1.0",

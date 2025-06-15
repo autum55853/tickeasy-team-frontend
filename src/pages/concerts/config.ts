@@ -50,5 +50,11 @@ export default {
       meta: { title: "購買演唱會票券結果" },
       needLogin: true,
     },
+    {
+      path: "/concert/verify-qrcode/:ticketId?",
+      component: lazy(() => import("./views/verifyQRCodePage")),
+      meta: { title: "票券 QRCode 驗證" },
+      needLogin: true,
+    },
   ],
 };
