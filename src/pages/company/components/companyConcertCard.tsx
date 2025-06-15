@@ -30,6 +30,8 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
   const clearConcertId = useConcertStore((state) => state.clearConcertId);
   const deleteConcert = useConcertStore((state) => state.deleteConcert);
   const organizationConcerts = useConcertStore((state) => state.organizationConcerts);
+  const submitConcert = useConcertStore((state) => state.submitConcert);
+  const cloneConcert = useConcertStore((state) => state.cloneConcert);
   const { toast } = useToast();
 
   const concert = organizationConcerts.find((c) => c.concertId === concertId);
@@ -64,6 +66,38 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
     }
   };
 
+  const handleSubmit = async () => {
+    try {
+      await submitConcert(concertId);
+      toast({
+        title: "成功",
+        description: "已成功送審演唱會",
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: "送審演唱會時發生錯誤",
+      });
+    }
+  };
+
+  const handleClone = async () => {
+    try {
+      await cloneConcert(concertId);
+      toast({
+        title: "成功",
+        description: "已成功複製演唱會",
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: "複製演唱會時發生錯誤",
+      });
+    }
+  };
+
   return (
     <div className="mb-4 flex flex-col rounded-lg border bg-white p-4 shadow-sm transition-all hover:shadow-md 2xl:flex-row 2xl:items-center">
       {/* 圖片區域 */}
@@ -94,7 +128,7 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
 
             {conInfoStatus === "draft" && (
               <>
-                <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon">
+                <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon" onClick={handleSubmit}>
                   <FileCheck className="h-5 w-5 text-gray-600" />
                   <span className="mt-1 text-xs text-gray-600">送審</span>
                 </Button>
@@ -107,7 +141,7 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
 
             {conInfoStatus === "rejected" && (
               <>
-                <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon">
+                <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon" onClick={handleSubmit}>
                   <FileCheck className="h-5 w-5 text-gray-600" />
                   <span className="mt-1 text-xs text-gray-600">送審</span>
                 </Button>
@@ -123,7 +157,7 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
             )}
 
             {(conInfoStatus === "draft" || conInfoStatus === "published" || conInfoStatus === "finished") && (
-              <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon">
+              <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon" onClick={handleClone}>
                 <Copy className="h-5 w-5 text-gray-600" />
                 <span className="mt-1 text-xs text-gray-600">複製</span>
               </Button>
