@@ -43,11 +43,14 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
     });
   }, [data, setValue]);
 
+  const handleFormSubmit = (formData: T_Profile) => {
+    onSubmit(formData); // 呼叫 props 傳進來的 onSubmit
+  };
   const renderContent = () => (
-    <div className="relative mt-2 lg:mt-0">
+    <div className="relative mx-auto mt-2 w-full lg:mt-0 lg:w-[80%]">
       {isEdit ? (
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleFormSubmit)}
           className="flex w-full flex-col gap-4"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -58,6 +61,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">帳號</p>
             <Input
+              height={40}
               id="email"
               {...register("email")}
               value={watch("email")}
@@ -70,6 +74,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
             <Input
+              height={40}
               id="name"
               {...register("name")}
               value={watch("name") || ""}
@@ -82,6 +87,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">暱稱</p>
             <Input
+              height={40}
               id="nickname"
               {...register("nickname")}
               value={watch("nickname") || ""}
@@ -94,6 +100,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">手機號碼</p>
             <Input
+              height={40}
               id="phone"
               {...register("phone")}
               value={watch("phone") || ""}
@@ -107,7 +114,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">出生年月日</p>
             <SingleDatePicker
-              inputClassName="ml-2 max-w-[300px] flex-1"
+              inputClassName=" max-w-[300px] flex-1"
               date={watch("birthday") ? new Date(watch("birthday") as string) : null}
               setDate={(date) =>
                 setValue(
@@ -156,16 +163,24 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           </div>
           <div className="flex h-[80px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動區域</p>
-            <ProfilePreferRegions disabled={isPending} regions={register("preferredRegions")} regionOptions={regionOptions || []} />
+            <ProfilePreferRegions
+              disabled={isPending}
+              regions={register("preferredRegions")}
+              regionOptions={Array.isArray(regionOptions) ? regionOptions : []}
+            />
           </div>
           <div
             className="flex items-center"
             style={{
-              height: `${Math.max(200, (MusicOptions?.length || 0) * 30 + 20)}px`,
+              height: `${Math.max(200, (Array.isArray(MusicOptions) ? MusicOptions.length : 0) * 30 + 20)}px`,
             }}
           >
             <p className="w-[120px] pr-4 text-right font-bold">偏好活動類型</p>
-            <ProfilePreferEventTypes disabled={isPending} eventTypes={register("preferredEventTypes")} MusicOptions={MusicOptions || []} />
+            <ProfilePreferEventTypes
+              disabled={isPending}
+              eventTypes={register("preferredEventTypes")}
+              MusicOptions={Array.isArray(MusicOptions) ? MusicOptions : []}
+            />
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">國家／地區</p>
@@ -176,7 +191,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
               }}
               disabled={isPending}
             >
-              <SelectTrigger className="ml-2 max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
+              <SelectTrigger className="max-w-[300px] flex-1 text-base text-neutral-600 focus:ring-0 focus:ring-offset-0">
                 <SelectValue placeholder="請選擇國家／地區" />
               </SelectTrigger>
               <SelectContent>
@@ -189,11 +204,12 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">詳細地址</p>
             <Input
+              height={40}
               id="address"
               {...register("address")}
               value={watch("address") || ""}
               onChange={(e) => setValue("address", e.target.value)}
-              className="max-w-[300px] flex-1"
+              className="max-w-[400px] flex-1"
               maxLength={50}
             />
           </div>
@@ -212,13 +228,13 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
             >
               取消編輯
             </Button>
-            <Button type="submit" variant="default">
-              儲存會員資料
+            <Button type="submit" variant="default" disabled={isPending} onClick={handleSubmit(onSubmit)}>
+              {isPending ? "儲存中..." : "儲存會員資料"}
             </Button>
           </div>
         </form>
       ) : (
-        <div className="flex w-full flex-col gap-4 px-4">
+        <div className="mx-auto flex w-full flex-col gap-4 px-4 lg:w-[80%]">
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">帳號</p>
             <p className="flex-1 text-sm text-gray-500">{data.email}</p>
@@ -265,7 +281,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
   );
 
   return (
-    <div className="relative p-4">
+    <div className="relative py-4 lg:p-4">
       {/* 會員頭像 */}
       <div className="flex justify-center lg:justify-start">
         <ProfileAvatar img={data?.avatar || DefaultImg} />
