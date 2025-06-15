@@ -8,10 +8,13 @@ import "@/core/styles/singleConcertPage.css";
 import { ConcertResponse } from "@/pages/comm/types/Concert";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useConcertStore } from "../store/useConcertStore";
+import { LexicalViewer } from "@/core/components/ui/LexicalViewer";
 
 export default function SingleConcertPage() {
   const { concertId } = useParams();
   const navigate = useNavigate();
+  const incrementVisitCount = useConcertStore((state) => state.incrementVisitCount);
   const [concert, setConcert] = useState<ConcertResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +34,9 @@ export default function SingleConcertPage() {
           return;
         }
         setConcert(response.data.data);
+        if (concertId) {
+          await incrementVisitCount(concertId);
+        }
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
@@ -55,7 +61,7 @@ export default function SingleConcertPage() {
     };
 
     fetchConcert();
-  }, [concertId, navigate]);
+  }, [concertId, navigate, incrementVisitCount]);
 
   const tabOptions = [
     { label: "活動場次", ref: sessionsRef },
@@ -70,6 +76,22 @@ export default function SingleConcertPage() {
     const idx = tabOptions.findIndex((opt) => opt.label === e.target.value);
     setSelectedTab(e.target.value);
     tabOptions[idx].ref.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function isLexicalJson(str: string) {
+    try {
+      const obj = JSON.parse(str);
+      return obj && typeof obj === "object" && obj.root;
+    } catch {
+      return false;
+    }
+  }
+
+  function renderContent(content: string) {
+    if (isLexicalJson(content)) {
+      return <LexicalViewer content={content} />;
+    }
+    return content;
   }
 
   if (loading)
@@ -169,7 +191,7 @@ export default function SingleConcertPage() {
         <div ref={introRef} className="scroll-mt-24">
           <div className="mb-8">
             <h2 className="mb-4 text-2xl font-bold text-gray-900">{concert.conTitle}</h2>
-            <p className="text-sm leading-relaxed text-gray-600">{concert.conIntroduction}</p>
+            <p className="text-sm leading-relaxed text-gray-600">{renderContent(concert.conIntroduction)}</p>
           </div>
         </div>
         <div ref={infoRef} className="scroll-mt-24">
@@ -235,7 +257,7 @@ export default function SingleConcertPage() {
           <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6">
             <h3 className="mb-6 text-2xl font-bold text-gray-900">購票方式</h3>
             <div className="space-y-6 text-base text-gray-800">
-              <div>{concert.ticketPurchaseMethod}</div>
+              <div>{renderContent(concert.ticketPurchaseMethod)}</div>
             </div>
           </div>
         </div>
@@ -244,10 +266,10 @@ export default function SingleConcertPage() {
           <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6">
             <h3 className="mb-6 text-2xl font-bold text-gray-900">注意事項</h3>
             <div className="space-y-6 text-base text-gray-800">
-              <div>{concert.precautions}</div>
+              <div>{renderContent(concert.precautions)}</div>
               <div>
                 <div className="mb-2 text-lg font-bold text-blue-700">退票注意事項</div>
-                <div>{concert.refundPolicy}</div>
+                <div>{renderContent(concert.refundPolicy)}</div>
               </div>
             </div>
           </div>

@@ -152,6 +152,9 @@ type ConcertState = {
   getConcertStatusCounts: () => Record<ConInfoStatus, number>;
   getLocationTags: () => Promise<void>;
   getMusicTags: () => Promise<void>;
+  submitConcert: (concertId: string) => Promise<void>;
+  cloneConcert: (concertId: string) => Promise<void>;
+  incrementVisitCount: (concertId: string) => Promise<void>;
 };
 
 // ========== 工具函數 ==========
@@ -651,6 +654,68 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
     } catch (error) {
       console.error("getMusicTags error", error);
       return Promise.reject(error);
+    }
+  },
+  // 送審演唱會
+  submitConcert: async (concertId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const response = await axios.put(
+        `${API_BASE_URL}/api/v1/concerts/${concertId}/submit`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error("送審失敗");
+      }
+
+      // 重新取得組織的演唱會列表
+      const info = get().info;
+      if (info.organizationId) {
+        await get().getOrganizationConcerts(info.organizationId);
+      }
+    } catch (error) {
+      console.error("submitConcert error", error);
+      return Promise.reject(error);
+    }
+  },
+  // 複製演唱會
+  cloneConcert: async (concertId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const response = await axios.post(
+        `${API_BASE_URL}/api/v1/concerts/${concertId}/duplicate`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.status !== 201 || response.data.status !== "success") {
+        throw new Error("複製失敗");
+      }
+
+      // 重新取得組織的演唱會列表
+      const info = get().info;
+      if (info.organizationId) {
+        await get().getOrganizationConcerts(info.organizationId);
+      }
+    } catch (error) {
+      console.error("cloneConcert error", error);
+      return Promise.reject(error);
+    }
+  },
+  // 增加瀏覽次數
+  incrementVisitCount: async (concertId: string) => {
+    try {
+      await axios.patch(`${API_BASE_URL}/api/v1/concerts/${concertId}/visit`);
+    } catch (error) {
+      console.error("incrementVisitCount error", error);
     }
   },
 }));
