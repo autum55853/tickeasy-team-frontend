@@ -61,11 +61,13 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
           // 成功掃描
           const parsedResult = parseQrCode(decodedText);
           if (parsedResult.isValid) {
+            stopScanner();
             onScan(decodedText);
-            setIsScanning(false);
           } else {
-            setError("無效的 QR Code 格式");
-            onError?.("無效的 QR Code 格式");
+            stopScanner();
+            const msg = "無效的 QR Code 格式";
+            setError(msg);
+            onError?.(msg);
           }
         },
         (errorMessage) => {
@@ -76,11 +78,17 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
 
       scannerRef.current = scanner;
       setIsScanning(true);
-    } catch (error: any) {
-      console.error("初始化掃描器失敗:", error);
+    } catch (err: unknown) {
+      const domErr = err as DOMException | null;
+      const msg = domErr?.name === "NotAllowedError"
+        ? "相機存取被拒絕，請檢查瀏覽器設定"
+        : domErr?.name === "NotFoundError"
+        ? "未偵測到相機裝置"
+        : "無法訪問相機，請檢查權限設置";
+      console.error("初始化掃描器失敗:", err);
       setHasCamera(false);
-      setError("無法訪問相機，請檢查權限設置");
-      onError?.("無法訪問相機，請檢查權限設置");
+      setError(msg);
+      onError?.(msg);
     }
   };
 
