@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { Camera, CameraOff, RefreshCw } from 'lucide-react';
-import { parseQrCode } from '../services/api';
+import React, { useEffect, useRef, useState } from "react";
+import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
+import { Camera, CameraOff, RefreshCw } from "lucide-react";
 
 interface QrScannerProps {
   onScan: (qrCode: string) => void;
@@ -9,16 +8,19 @@ interface QrScannerProps {
   isActive: boolean;
 }
 
-export const QrScanner: React.FC<QrScannerProps> = ({ 
-  onScan, 
-  onError, 
-  isActive 
-}) => {
+// 內建簡易 QRCode 解析器，未來可依需求替換
+const parseQrCode = (decodedText: string): { isValid: boolean; ticketId?: string } => {
+  const trimmed = decodedText.trim();
+  if (!trimmed) return { isValid: false };
+  return { isValid: true, ticketId: trimmed };
+};
+
+export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive }) => {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [hasCamera, setHasCamera] = useState(true);
-  const [error, setError] = useState<string>('');
-  const elementId = 'qr-reader';
+  const [error, setError] = useState<string>("");
+  const elementId = "qr-reader";
 
   useEffect(() => {
     if (isActive && !scannerRef.current) {
@@ -36,9 +38,9 @@ export const QrScanner: React.FC<QrScannerProps> = ({
     try {
       // 檢查相機權限
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       setHasCamera(true);
-      setError('');
+      setError("");
 
       // 初始化掃描器
       const scanner = new Html5QrcodeScanner(
@@ -62,23 +64,23 @@ export const QrScanner: React.FC<QrScannerProps> = ({
             onScan(decodedText);
             setIsScanning(false);
           } else {
-            setError('無效的 QR Code 格式');
-            onError?.('無效的 QR Code 格式');
+            setError("無效的 QR Code 格式");
+            onError?.("無效的 QR Code 格式");
           }
         },
         (errorMessage) => {
           // 掃描失敗（這是正常的，當沒有 QR Code 時會觸發）
-          console.log('掃描中...', errorMessage);
+          console.log("掃描中...", errorMessage);
         }
       );
 
       scannerRef.current = scanner;
       setIsScanning(true);
     } catch (error: any) {
-      console.error('初始化掃描器失敗:', error);
+      console.error("初始化掃描器失敗:", error);
       setHasCamera(false);
-      setError('無法訪問相機，請檢查權限設置');
-      onError?.('無法訪問相機，請檢查權限設置');
+      setError("無法訪問相機，請檢查權限設置");
+      onError?.("無法訪問相機，請檢查權限設置");
     }
   };
 
@@ -87,7 +89,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({
       try {
         scannerRef.current.clear();
       } catch (error) {
-        console.warn('停止掃描器時發生錯誤:', error);
+        console.warn("停止掃描器時發生錯誤:", error);
       }
       scannerRef.current = null;
     }
@@ -108,29 +110,25 @@ export const QrScanner: React.FC<QrScannerProps> = ({
     if (file) {
       // 這裡可以實作檔案上傳掃描 QR Code 的功能
       // 需要使用 html5-qrcode 的檔案掃描功能
-      console.log('檔案上傳功能待實作');
+      console.log("檔案上傳功能待實作");
     }
   };
 
   if (!hasCamera) {
     return (
       <div className="qr-scanner-container">
-        <div className="text-center p-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <CameraOff className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            無法訪問相機
-          </h3>
-          <p className="text-gray-600 mb-4">
-            請檢查瀏覽器相機權限設置
-          </p>
+        <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+          <CameraOff className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+          <h3 className="mb-2 text-lg font-medium text-gray-900">無法訪問相機</h3>
+          <p className="mb-4 text-gray-600">請檢查瀏覽器相機權限設置</p>
           <button
             onClick={restartScanner}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             重新嘗試
           </button>
-          
+
           {/* 備用檔案上傳選項 */}
           <div className="mt-4">
             <label className="block">
@@ -139,7 +137,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({
                 type="file"
                 accept="image/*"
                 onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-blue-700 hover:file:bg-blue-100"
               />
             </label>
           </div>
@@ -150,15 +148,11 @@ export const QrScanner: React.FC<QrScannerProps> = ({
 
   return (
     <div className="qr-scanner-container">
-      {error && (
-        <div className="error-message mb-4">
-          {error}
-        </div>
-      )}
-      
+      {error && <div className="error-message mb-4">{error}</div>}
+
       <div className="relative">
         <div id={elementId} className="w-full" />
-        
+
         {isScanning && (
           <div className="qr-scanner-overlay">
             <div className="qr-scanner-corner top-left"></div>
@@ -169,30 +163,27 @@ export const QrScanner: React.FC<QrScannerProps> = ({
         )}
       </div>
 
-      <div className="flex justify-center space-x-4 mt-4">
+      <div className="mt-4 flex justify-center space-x-4">
         {isScanning ? (
-          <button
-            onClick={stopScanner}
-            className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <CameraOff className="w-4 h-4 mr-2" />
+          <button onClick={stopScanner} className="flex items-center rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700">
+            <CameraOff className="mr-2 h-4 w-4" />
             停止掃描
           </button>
         ) : (
           <button
             onClick={initializeScanner}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
           >
-            <Camera className="w-4 h-4 mr-2" />
+            <Camera className="mr-2 h-4 w-4" />
             開始掃描
           </button>
         )}
-        
+
         <button
           onClick={restartScanner}
-          className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          className="flex items-center rounded-lg bg-gray-600 px-4 py-2 text-white transition-colors hover:bg-gray-700"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className="mr-2 h-4 w-4" />
           重新掃描
         </button>
       </div>

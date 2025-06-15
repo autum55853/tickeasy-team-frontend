@@ -6,10 +6,28 @@ import { useState } from "react";
 export default function Page() {
   const { toast } = useToast();
   const [scanResult, setScanResult] = useState<string | null>(null);
+  const [apiResult, setApiResult] = useState<{ status: string; message: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 暫時的模擬驗票 API，之後可替換為真實請求
+  const verifyQrCode = async (qrCode: string): Promise<{ status: string; message: string }> => {
+    return new Promise((resolve) => setTimeout(() => resolve({ status: "success", message: `模擬驗證成功：${qrCode}` }), 500));
+  };
 
   const handleScan = (qrCode: string) => {
     setScanResult(qrCode);
     toast({ title: "掃描成功", description: qrCode });
+
+    // 呼叫驗證 API（目前為模擬）
+    setLoading(true);
+    verifyQrCode(qrCode)
+      .then((res) => {
+        setApiResult(res);
+      })
+      .catch((err) => {
+        toast({ variant: "destructive", title: "API 錯誤", description: err?.message || "呼叫失敗" });
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleError = (msg?: string) => {
@@ -24,9 +42,22 @@ export default function Page() {
         <QrScanner onScan={handleScan} onError={handleError} isActive={true} />
 
         {scanResult && (
-          <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-4">
-            <h2 className="font-medium text-green-700">掃描結果</h2>
-            <p className="break-all text-green-700">{scanResult}</p>
+          <div className="mt-4 w-full max-w-md rounded-lg border border-gray-200 p-4">
+            <h2 className="mb-2 font-medium text-gray-800">掃描結果</h2>
+            <p className="break-all text-gray-700">{scanResult}</p>
+          </div>
+        )}
+
+        {loading && <p className="text-blue-600">驗證中...</p>}
+
+        {apiResult && (
+          <div
+            className={`mt-4 w-full max-w-md rounded-lg border p-4 ${
+              apiResult.status === "success" ? "border-green-300 bg-green-50" : "border-red-300 bg-red-50"
+            }`}
+          >
+            <h2 className={`mb-2 font-medium ${apiResult.status === "success" ? "text-green-700" : "text-red-700"}`}>API 回應</h2>
+            <p className={`break-all ${apiResult.status === "success" ? "text-green-700" : "text-red-700"}`}>{apiResult.message}</p>
           </div>
         )}
       </section>
