@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 export default function GoogleAuthCallbackPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const setCookie = useAuthStore((state) => state.setCookie);
   const handledRef = useRef(false);
   useEffect(() => {
     if (handledRef.current) return;
@@ -27,7 +27,7 @@ export default function GoogleAuthCallbackPage() {
     }
 
     if (token) {
-      setAuth(token, "");
+      setCookie(token);
       // 重定向到首頁或其他適當的頁面
       toast({
         title: "登入成功",
@@ -41,7 +41,7 @@ export default function GoogleAuthCallbackPage() {
         description: "請重新嘗試登入",
       });
     }
-  }, [navigate, setAuth, toast]);
+  }, [navigate, setCookie, toast]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
