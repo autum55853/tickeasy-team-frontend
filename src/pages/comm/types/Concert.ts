@@ -72,3 +72,11 @@ export interface ConcertResponse {
   status: string;
   data: Concert;
 }
+
+export interface ConcertCreateResponse {
+  status: string;
+  message: string;
+  data: {
+    concert: Concert;
+  };
+}

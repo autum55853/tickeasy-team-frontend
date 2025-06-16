@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import axios, { AxiosResponse } from "axios";
-import { ConcertResponse, Session, TicketType, Venue } from "@/pages/comm/types/Concert";
+import { ConcertResponse, ConcertCreateResponse, Session, TicketType, Venue } from "@/pages/comm/types/Concert";
 import { useAuthStore } from "@/store/authStore";
+import dayjs from "dayjs";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+// const API_BASE_URL = "http://localhost:3000";
 
 // ========== 型別定義 ==========
 type UploadContext = "USER_AVATAR" | "VENUE_PHOTO" | "CONCERT_SEATING_TABLE" | "CONCERT_BANNER";
@@ -263,13 +265,16 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
     try {
       const token = useAuthStore.getState().getAuthToken();
       if (!token) {
+        console.error("[saveDraft] 未登入");
         return Promise.reject(new Error("未登入"));
       }
 
       const { info, sessions } = get();
+      console.log("[saveDraft] 當前 store 狀態:", { info, sessions });
 
       // 只檢查 conTitle
       if (!info.conTitle?.trim()) {
+        console.error("[saveDraft] 演唱會名稱為空");
         return Promise.reject(new Error("演唱會名稱為必填"));
       }
 
@@ -286,6 +291,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       }
 
       if (!organizationId) {
+        console.error("[saveDraft] 無法取得組織ID");
         return Promise.reject(new Error("無法取得組織ID"));
       }
 
@@ -294,66 +300,110 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         conTitle: info.conTitle.trim(),
         conInfoStatus: info.conInfoStatus || "draft",
         organizationId,
-        imgBanner: info.imgBanner, // 確保 imgBanner 被包含在 payload 中
+        imgBanner: info.imgBanner,
       };
 
       // 這三個欄位要 stringify
       ["ticketPurchaseMethod", "precautions", "refundPolicy"].forEach((key) => {
-        if (info[key]) payload[key] = typeof info[key] === "string" ? info[key] : JSON.stringify(info[key]);
+        if (info[key]) {
+          try {
+            payload[key] = typeof info[key] === "string" ? info[key] : JSON.stringify(info[key]);
+          } catch (e) {
+            console.error(`[saveDraft] ${key} 轉換失敗:`, e);
+            payload[key] = info[key];
+          }
+        }
       });
 
       // 其他欄位直接丟
       ["conIntroduction", "conLocation", "conAddress", "eventStartDate", "eventEndDate", "locationTagId", "musicTagId", "venueId"].forEach((key) => {
-        if (info[key]) payload[key] = info[key];
+        if (info[key]) {
+          try {
+            payload[key] = info[key];
+          } catch (e) {
+            console.error(`[saveDraft] ${key} 處理失敗:`, e);
+          }
+        }
       });
 
       // sessions 處理
-      payload.sessions = sessions.map((s) => ({
-        ...(s.sessionTitle && { sessionTitle: s.sessionTitle }),
-        ...(s.sessionDate && { sessionDate: s.sessionDate }),
-        ...(s.sessionStart && { sessionStart: s.sessionStart }),
-        ...(s.sessionEnd && { sessionEnd: s.sessionEnd }),
-        ...(s.imgSeattable && { imgSeattable: s.imgSeattable }),
-        ticketTypes: s.ticketTypes.map((t) => ({
-          ...(t.ticketTypeName && { ticketTypeName: t.ticketTypeName }),
-          ...(t.entranceType && { entranceType: t.entranceType }),
-          ...(t.ticketBenefits && { ticketBenefits: t.ticketBenefits }),
-          ...(t.ticketRefundPolicy && { ticketRefundPolicy: t.ticketRefundPolicy }),
-          ...(t.ticketTypePrice && { ticketTypePrice: Number(t.ticketTypePrice) }),
-          ...(t.totalQuantity && { totalQuantity: t.totalQuantity }),
-          ...(t.sellBeginDate && { sellBeginDate: t.sellBeginDate }),
-          ...(t.sellEndDate && { sellEndDate: t.sellEndDate }),
-        })),
-      }));
+      try {
+        payload.sessions = sessions.map((s) => {
+          // 確保 sessionDate 只有日期部分
+          const sessionDate = s.sessionDate ? s.sessionDate.split("T")[0] : "";
+
+          const sessionData = {
+            ...(s.sessionTitle && { sessionTitle: s.sessionTitle }),
+            ...(sessionDate && { sessionDate }),
+            ...(s.sessionStart && { sessionStart: s.sessionStart }),
+            ...(s.sessionEnd && { sessionEnd: s.sessionEnd }),
+            ...(s.imgSeattable && { imgSeattable: s.imgSeattable }),
+            ticketTypes: s.ticketTypes.map((t) => {
+              try {
+                return {
+                  ...(t.ticketTypeName && { ticketTypeName: t.ticketTypeName }),
+                  ...(t.entranceType && { entranceType: t.entranceType }),
+                  ...(t.ticketBenefits && { ticketBenefits: t.ticketBenefits }),
+                  ...(t.ticketRefundPolicy && { ticketRefundPolicy: t.ticketRefundPolicy }),
+                  ...(t.ticketTypePrice && { ticketTypePrice: Number(t.ticketTypePrice) }),
+                  ...(t.totalQuantity && { totalQuantity: t.totalQuantity }),
+                  ...(t.sellBeginDate && { sellBeginDate: t.sellBeginDate }),
+                  ...(t.sellEndDate && { sellEndDate: t.sellEndDate }),
+                };
+              } catch (e) {
+                console.error("[saveDraft] ticketType 處理失敗:", t, e);
+                throw e;
+              }
+            }),
+          };
+          console.log("[saveDraft] 處理後的 session 資料:", sessionData);
+          return sessionData;
+        });
+      } catch (e) {
+        console.error("[saveDraft] sessions 處理失敗:", e);
+        throw e;
+      }
 
       console.log("[saveDraft] 準備發送的 payload:", JSON.stringify(payload, null, 2));
 
-      let response: AxiosResponse<ConcertResponse>;
-      if (info.concertId) {
-        // 如果已有 concertId，使用 PUT 更新
-        response = await axios.put<ConcertResponse>(`${API_BASE_URL}/api/v1/concerts/${info.concertId}`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        // 如果沒有 concertId，使用 POST 新增
-        response = await axios.post<ConcertResponse>(`${API_BASE_URL}/api/v1/concerts/`, payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      let response: AxiosResponse<ConcertCreateResponse>;
+      try {
+        if (info.concertId) {
+          // 如果已有 concertId，使用 PUT 更新
+          response = await axios.put<ConcertCreateResponse>(`${API_BASE_URL}/api/v1/concerts/${info.concertId}`, payload, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } else {
+          // 如果沒有 concertId，使用 POST 新增
+          response = await axios.post<ConcertCreateResponse>(`${API_BASE_URL}/api/v1/concerts/`, payload, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        }
+      } catch (e) {
+        if (axios.isAxiosError(e)) {
+          console.error("[saveDraft] API 錯誤:", {
+            status: e.response?.status,
+            data: e.response?.data,
+            message: e.message,
+          });
+        } else {
+          console.error("[saveDraft] 未知錯誤:", e);
+        }
+        throw e;
       }
 
       console.log("[saveDraft] API 回傳資料:", response.data);
-      console.log("[saveDraft] 回傳的 imgBanner:", response.data.data.imgBanner);
 
-      const concertData = response.data.data;
+      const concertData = response.data.data.concert;
       if (concertData.concertId) {
         // 確保使用 API 回傳的新 imgBanner
         const updatedInfo = {
           ...concertData,
-          imgBanner: concertData.imgBanner || "", // 強制使用 API 回傳的 imgBanner
+          imgBanner: concertData.imgBanner || "",
         };
 
         console.log("[saveDraft] 更新前的 store info:", get().info);
@@ -374,7 +424,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       }
       return undefined;
     } catch (error) {
-      console.error("saveDraft error", error);
+      console.error("[saveDraft] 完整錯誤:", error);
       return Promise.reject(error);
     }
   },
@@ -401,41 +451,49 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       if (response.data.status === "success" && response.data.data) {
         const concertData = response.data.data;
 
-        // 處理 ticketTypePrice 從字串轉數字
+        // 處理 ticketTypePrice 從字串轉數字，並確保 sessionDate 只有日期部分
         const processedSessions = concertData.sessions.map((session) => ({
           ...session,
+          sessionDate: session.sessionDate ? dayjs(session.sessionDate).format("YYYY-MM-DD") : "",
           ticketTypes: session.ticketTypes.map((ticket) => ({
             ...ticket,
             ticketTypePrice: Number(ticket.ticketTypePrice),
           })),
         }));
 
+        // 處理 eventStartDate 和 eventEndDate
+        const processedInfo = {
+          ...concertData,
+          eventStartDate: concertData.eventStartDate ? dayjs(concertData.eventStartDate).format("YYYY-MM-DD") : "",
+          eventEndDate: concertData.eventEndDate ? dayjs(concertData.eventEndDate).format("YYYY-MM-DD") : "",
+        };
+
         set((state) => ({
           info: {
             ...state.info,
-            concertId: concertData.concertId,
-            organizationId: concertData.organizationId,
-            venueId: concertData.venueId,
-            locationTagId: concertData.locationTagId,
-            musicTagId: concertData.musicTagId,
-            conTitle: concertData.conTitle,
-            conIntroduction: concertData.conIntroduction,
-            conLocation: concertData.conLocation,
-            conAddress: concertData.conAddress,
-            eventStartDate: concertData.eventStartDate,
-            eventEndDate: concertData.eventEndDate,
-            ticketPurchaseMethod: concertData.ticketPurchaseMethod,
-            precautions: concertData.precautions,
-            refundPolicy: concertData.refundPolicy,
-            conInfoStatus: concertData.conInfoStatus,
-            imgBanner: concertData.imgBanner,
-            reviewStatus: concertData.reviewStatus,
-            reviewNote: concertData.reviewNote,
-            visitCount: concertData.visitCount,
-            promotion: concertData.promotion,
-            cancelledAt: concertData.cancelledAt,
-            updatedAt: concertData.updatedAt,
-            createdAt: concertData.createdAt,
+            concertId: processedInfo.concertId,
+            organizationId: processedInfo.organizationId,
+            venueId: processedInfo.venueId,
+            locationTagId: processedInfo.locationTagId,
+            musicTagId: processedInfo.musicTagId,
+            conTitle: processedInfo.conTitle,
+            conIntroduction: processedInfo.conIntroduction,
+            conLocation: processedInfo.conLocation,
+            conAddress: processedInfo.conAddress,
+            eventStartDate: processedInfo.eventStartDate,
+            eventEndDate: processedInfo.eventEndDate,
+            ticketPurchaseMethod: processedInfo.ticketPurchaseMethod,
+            precautions: processedInfo.precautions,
+            refundPolicy: processedInfo.refundPolicy,
+            conInfoStatus: processedInfo.conInfoStatus,
+            imgBanner: processedInfo.imgBanner,
+            reviewStatus: processedInfo.reviewStatus,
+            reviewNote: processedInfo.reviewNote,
+            visitCount: processedInfo.visitCount,
+            promotion: processedInfo.promotion,
+            cancelledAt: processedInfo.cancelledAt,
+            updatedAt: processedInfo.updatedAt,
+            createdAt: processedInfo.createdAt,
           },
           sessions: processedSessions,
           venue: concertData.venue,

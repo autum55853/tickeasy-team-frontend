@@ -75,11 +75,25 @@ export default function CreateConSessionsAndTicketsPage() {
   };
 
   const handleSave = (id: string) => {
+    // 確保時間格式為 HH:mm
+    const formatTime = (time: string) => {
+      if (!time) return "";
+      // 如果已經是 HH:mm 格式就直接返回
+      if (/^\d{2}:\d{2}$/.test(time)) return time;
+      // 否則嘗試轉換
+      try {
+        const [hours, minutes] = time.split(":");
+        return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+      } catch {
+        return "";
+      }
+    };
+
     updateSession({
       sessionId: id,
       sessionDate: editBuffer.sessionDate,
-      sessionStart: editBuffer.sessionStart,
-      sessionEnd: editBuffer.sessionEnd,
+      sessionStart: formatTime(editBuffer.sessionStart),
+      sessionEnd: formatTime(editBuffer.sessionEnd),
       sessionTitle: editBuffer.sessionTitle,
     });
     setEditingSessionId(null);
@@ -276,7 +290,7 @@ export default function CreateConSessionsAndTicketsPage() {
                           {editingSessionId === s.sessionId ? (
                             <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
                               <SingleDatePicker
-                                date={editBuffer.sessionDate ? new Date(editBuffer.sessionDate) : null}
+                                date={editBuffer.sessionDate ? dayjs(editBuffer.sessionDate).toDate() : null}
                                 setDate={(date) =>
                                   setEditBuffer((buf) => ({
                                     ...buf,
