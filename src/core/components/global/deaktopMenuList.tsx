@@ -2,6 +2,7 @@ import { useEffect, useState, RefObject, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@/core/hooks/useLogout";
 import { useAuthStore } from "@/store/authStore";
+import { redirectToDashboard } from "@/utils/authUtils";
 
 export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOpen: boolean; accountButtonRef: RefObject<HTMLDivElement | null> }) {
   const [position, setPosition] = useState({ top: -1000, right: 0 });
@@ -53,11 +54,9 @@ export default function DesktopMenuList({ menuOpen, accountButtonRef }: { menuOp
         <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={() => handleNavigation("/user/about/history")}>
           查看參與的演唱會
         </li>
-        {role === "admin" && (
-          <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100">
-            <a href="https://tickeasy-dashboard.onrender.com/dashboard" target="_blank" rel="noopener noreferrer">
-              後台管理
-            </a>
+        {(role === "admin" || role === "superuser") && (
+          <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={redirectToDashboard}>
+            後台管理
           </li>
         )}
         <li className="cursor-pointer px-12 py-2 hover:bg-neutral-100" onClick={handleLogout}>
