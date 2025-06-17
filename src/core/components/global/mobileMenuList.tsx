@@ -3,6 +3,7 @@ import MobileSearchBar from "./mobileSearchBar";
 import { useLogout } from "@/core/hooks/useLogout";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { redirectToDashboard } from "@/utils/authUtils";
 export default function MobileMenuList({
   menuOpen,
   isLogin,
@@ -50,11 +51,9 @@ export default function MobileMenuList({
                 <li className="cursor-pointer rounded-md p-2 text-start hover:bg-blue-100" onClick={() => navigate("/user/about/history")}>
                   查看參與的演唱會
                 </li>
-                {role === "admin" && (
-                  <li className="cursor-pointer p-2 hover:bg-neutral-100">
-                    <a href="https://tickeasy-dashboard.onrender.com/dashboard" target="_blank" rel="noopener noreferrer">
-                      後台管理
-                    </a>
+                {(role === "admin" || role === "superuser") && (
+                  <li className="cursor-pointer p-2 hover:bg-neutral-100" onClick={redirectToDashboard}>
+                    後台管理
                   </li>
                 )}
                 <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={handleLogout}>
