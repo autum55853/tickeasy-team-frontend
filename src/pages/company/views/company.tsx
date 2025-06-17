@@ -20,15 +20,21 @@ function PageContent() {
   const companyCount = useRef(0);
   const pageStatus = useRef<"list" | "empty">("list");
   const [companyList, setCompanyList] = useState<CompanyData[]>([]);
-  const { data, error, isLoading, refetch } = useRequest<CompanyResponse>({
+  const {
+    data,
+    error,
+    isLoading: isGettingCompanyList,
+    refetch,
+  } = useRequest<CompanyResponse>({
     queryKey: ["organizations"],
     url: "/api/v1/organizations/",
   }).useGet();
 
   useEffect(() => {
-    if (data?.organizations) {
-      setCompanyList(data.organizations);
-      companyCount.current = data.organizations.length;
+    const organizations = typeof data === "object" ? (data as CompanyResponse)?.organizations : [];
+    if (organizations) {
+      setCompanyList(organizations);
+      companyCount.current = organizations.length;
     }
   }, [data]);
 
@@ -56,9 +62,6 @@ function PageContent() {
   }, [companyCount]);
 
   const renderContent = () => {
-    if (isLoading) {
-      return <LoadingSpin />;
-    }
     if (isCreateOrganize) {
       return <CreateOrganizer />;
     }
@@ -73,7 +76,7 @@ function PageContent() {
     <Layout>
       <div className="flex min-h-[calc(100vh-6rem)] flex-col">
         <BannerSection companyCount={companyCount.current} />
-        <div className="grid grid-cols-1 gap-4">{renderContent()}</div>
+        {isGettingCompanyList ? <LoadingSpin /> : <div className="grid grid-cols-1 gap-4">{renderContent()}</div>}
       </div>
     </Layout>
   );
