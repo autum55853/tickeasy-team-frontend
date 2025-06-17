@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 export default function GoogleAuthCallbackPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const setCookie = useAuthStore((state) => state.setCookie);
   const handledRef = useRef(false);
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function GoogleAuthCallbackPage() {
 
     if (token) {
       setCookie(token);
+      setAuth("", "");
       // 重定向到首頁或其他適當的頁面
       toast({
         title: "登入成功",
