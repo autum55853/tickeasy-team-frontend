@@ -10,8 +10,9 @@ interface PasswordInfoProps {
   data: T_Password;
   onSubmit: (data: T_Password) => void;
   // errors: ZodIssue[];
+  isSubmitting: boolean;
 }
-export default function PasswordInfo({ data, onSubmit }: PasswordInfoProps) {
+export default function PasswordInfo({ data, onSubmit, isSubmitting }: PasswordInfoProps) {
   const {
     register,
     handleSubmit,
@@ -92,8 +93,8 @@ export default function PasswordInfo({ data, onSubmit }: PasswordInfoProps) {
           </div>
         </div>
         <div className="mt-10 flex justify-center gap-4 lg:mt-8">
-          <Button type="submit" variant="default" className="mx-auto w-full lg:w-[60%]">
-            修改密碼
+          <Button type="submit" variant="default" disabled={isSubmitting} className="mx-auto w-full lg:w-[60%]">
+            {isSubmitting ? "處理中..." : "修改密碼"}
           </Button>
         </div>
       </form>

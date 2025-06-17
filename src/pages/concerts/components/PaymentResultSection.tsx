@@ -15,12 +15,12 @@ export default function PaymentResultSection() {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const oid = searchParams.get("oid");
+  const oid = searchParams.get("oId");
 
   // 取得訂單資料
   const { useGet: useGetOrderData } = useRequest<orderDataResponse>({
-    queryKey: oid ? [oid] : [],
-    url: `/api/v1/order/${oid}`,
+    queryKey: ["order", oid ?? ""],
+    url: `/api/v1/orders`,
   });
 
   const {
@@ -33,8 +33,8 @@ export default function PaymentResultSection() {
     concert: {} as RawConertDataResponse,
   });
   useEffect(() => {
-    if (rawOrderData?.data) {
-      const maybeData = rawOrderData.data;
+    if (rawOrderData) {
+      const maybeData = rawOrderData;
 
       if ("order" in maybeData && "concert" in maybeData) {
         setOrderData(maybeData as { order: orderItem; concert: RawConertDataResponse });

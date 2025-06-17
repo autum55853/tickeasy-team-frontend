@@ -10,6 +10,7 @@ import { TermsDialog } from "@/core/components/global/termsDialog";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { CreateOrganizeData } from "../types/company";
+import { useState } from "react";
 
 // 定義表單驗證 schema
 const formSchema = z.object({
@@ -21,7 +22,7 @@ const formSchema = z.object({
   orgPhone: z
     .string()
     .trim()
-    .regex(/^0\d{1}-\d{9,10}$/, "必須為 0X-XXXXXXX 格式, 共10碼或11碼"),
+    .regex(/^0\d{8,9}$/, "必須為 0 開頭的 9 或 10 碼數字"),
   orgWebsite: z.string().trim().optional(),
   agreementService: z.boolean().refine((val) => val === true, {
     message: "請同意服務條款及隱私政策",
@@ -112,6 +113,7 @@ export default function FormCreateOrganize() {
       agreementService: false,
     },
   });
+  const [isHandlingCreateOrganizer, setIsHandlingCreateOrganizer] = useState(false);
   // 串接 建立舉辦者的API
   const { useCreate: requestCreateOrganize } = useRequest({
     queryKey: ["organizations"],
@@ -120,6 +122,7 @@ export default function FormCreateOrganize() {
 
   const requestCreateOrganizeMutation = requestCreateOrganize({
     onSuccess: (response) => {
+      setIsHandlingCreateOrganizer(false);
       const res = response as CreateOrganizeResponse;
       if (res.organization) {
         toast({
@@ -130,6 +133,7 @@ export default function FormCreateOrganize() {
       }
     },
     onError: (error: Error) => {
+      setIsHandlingCreateOrganizer(false);
       toast({
         variant: "destructive",
         title: "錯誤",
@@ -138,16 +142,14 @@ export default function FormCreateOrganize() {
     },
   });
   const onSubmit = (data: FormValues) => {
+    setIsHandlingCreateOrganizer(true);
     // 在這裡處理表單提交邏輯
     requestCreateOrganizeMutation.mutate(data);
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ""); // 移除所有非數字字符
-    if (value.length > 1) {
-      value = value.slice(0, 2) + "-" + value.slice(2); // 在第二個字符後插入 '-'
-    }
-    e.target.value = value;
+    const onlyNumber = e.target.value.replace(/\D/g, ""); // 只保留數字
+    e.target.value = onlyNumber;
   };
   return (
     <div className="mx-auto h-full w-full lg:w-[40%]">
@@ -208,8 +210,13 @@ export default function FormCreateOrganize() {
               {/* {errors.agreementService && <p className="pl-2 text-sm text-red-500">{errors.agreementService.message}</p>} */}
             </div>
             <div className="flex justify-between gap-4">
-              <Button type="submit" className="bg-primary flex-start my-2 flex w-full rounded-full text-white lg:w-[200px]">
+              <Button
+                type="submit"
+                disabled={isHandlingCreateOrganizer}
+                className="bg-primary flex-start my-2 flex w-full rounded-full text-white lg:w-[200px]"
+              >
                 建立
+                {isHandlingCreateOrganizer ? "處理中" : "建立"}
               </Button>
               <Button
                 type="button"
