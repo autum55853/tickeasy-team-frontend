@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/core/hooks/useToast";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useLogout } from "@/core/hooks/useLogout";
-import { useAuthStore } from "@/store/authStore";
 export default function Password() {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -17,10 +16,11 @@ export default function Password() {
     confirmPassword: "",
   });
   // const [errors, setErrors] = useState<ZodIssue[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // 處理重設密碼
   const { useCreate: resetPassword } = useRequest({
-    queryKey: ["auth", "reset-password"],
-    url: "/api/v1/auth/reset-password",
+    queryKey: ["auth", "change-password"],
+    url: "/api/v1/auth/change-password",
   });
   const resetPasswordMutation = resetPassword({
     onSuccess: () => {
@@ -30,6 +30,7 @@ export default function Password() {
       });
       handleLogout();
       navigate("/login");
+      setIsSubmitting(false);
     },
     onError: (error: Error) => {
       toast({
@@ -37,10 +38,10 @@ export default function Password() {
         title: "錯誤",
         description: error.message || "重設密碼失敗，請確認驗證碼是否正確",
       });
+      setIsSubmitting(false);
     },
   });
   const { handleLogout } = useLogout();
-  const userEmail = useAuthStore((state) => state.email);
   const handleSubmit = (updatedData: T_Password) => {
     try {
       // 使用 schema 驗證數據
@@ -48,9 +49,10 @@ export default function Password() {
       // 驗證通過後才執行更新
       setData(validatedData);
       const data = {
-        email: userEmail,
-        newPassword: validatedData.newPassword,
+        oldPassword: validatedData.oldPassword,
+        newPassword: validatedData.confirmPassword,
       };
+      setIsSubmitting(true);
       resetPasswordMutation.mutate(data);
       // navigate("/login");
     } catch (error: unknown) {
@@ -83,7 +85,7 @@ export default function Password() {
           <h4 className="text-2xl font-bold">修改密碼</h4>
           <p className="text-center text-sm text-red-500">修改密碼後將導回登入頁面，重新登入</p>
         </div>
-        <PasswordInfo onSubmit={handleSubmit} data={data} />
+        <PasswordInfo onSubmit={handleSubmit} data={data} isSubmitting={isSubmitting} />
       </div>
     </>
   );
