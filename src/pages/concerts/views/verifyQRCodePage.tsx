@@ -1,9 +1,10 @@
 import { Layout } from "@/pages/comm/views/layout";
 import { useToast } from "@/core/hooks/useToast";
 import QrScanner from "../components/QrScanner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { axiosInstance } from "@/core/lib/axios";
-
+import { useAuthStore } from "@/store/authStore";
+import { useNavigate } from "react-router-dom";
 // 驗票 API 回傳型別
 interface VerifyApiResponse<T = unknown> {
   status: string;
@@ -22,6 +23,21 @@ export default function Page() {
     console.log("API result", data);
     return data;
   };
+
+  // 驗證是否登入
+  // 檢查 cookies 是否有 token
+  function hasToken() {
+    return document.cookie.split(";").some((item) => item.trim().startsWith("auth_token"));
+  }
+  const isLogin = useAuthStore((state) => state.isLogin);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLogin && !hasToken()) {
+      toast({ variant: "destructive", title: "請先登入", description: "您必須登入才能驗票。" });
+      navigate("/comm/login");
+    }
+  }, [isLogin, navigate, toast]);
 
   const handleScan = (qrCode: string) => {
     toast({ title: "掃描成功", description: qrCode });
