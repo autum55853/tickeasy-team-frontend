@@ -6,13 +6,11 @@ import { useAuthStore } from "@/store/authStore";
  */
 export const redirectToDashboard = () => {
   const token = useAuthStore.getState().getAuthToken();
-  const userInfo = localStorage.getItem('auth-storage');
   
-  if (token && userInfo) {
+  if (token) {
     // 創建 URL 參數
     const params = new URLSearchParams({
       token: token,
-      userInfo: encodeURIComponent(userInfo)
     });
     
     // 在新視窗開啟 Dashboard
@@ -33,5 +31,5 @@ export const canAccessDashboard = (): boolean => {
   const role = useAuthStore.getState().role;
   const isLogin = useAuthStore.getState().isLogin;
   
-  return isLogin && role === 'admin';
+  return isLogin && (role === 'admin' || role === 'superuser');
 };
