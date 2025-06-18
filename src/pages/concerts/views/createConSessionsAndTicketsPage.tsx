@@ -35,8 +35,6 @@ export default function CreateConSessionsAndTicketsPage() {
     sessionEnd: "",
   });
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
-  const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
-  const [ticketEditBuffer, setTicketEditBuffer] = useState<Partial<TicketType>>({});
   const { handleUploadSeattable } = useSeattableUpload();
   const { toast } = useToast();
 
@@ -99,35 +97,6 @@ export default function CreateConSessionsAndTicketsPage() {
     setEditingSessionId(null);
   };
 
-  const handleTicketEdit = (t: TicketType) => {
-    setEditingTicketId(t.ticketTypeId);
-    setTicketEditBuffer({
-      ticketTypeId: t.ticketTypeId,
-      concertSessionId: t.concertSessionId,
-      ticketTypeName: t.ticketTypeName,
-      sellBeginDate: t.sellBeginDate,
-      sellEndDate: t.sellEndDate,
-      ticketTypePrice: t.ticketTypePrice,
-      totalQuantity: t.totalQuantity,
-      entranceType: t.entranceType,
-      ticketBenefits: t.ticketBenefits,
-      ticketRefundPolicy: t.ticketRefundPolicy,
-    });
-  };
-
-  const handleTicketSave = (sessionId: string, ticketId: string) => {
-    const session = sessions.find((s) => s.sessionId === sessionId);
-    if (!session) return;
-
-    const updatedTickets = session.ticketTypes.map((t) => (t.ticketTypeId === ticketId ? { ...t, ...ticketEditBuffer } : t));
-
-    updateSession({
-      sessionId,
-      ticketTypes: updatedTickets,
-    });
-    setEditingTicketId(null);
-  };
-
   const handleAddSessionWrapper = () => {
     const newSession: Session = {
       sessionId: `tmp-${Date.now()}`,
@@ -161,7 +130,6 @@ export default function CreateConSessionsAndTicketsPage() {
       createdAt: new Date().toISOString(),
     };
     addTicket(sessionId, newTicket);
-    setEditingTicketId(newTicketId);
     setExpandedTicketId(newTicketId);
   };
 
@@ -187,7 +155,7 @@ export default function CreateConSessionsAndTicketsPage() {
 
   const handleBack = () => {
     const backPath = isEditMode
-      ? `/concert/edit/${concertId}/info?tab=concertList`
+      ? `/concert/edit/${concertId}/info?${new URLSearchParams({ companyId: companyId || "", tab: "concertList" }).toString()}`
       : `/concert/create/info?${new URLSearchParams({ concertId: info.concertId || "", companyId: companyId || "", tab: "concertList" }).toString()}`;
     navigate(backPath);
   };
@@ -195,6 +163,140 @@ export default function CreateConSessionsAndTicketsPage() {
   const handleSubmit = async () => {
     try {
       const { info, saveDraft, submitConcert } = useConcertStore.getState();
+
+      // 驗證基本資料
+      const basicInfoErrors: string[] = [];
+
+      if (!info.conTitle?.trim()) {
+        basicInfoErrors.push("演唱會名稱");
+      }
+      if (!info.conIntroduction?.trim()) {
+        basicInfoErrors.push("演唱會簡介");
+      }
+      if (!info.conLocation?.trim()) {
+        basicInfoErrors.push("演唱會地點");
+      }
+      if (!info.conAddress?.trim()) {
+        basicInfoErrors.push("演唱會地址");
+      }
+      if (!info.eventStartDate?.trim()) {
+        basicInfoErrors.push("活動開始日期");
+      }
+      if (!info.eventEndDate?.trim()) {
+        basicInfoErrors.push("活動結束日期");
+      }
+      if (!info.venueId?.trim()) {
+        basicInfoErrors.push("場館");
+      }
+      if (!info.locationTagId?.trim()) {
+        basicInfoErrors.push("地點標籤");
+      }
+      if (!info.musicTagId?.trim()) {
+        basicInfoErrors.push("音樂標籤");
+      }
+      if (!info.ticketPurchaseMethod?.trim()) {
+        basicInfoErrors.push("購票方式");
+      }
+      if (!info.precautions?.trim()) {
+        basicInfoErrors.push("注意事項");
+      }
+      if (!info.refundPolicy?.trim()) {
+        basicInfoErrors.push("退票政策");
+      }
+      if (!info.imgBanner?.trim()) {
+        basicInfoErrors.push("演唱會橫幅圖片");
+      }
+
+      if (basicInfoErrors.length > 0) {
+        toast({
+          title: "基本資料未完整",
+          description: `請填寫以下欄位：${basicInfoErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 驗證場次資料
+      if (sessions.length === 0) {
+        toast({
+          title: "場次資料未完整",
+          description: "請至少新增一個場次",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const sessionErrors: string[] = [];
+      sessions.forEach((session, index) => {
+        if (!session.sessionTitle?.trim()) {
+          sessionErrors.push(`場次${index + 1}名稱`);
+        }
+        if (!session.sessionDate?.trim()) {
+          sessionErrors.push(`場次${index + 1}日期`);
+        }
+        if (!session.sessionStart?.trim()) {
+          sessionErrors.push(`場次${index + 1}開始時間`);
+        }
+        if (!session.sessionEnd?.trim()) {
+          sessionErrors.push(`場次${index + 1}結束時間`);
+        }
+        if (!session.imgSeattable?.trim()) {
+          sessionErrors.push(`場次${index + 1}座位圖`);
+        }
+      });
+
+      if (sessionErrors.length > 0) {
+        toast({
+          title: "場次資料未完整",
+          description: `請填寫以下欄位：${sessionErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 驗證票種資料
+      const ticketErrors: string[] = [];
+      sessions.forEach((session, sessionIndex) => {
+        if (session.ticketTypes.length === 0) {
+          ticketErrors.push(`場次${sessionIndex + 1}票種`);
+        } else {
+          session.ticketTypes.forEach((ticket, ticketIndex) => {
+            if (!ticket.ticketTypeName?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}名稱`);
+            }
+            if (!ticket.sellBeginDate?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售開始時間`);
+            }
+            if (!ticket.sellEndDate?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售結束時間`);
+            }
+            if (!ticket.ticketTypePrice || ticket.ticketTypePrice <= 0) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}價格`);
+            }
+            if (!ticket.totalQuantity || ticket.totalQuantity <= 0) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}數量`);
+            }
+            if (!ticket.entranceType?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}入場方式`);
+            }
+            if (!ticket.ticketBenefits?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}票種福利`);
+            }
+            if (!ticket.ticketRefundPolicy?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}退票政策`);
+            }
+          });
+        }
+      });
+
+      if (ticketErrors.length > 0) {
+        toast({
+          title: "票種資料未完整",
+          description: `請填寫以下欄位：${ticketErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
 
       let concertId = info.concertId;
 
@@ -213,6 +315,12 @@ export default function CreateConSessionsAndTicketsPage() {
         title: "成功",
         description: "送審成功",
       });
+
+      // 送審成功後自動導航到演唱會列表頁面
+      const orgId = companyId || searchParams.get("companyId") || (isEditMode ? info.organizationId : null);
+      if (orgId) {
+        navigate(`/companyDetail?companyId=${orgId}&tab=concertList`);
+      }
     } catch (error) {
       console.error("送審失敗:", error);
       toast({
@@ -259,80 +367,99 @@ export default function CreateConSessionsAndTicketsPage() {
           <div className="space-y-4 p-4 sm:space-y-8 sm:p-8">
             {/* 場次表格 */}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[375px] border-separate border-spacing-0">
-                <thead>
-                  <tr className="border-b">
-                    <th className="w-[40px] py-2 text-left text-xs font-bold sm:w-[60px] sm:text-sm">序號</th>
-                    <th className="w-[100px] py-2 text-left text-xs font-bold sm:w-[120px] sm:text-sm">場次名稱</th>
-                    <th className="py-2 text-left text-xs font-bold sm:text-sm">舉辦時間</th>
-                    <th className="w-[100px] py-2 text-left text-xs font-bold sm:w-[120px] sm:text-sm"></th>
-                  </tr>
-                </thead>
-                <tbody>
+              <div className="w-full">
+                {/* Header */}
+                <div className="hidden grid-cols-[60px_120px_1fr_180px] gap-4 border-b px-4 py-2 md:grid">
+                  <div className="text-xs font-bold sm:text-sm">序號</div>
+                  <div className="text-xs font-bold sm:text-sm">場次名稱</div>
+                  <div className="text-xs font-bold sm:text-sm">舉辦時間</div>
+                  <div className="text-xs font-bold sm:text-sm"></div>
+                </div>
+                {/* Body */}
+                <div className="divide-y">
                   {sessions.map((s, idx) => (
-                    <>
-                      <tr key={s.sessionId} className="border-b">
-                        <td className="py-2 text-xs sm:py-3 sm:text-sm">{String(idx + 1).padStart(2, "0")}</td>
-                        <td>
+                    <div key={s.sessionId}>
+                      {/* Main Row */}
+                      <div className="flex flex-col gap-2 p-2 md:grid md:grid-cols-[60px_120px_1fr_180px] md:gap-4 md:px-4 md:py-2">
+                        <div className="flex items-center text-xs sm:text-sm md:block">
+                          <span className="mr-2 shrink-0 font-bold md:hidden">序號：</span>
+                          {String(idx + 1).padStart(2, "0")}
+                        </div>
+                        <div className="flex flex-col md:block">
+                          <span className="mb-1 shrink-0 font-bold md:hidden">場次名稱：</span>
                           {editingSessionId === s.sessionId ? (
                             <input
-                              className="w-full rounded border px-2 py-1 text-center text-xs sm:w-[120px] sm:text-sm"
+                              className="w-full rounded border px-2 py-1 text-center text-xs placeholder:text-gray-400 sm:text-sm"
                               value={editBuffer.sessionTitle}
                               onChange={(e) => setEditBuffer((buf) => ({ ...buf, sessionTitle: e.target.value }))}
+                              placeholder="請輸入場次名稱"
                             />
                           ) : (
-                            <span className="inline-block w-full rounded border px-2 py-1 text-center text-xs sm:w-[120px] sm:text-sm">
-                              {s.sessionTitle}
+                            <span className="inline-block w-full rounded border px-2 py-1 text-center text-xs sm:text-sm">
+                              {s.sessionTitle || <span className="text-gray-400">請輸入場次名稱</span>}
                             </span>
                           )}
-                        </td>
-                        <td>
+                        </div>
+                        <div className="relative flex flex-col md:block">
+                          <span className="mb-1 shrink-0 font-bold md:hidden">舉辦時間：</span>
                           {editingSessionId === s.sessionId ? (
-                            <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
-                              <SingleDatePicker
-                                date={editBuffer.sessionDate ? dayjs(editBuffer.sessionDate).toDate() : null}
-                                setDate={(date) =>
-                                  setEditBuffer((buf) => ({
-                                    ...buf,
-                                    sessionDate: date ? dayjs(date).format("YYYY-MM-DD") : "",
-                                  }))
-                                }
-                                placeholder="選擇日期"
-                                inputClassName="w-full text-xs sm:text-sm lg:w-[130px]"
-                              />
-                              <TimeOnlyPicker
-                                value={editBuffer.sessionStart}
-                                onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionStart: time }))}
-                                placeholder="開始時間"
-                                inputClassName="w-full text-xs sm:text-sm lg:w-[110px]"
-                              />
-                              <TimeOnlyPicker
-                                value={editBuffer.sessionEnd}
-                                onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionEnd: time }))}
-                                placeholder="結束時間"
-                                inputClassName="w-full text-xs sm:text-sm lg:w-[110px]"
-                              />
+                            <div className="flex flex-col items-start gap-2 md:flex-row md:items-center">
+                              <div className="relative w-full md:flex-1">
+                                <SingleDatePicker
+                                  date={editBuffer.sessionDate ? dayjs(editBuffer.sessionDate).toDate() : null}
+                                  setDate={(date) =>
+                                    setEditBuffer((buf) => ({
+                                      ...buf,
+                                      sessionDate: date ? dayjs(date).format("YYYY-MM-DD") : "",
+                                    }))
+                                  }
+                                  placeholder="請輸入場次日期"
+                                  inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
+                                />
+                              </div>
+                              <div className="relative w-full md:flex-1">
+                                <TimeOnlyPicker
+                                  value={editBuffer.sessionStart}
+                                  onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionStart: time }))}
+                                  placeholder="請選擇開始時間"
+                                  inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
+                                />
+                              </div>
+                              <div className="relative w-full md:flex-1">
+                                <TimeOnlyPicker
+                                  value={editBuffer.sessionEnd}
+                                  onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionEnd: time }))}
+                                  placeholder="請選擇結束時間"
+                                  inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
+                                />
+                              </div>
                             </div>
                           ) : (
-                            <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
-                              <span className="inline-flex w-full items-center justify-around rounded border px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm lg:w-[130px] lg:px-2 lg:py-0.5">
-                                <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5" />
-                                {s.sessionDate}
-                              </span>
-                              <span className="inline-flex w-full items-center justify-around rounded border px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm lg:w-[110px] lg:px-2 lg:py-0.5">
-                                {s.sessionStart}
-                              </span>
-                              <span className="inline-flex w-full items-center justify-around rounded border px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm lg:w-[110px] lg:px-2 lg:py-0.5">
-                                {s.sessionEnd}
-                              </span>
+                            <div className="flex flex-col items-start gap-2 md:flex-row md:items-center">
+                              <div className="relative w-full md:flex-1">
+                                <span className="inline-block w-full rounded border px-2 py-1 text-xs sm:text-sm">
+                                  <Calendar className="mr-1 inline-block h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5" />
+                                  {s.sessionDate || <span className="text-gray-400">請輸入場次日期</span>}
+                                </span>
+                              </div>
+                              <div className="relative w-full md:flex-1">
+                                <span className="inline-block w-full rounded border px-2 py-1 text-xs sm:text-sm">
+                                  開始：{s.sessionStart || <span className="text-gray-400">請選擇開始時間</span>}
+                                </span>
+                              </div>
+                              <div className="relative w-full md:flex-1">
+                                <span className="inline-block w-full rounded border px-2 py-1 text-xs sm:text-sm">
+                                  結束：{s.sessionEnd || <span className="text-gray-400">請選擇結束時間</span>}
+                                </span>
+                              </div>
                             </div>
                           )}
-                        </td>
-                        <td>
-                          <div className="flex min-w-[100px] flex-col items-end gap-1 sm:min-w-[120px] sm:flex-row sm:items-center sm:gap-2">
+                        </div>
+                        <div className="mt-4 flex justify-end md:mt-0 md:block">
+                          <div className="flex flex-wrap items-center gap-2">
                             <Button
                               variant="outline"
-                              className="w-full border-black px-2 py-1 text-xs whitespace-nowrap text-black sm:w-auto sm:px-3 sm:text-sm"
+                              className="border-black px-2 py-1 text-xs whitespace-nowrap text-black sm:px-3 sm:text-sm"
                               onClick={() => setExpandedSessionId(expandedSessionId === s.sessionId ? null : s.sessionId)}
                             >
                               票種設定 <span className="ml-0.5">{expandedSessionId === s.sessionId ? "⌃" : "⌄"}</span>
@@ -352,44 +479,38 @@ export default function CreateConSessionsAndTicketsPage() {
                               </Button>
                             </div>
                           </div>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
+                      {/* Expanded Content */}
                       {expandedSessionId === s.sessionId && (
-                        <tr>
-                          <td colSpan={4} className="p-2 sm:p-4">
-                            <div className="mb-4 flex flex-col items-center">
-                              {s.imgSeattable ? (
-                                <img src={s.imgSeattable} alt="座位圖" className="mb-2 h-24 w-auto rounded border object-contain sm:h-32" />
-                              ) : (
-                                <div className="my-2 text-xs text-gray-500 sm:my-4 sm:text-sm">尚未上傳座位圖</div>
-                              )}
-                              <Button
-                                variant="outline"
-                                className="border-black px-2 py-1 text-xs text-black sm:px-3 sm:py-2 sm:text-sm"
-                                onClick={() => handleUploadSeattable(s.sessionId)}
-                              >
-                                上傳座位圖
-                              </Button>
-                            </div>
-                            <TicketTypeTable
-                              session={s}
-                              editingTicketId={editingTicketId}
-                              expandedTicketId={expandedTicketId}
-                              ticketEditBuffer={ticketEditBuffer}
-                              setTicketEditBuffer={setTicketEditBuffer}
-                              handleTicketEdit={handleTicketEdit}
-                              handleTicketSave={handleTicketSave}
-                              handleDeleteTicket={deleteTicket}
-                              handleAddTicketType={handleAddTicketTypeWrapper}
-                              setExpandedTicketId={setExpandedTicketId}
-                            />
-                          </td>
-                        </tr>
+                        <div className="px-4 py-2">
+                          <div className="mb-4 flex flex-col items-center">
+                            {s.imgSeattable ? (
+                              <img src={s.imgSeattable} alt="座位圖" className="mb-2 h-24 w-auto rounded border object-contain sm:h-32" />
+                            ) : (
+                              <div className="my-2 text-xs text-gray-500 sm:my-4 sm:text-sm">尚未上傳座位圖</div>
+                            )}
+                            <Button
+                              variant="outline"
+                              className="border-black px-2 py-1 text-xs text-black sm:px-3 sm:py-2 sm:text-sm"
+                              onClick={() => handleUploadSeattable(s.sessionId)}
+                            >
+                              上傳座位圖
+                            </Button>
+                          </div>
+                          <TicketTypeTable
+                            session={s}
+                            expandedTicketId={expandedTicketId}
+                            handleDeleteTicket={deleteTicket}
+                            handleAddTicketType={handleAddTicketTypeWrapper}
+                            setExpandedTicketId={setExpandedTicketId}
+                          />
+                        </div>
                       )}
-                    </>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
             {/* 按鈕 */}
             <div className="mt-4 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-4">

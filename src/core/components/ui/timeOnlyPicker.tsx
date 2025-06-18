@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface TimeOnlyPickerProps {
   value: string;
@@ -42,6 +43,18 @@ export function TimeOnlyPicker({ value, onChange, placeholder = "選擇時間", 
   const { morningOptions, afternoonOptions } = generateTimeOptions();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+
+  // 更新下拉選單位置
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [isOpen]);
 
   // 點擊外部關閉下拉選單
   useEffect(() => {
@@ -77,26 +90,36 @@ export function TimeOnlyPicker({ value, onChange, placeholder = "選擇時間", 
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`${baseInputStyle} ${inputClassName} cursor-pointer`}
       />
-      {isOpen && (
-        <div ref={dropdownRef} className={baseDropdownStyle}>
-          <div className="sticky top-0 bg-gray-100 px-2 py-1 text-sm font-medium text-gray-700">上午</div>
-          <ul>
-            {morningOptions.map((time) => (
-              <li key={time} onClick={() => handleSelect(time)} className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-100">
-                {time}
-              </li>
-            ))}
-          </ul>
-          <div className="sticky top-0 bg-gray-100 px-2 py-1 text-sm font-medium text-gray-700">下午</div>
-          <ul>
-            {afternoonOptions.map((time) => (
-              <li key={time} onClick={() => handleSelect(time)} className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-100">
-                {time}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className={`${baseDropdownStyle} fixed`}
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: inputRef.current?.offsetWidth,
+            }}
+          >
+            <div className="sticky top-0 bg-gray-100 px-2 py-1 text-sm font-medium text-gray-700">上午</div>
+            <ul>
+              {morningOptions.map((time) => (
+                <li key={time} onClick={() => handleSelect(time)} className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-100">
+                  {time}
+                </li>
+              ))}
+            </ul>
+            <div className="sticky top-0 bg-gray-100 px-2 py-1 text-sm font-medium text-gray-700">下午</div>
+            <ul>
+              {afternoonOptions.map((time) => (
+                <li key={time} onClick={() => handleSelect(time)} className="cursor-pointer px-2 py-1 text-sm hover:bg-gray-100">
+                  {time}
+                </li>
+              ))}
+            </ul>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

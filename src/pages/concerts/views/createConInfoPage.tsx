@@ -47,7 +47,17 @@ export default function CreateConInfoPage() {
       }
       setInfo({ concertId });
     }
-    const nextPath = isEditMode ? `/concert/edit/${concertId}/sessions-and-tickets` : `/concert/create/sessions-and-tickets?concertId=${concertId}`;
+
+    // 構建查詢參數
+    const queryParams = new URLSearchParams();
+    queryParams.set("concertId", concertId);
+    if (companyId) {
+      queryParams.set("companyId", companyId);
+    }
+
+    const nextPath = isEditMode
+      ? `/concert/edit/${concertId}/sessions-and-tickets`
+      : `/concert/create/sessions-and-tickets?${queryParams.toString()}`;
     window.location.href = nextPath;
   };
 

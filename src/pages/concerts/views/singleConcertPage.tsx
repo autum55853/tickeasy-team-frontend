@@ -315,7 +315,12 @@ export default function SingleConcertPage() {
                     </div>
                   </div>
                 </div>
-                <Button variant="default" size="lg" className="flex items-center gap-2 rounded-full bg-[#2A7AC0] px-8 hover:bg-[#2563eb]">
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="flex items-center gap-2 rounded-full bg-[#2A7AC0] px-8 hover:bg-[#2563eb]"
+                  onClick={() => navigate(`/concert/buyTicket/${concertId}`)}
+                >
                   下一步 <ArrowRight className="ml-1" size={20} />
                 </Button>
               </div>
