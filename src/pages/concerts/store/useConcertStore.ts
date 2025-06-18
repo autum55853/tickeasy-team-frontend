@@ -232,37 +232,80 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
 
   updateSession: (session) => {
     console.log("updateSession called with", session);
-    set((state) => ({
-      sessions: state.sessions.map((s) => (s.sessionId === session.sessionId ? { ...s, ...session } : s)),
-    }));
+    set((state) => {
+      const newSessions = state.sessions.map((s) => (s.sessionId === session.sessionId ? { ...s, ...session } : s));
+      return {
+        sessions: newSessions,
+        info: {
+          ...state.info,
+          sessions: newSessions,
+        },
+      };
+    });
   },
 
   addSession: (session) =>
-    set((state) => ({
-      sessions: [...state.sessions, session],
-    })),
+    set((state) => {
+      const newSessions = [...state.sessions, session];
+      return {
+        sessions: newSessions,
+        info: {
+          ...state.info,
+          sessions: newSessions,
+        },
+      };
+    }),
 
   deleteSession: (sessionId) =>
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.sessionId !== sessionId),
-    })),
+    set((state) => {
+      const newSessions = state.sessions.filter((s) => s.sessionId !== sessionId);
+      return {
+        sessions: newSessions,
+        info: {
+          ...state.info,
+          sessions: newSessions,
+        },
+      };
+    }),
 
   // ========== 票券管理 ==========
   addTicket: (sessionId, ticket) =>
-    set((state) => ({
-      sessions: state.sessions.map((s) => (s.sessionId === sessionId ? { ...s, ticketTypes: [...s.ticketTypes, ticket] } : s)),
-    })),
+    set((state) => {
+      const newSessions = state.sessions.map((s) => (s.sessionId === sessionId ? { ...s, ticketTypes: [...s.ticketTypes, ticket] } : s));
+      return {
+        sessions: newSessions,
+        info: {
+          ...state.info,
+          sessions: newSessions,
+        },
+      };
+    }),
 
   deleteTicket: (sessionId, ticketId) =>
-    set((state) => ({
-      sessions: state.sessions.map((s) =>
+    set((state) => {
+      const newSessions = state.sessions.map((s) =>
         s.sessionId === sessionId ? { ...s, ticketTypes: s.ticketTypes.filter((t) => t.ticketTypeId !== ticketId) } : s
-      ),
-    })),
+      );
+      return {
+        sessions: newSessions,
+        info: {
+          ...state.info,
+          sessions: newSessions,
+        },
+      };
+    }),
 
   // ========== API 操作 ==========
   saveDraft: async (): Promise<{ concertId: string } | undefined> => {
     try {
+      // 先同步 info.sessions
+      set((state) => ({
+        info: {
+          ...state.info,
+          sessions: state.sessions,
+        },
+      }));
+
       const token = useAuthStore.getState().getAuthToken();
       if (!token) {
         console.error("[saveDraft] 未登入");

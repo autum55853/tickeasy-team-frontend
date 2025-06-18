@@ -35,8 +35,6 @@ export default function CreateConSessionsAndTicketsPage() {
     sessionEnd: "",
   });
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
-  const [editingTicketId, setEditingTicketId] = useState<string | null>(null);
-  const [ticketEditBuffer, setTicketEditBuffer] = useState<Partial<TicketType>>({});
   const { handleUploadSeattable } = useSeattableUpload();
   const { toast } = useToast();
 
@@ -99,35 +97,6 @@ export default function CreateConSessionsAndTicketsPage() {
     setEditingSessionId(null);
   };
 
-  const handleTicketEdit = (t: TicketType) => {
-    setEditingTicketId(t.ticketTypeId);
-    setTicketEditBuffer({
-      ticketTypeId: t.ticketTypeId,
-      concertSessionId: t.concertSessionId,
-      ticketTypeName: t.ticketTypeName,
-      sellBeginDate: t.sellBeginDate,
-      sellEndDate: t.sellEndDate,
-      ticketTypePrice: t.ticketTypePrice,
-      totalQuantity: t.totalQuantity,
-      entranceType: t.entranceType,
-      ticketBenefits: t.ticketBenefits,
-      ticketRefundPolicy: t.ticketRefundPolicy,
-    });
-  };
-
-  const handleTicketSave = (sessionId: string, ticketId: string) => {
-    const session = sessions.find((s) => s.sessionId === sessionId);
-    if (!session) return;
-
-    const updatedTickets = session.ticketTypes.map((t) => (t.ticketTypeId === ticketId ? { ...t, ...ticketEditBuffer } : t));
-
-    updateSession({
-      sessionId,
-      ticketTypes: updatedTickets,
-    });
-    setEditingTicketId(null);
-  };
-
   const handleAddSessionWrapper = () => {
     const newSession: Session = {
       sessionId: `tmp-${Date.now()}`,
@@ -161,7 +130,6 @@ export default function CreateConSessionsAndTicketsPage() {
       createdAt: new Date().toISOString(),
     };
     addTicket(sessionId, newTicket);
-    setEditingTicketId(newTicketId);
     setExpandedTicketId(newTicketId);
   };
 
@@ -187,7 +155,7 @@ export default function CreateConSessionsAndTicketsPage() {
 
   const handleBack = () => {
     const backPath = isEditMode
-      ? `/concert/edit/${concertId}/info?tab=concertList`
+      ? `/concert/edit/${concertId}/info?${new URLSearchParams({ companyId: companyId || "", tab: "concertList" }).toString()}`
       : `/concert/create/info?${new URLSearchParams({ concertId: info.concertId || "", companyId: companyId || "", tab: "concertList" }).toString()}`;
     navigate(backPath);
   };
@@ -195,6 +163,140 @@ export default function CreateConSessionsAndTicketsPage() {
   const handleSubmit = async () => {
     try {
       const { info, saveDraft, submitConcert } = useConcertStore.getState();
+
+      // 驗證基本資料
+      const basicInfoErrors: string[] = [];
+
+      if (!info.conTitle?.trim()) {
+        basicInfoErrors.push("演唱會名稱");
+      }
+      if (!info.conIntroduction?.trim()) {
+        basicInfoErrors.push("演唱會簡介");
+      }
+      if (!info.conLocation?.trim()) {
+        basicInfoErrors.push("演唱會地點");
+      }
+      if (!info.conAddress?.trim()) {
+        basicInfoErrors.push("演唱會地址");
+      }
+      if (!info.eventStartDate?.trim()) {
+        basicInfoErrors.push("活動開始日期");
+      }
+      if (!info.eventEndDate?.trim()) {
+        basicInfoErrors.push("活動結束日期");
+      }
+      if (!info.venueId?.trim()) {
+        basicInfoErrors.push("場館");
+      }
+      if (!info.locationTagId?.trim()) {
+        basicInfoErrors.push("地點標籤");
+      }
+      if (!info.musicTagId?.trim()) {
+        basicInfoErrors.push("音樂標籤");
+      }
+      if (!info.ticketPurchaseMethod?.trim()) {
+        basicInfoErrors.push("購票方式");
+      }
+      if (!info.precautions?.trim()) {
+        basicInfoErrors.push("注意事項");
+      }
+      if (!info.refundPolicy?.trim()) {
+        basicInfoErrors.push("退票政策");
+      }
+      if (!info.imgBanner?.trim()) {
+        basicInfoErrors.push("演唱會橫幅圖片");
+      }
+
+      if (basicInfoErrors.length > 0) {
+        toast({
+          title: "基本資料未完整",
+          description: `請填寫以下欄位：${basicInfoErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 驗證場次資料
+      if (sessions.length === 0) {
+        toast({
+          title: "場次資料未完整",
+          description: "請至少新增一個場次",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const sessionErrors: string[] = [];
+      sessions.forEach((session, index) => {
+        if (!session.sessionTitle?.trim()) {
+          sessionErrors.push(`場次${index + 1}名稱`);
+        }
+        if (!session.sessionDate?.trim()) {
+          sessionErrors.push(`場次${index + 1}日期`);
+        }
+        if (!session.sessionStart?.trim()) {
+          sessionErrors.push(`場次${index + 1}開始時間`);
+        }
+        if (!session.sessionEnd?.trim()) {
+          sessionErrors.push(`場次${index + 1}結束時間`);
+        }
+        if (!session.imgSeattable?.trim()) {
+          sessionErrors.push(`場次${index + 1}座位圖`);
+        }
+      });
+
+      if (sessionErrors.length > 0) {
+        toast({
+          title: "場次資料未完整",
+          description: `請填寫以下欄位：${sessionErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // 驗證票種資料
+      const ticketErrors: string[] = [];
+      sessions.forEach((session, sessionIndex) => {
+        if (session.ticketTypes.length === 0) {
+          ticketErrors.push(`場次${sessionIndex + 1}票種`);
+        } else {
+          session.ticketTypes.forEach((ticket, ticketIndex) => {
+            if (!ticket.ticketTypeName?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}名稱`);
+            }
+            if (!ticket.sellBeginDate?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售開始時間`);
+            }
+            if (!ticket.sellEndDate?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售結束時間`);
+            }
+            if (!ticket.ticketTypePrice || ticket.ticketTypePrice <= 0) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}價格`);
+            }
+            if (!ticket.totalQuantity || ticket.totalQuantity <= 0) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}數量`);
+            }
+            if (!ticket.entranceType?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}入場方式`);
+            }
+            if (!ticket.ticketBenefits?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}票種福利`);
+            }
+            if (!ticket.ticketRefundPolicy?.trim()) {
+              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}退票政策`);
+            }
+          });
+        }
+      });
+
+      if (ticketErrors.length > 0) {
+        toast({
+          title: "票種資料未完整",
+          description: `請填寫以下欄位：${ticketErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
 
       let concertId = info.concertId;
 
@@ -213,6 +315,12 @@ export default function CreateConSessionsAndTicketsPage() {
         title: "成功",
         description: "送審成功",
       });
+
+      // 送審成功後自動導航到演唱會列表頁面
+      const orgId = companyId || searchParams.get("companyId") || (isEditMode ? info.organizationId : null);
+      if (orgId) {
+        navigate(`/companyDetail?companyId=${orgId}&tab=concertList`);
+      }
     } catch (error) {
       console.error("送審失敗:", error);
       toast({
@@ -373,12 +481,7 @@ export default function CreateConSessionsAndTicketsPage() {
                             </div>
                             <TicketTypeTable
                               session={s}
-                              editingTicketId={editingTicketId}
                               expandedTicketId={expandedTicketId}
-                              ticketEditBuffer={ticketEditBuffer}
-                              setTicketEditBuffer={setTicketEditBuffer}
-                              handleTicketEdit={handleTicketEdit}
-                              handleTicketSave={handleTicketSave}
                               handleDeleteTicket={deleteTicket}
                               handleAddTicketType={handleAddTicketTypeWrapper}
                               setExpandedTicketId={setExpandedTicketId}
