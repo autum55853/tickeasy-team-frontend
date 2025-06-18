@@ -15,7 +15,7 @@ export default function Profile() {
   const [error, setError] = useState<string>("");
   const [showError, setShowError] = useState(false);
   const [profileData, setProfileData] = useState<T_Profile>({});
-  const { data, isLoading } = useRequest<UserResponse>({
+  const { data, isLoading, refetch } = useRequest<UserResponse>({
     url: "/api/v1/users/profile",
     queryKey: ["userInfo"],
   }).useGet();
@@ -73,6 +73,69 @@ export default function Profile() {
       }
     }
   };
+  // 驗證碼驗證
+  const [isVerifyingEmailCode, setIsVerifyingEmailCode] = useState(false);
+  const [insertCode, setInsertCode] = useState("");
+  const [isInertVerifyCode, setIsInertVerifyCode] = useState(false);
+  const { useCreate: sendVerifyEmailCode } = useRequest({
+    queryKey: ["auth", "verify-email"],
+    url: "/api/v1/auth/verify-email",
+  });
+  const sendVerifyEmailCodeMutation = sendVerifyEmailCode({
+    onSuccess: () => {
+      toast({
+        title: "成功",
+        description: "信箱驗證成功",
+      });
+      setIsVerifyingEmailCode(false);
+      setIsInertVerifyCode(false);
+      setInsertCode("");
+      setIsEdit(false);
+      alert("信箱驗證成功");
+      window.scrollTo(0, 0);
+      refetch();
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "驗證碼驗證失敗，請稍後再試",
+      });
+      setIsVerifyingEmailCode(false);
+    },
+  });
+  const handleVerifyEmailCode = () => {
+    setIsVerifyingEmailCode(true);
+    sendVerifyEmailCodeMutation.mutate({ email: profileData.email, code: insertCode });
+  };
+  // 寄送驗證碼
+  const [isSendingVerifyCode, setIsSendingVerifyCode] = useState(false);
+  const { useCreate: resendVerifyCode } = useRequest({
+    queryKey: ["auth", "resend-verification"],
+    url: "/api/v1/auth/resend-verification",
+  });
+  const resendVerifyCodeMutation = resendVerifyCode({
+    onSuccess: () => {
+      toast({
+        title: "成功",
+        description: "驗證碼已發送",
+      });
+      setIsSendingVerifyCode(false);
+      alert(`驗證碼已發送, 請至信箱 ${profileData.email} 查看`);
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "錯誤",
+        description: error.message || "發送驗證碼失敗，請稍後再試",
+      });
+      setIsSendingVerifyCode(false);
+    },
+  });
+  const handleSendVerifyCode = () => {
+    setIsSendingVerifyCode(true);
+    resendVerifyCodeMutation.mutate({ email: profileData.email });
+  };
   return (
     <>
       {isLoading ? (
@@ -96,6 +159,14 @@ export default function Profile() {
               window.scrollTo(0, 0);
             }}
             isPending={putProfileMutation.isPending}
+            handleSendVerifyCode={handleSendVerifyCode}
+            isSendingVerifyCode={isSendingVerifyCode}
+            isVerifyingEmailCode={isVerifyingEmailCode}
+            insertCode={insertCode}
+            setInsertCode={setInsertCode}
+            handleVerifyEmailCode={handleVerifyEmailCode}
+            isInertVerifyCode={isInertVerifyCode}
+            setIsInertVerifyCode={setIsInertVerifyCode}
           />
           {/* 錯誤提示 */}
           <AlertError error={error} isOpen={showError} onClose={() => setShowError(false)} />

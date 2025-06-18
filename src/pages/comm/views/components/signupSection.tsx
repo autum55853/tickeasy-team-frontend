@@ -85,13 +85,13 @@ export function SignupSection() {
     onSuccess: (response) => {
       toast({
         title: "註冊成功",
-        description: "請至您的信箱進行驗證",
+        description: "請至您的信箱取得驗證碼",
       });
       // 將response的token和email設定到authStore
       const res = response as { token: string; user: { email: string } };
       setAuth(res.token, res.user.email);
-      // 跳轉到首頁
-      navigate("/");
+      // 跳轉到會員中心進行信箱驗證
+      navigate("/user/about/profile");
     },
     onError: (error: Error) => {
       toast({

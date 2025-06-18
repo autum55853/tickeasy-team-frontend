@@ -15,15 +15,40 @@ import dayjs from "dayjs";
 import { useRequest } from "@/core/hooks/useRequest";
 import { MusicTypeOption } from "../types/musicType";
 import { RegionOption } from "../types/region";
+import { CircleCheck, Send } from "lucide-react";
+import { ModalVerifyEmail } from "./modalVerifyEmail";
+
 interface ProfileInfoProps {
   isEdit: boolean;
   data: T_Profile;
   onSubmit: (data: T_Profile) => void;
   onCancel: () => void;
   isPending: boolean;
+  handleSendVerifyCode: () => void;
+  isSendingVerifyCode: boolean;
+  isVerifyingEmailCode: boolean;
+  setInsertCode: (code: string) => void;
+  handleVerifyEmailCode: () => void;
+  insertCode: string;
+  isInertVerifyCode: boolean;
+  setIsInertVerifyCode: (isInertVerifyCode: boolean) => void;
 }
 
-export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPending }: ProfileInfoProps) {
+export default function ProfileInfo({
+  isEdit,
+  data,
+  onSubmit,
+  onCancel,
+  isPending,
+  handleSendVerifyCode,
+  isSendingVerifyCode,
+  isVerifyingEmailCode,
+  setInsertCode,
+  handleVerifyEmailCode,
+  insertCode,
+  isInertVerifyCode,
+  setIsInertVerifyCode,
+}: ProfileInfoProps) {
   const { register, watch, setValue, handleSubmit } = useForm<T_Profile>({
     defaultValues: data,
   });
@@ -46,8 +71,9 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
   const handleFormSubmit = (formData: T_Profile) => {
     onSubmit(formData); // 呼叫 props 傳進來的 onSubmit
   };
+
   const renderContent = () => (
-    <div className="relative mx-auto mt-2 w-full lg:mt-0 lg:w-[80%]">
+    <div className="relative mx-auto mt-2 w-full lg:mt-0">
       {isEdit ? (
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
@@ -234,10 +260,78 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
           </div>
         </form>
       ) : (
-        <div className="mx-auto flex w-full flex-col gap-4 px-4 lg:w-[80%]">
+        <div className="mx-auto flex w-full flex-col gap-4 px-4">
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">帳號</p>
-            <p className="flex-1 text-sm text-gray-500">{data.email}</p>
+            <div className="flex items-center text-sm text-gray-500">
+              <p>{data.email}</p>
+              <div className="ml-2 flex gap-2 text-xs text-gray-500">
+                {data.isEmailVerified ? (
+                  <CircleCheck className="h-4 w-4 text-green-500" />
+                ) : (
+                  <div className="relative flex flex-col gap-2 lg:flex-row">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="text-sidebar-primary border-sidebar-ring w-[100px] border-1 text-sm hover:shadow-sm"
+                      onClick={() => handleSendVerifyCode()}
+                      disabled={isSendingVerifyCode}
+                    >
+                      {isSendingVerifyCode ? "發送中..." : "發送驗證碼"}
+                    </Button>
+                    {isInertVerifyCode ? (
+                      <>
+                        <ModalVerifyEmail active={isInertVerifyCode} setIsInertVerifyCode={setIsInertVerifyCode}>
+                          <div className="mb-2 block flex flex-col items-center lg:hidden">
+                            <Input
+                              height={40}
+                              type="text"
+                              className="w-full"
+                              placeholder="請輸入驗證碼"
+                              value={insertCode}
+                              onChange={(e) => setInsertCode(e.target.value)}
+                            />
+                            <Button className="mt-2 w-[80px] text-sm" onClick={() => handleVerifyEmailCode()} disabled={isVerifyingEmailCode}>
+                              <Send className="h-4 w-4" />
+                              驗證
+                            </Button>
+                          </div>
+                        </ModalVerifyEmail>
+                        <div className="relative flex hidden gap-2 lg:block">
+                          <Input
+                            height={20}
+                            type="text"
+                            placeholder="請輸入驗證碼"
+                            value={insertCode}
+                            onChange={(e) => setInsertCode(e.target.value)}
+                          />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="text-secondary absolute -top-1 -right-1 h-5 w-5"
+                            onClick={() => setIsInertVerifyCode(false)}
+                          >
+                            X
+                          </Button>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="hidden text-sm lg:block"
+                          onClick={() => handleVerifyEmailCode()}
+                          disabled={isVerifyingEmailCode}
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <Button variant="outline" onClick={() => setIsInertVerifyCode(true)}>
+                        輸入驗證碼
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex h-[40px] items-center">
             <p className="w-[120px] pr-4 text-right font-bold">姓名</p>
@@ -281,7 +375,7 @@ export default function ProfileInfo({ isEdit, data, onSubmit, onCancel, isPendin
   );
 
   return (
-    <div className="relative py-4 lg:p-4">
+    <div className="relative py-4 lg:mx-auto lg:w-[80%] lg:p-4">
       {/* 會員頭像 */}
       <div className="flex justify-center lg:justify-start">
         <ProfileAvatar img={data?.avatar || DefaultImg} />
