@@ -1,6 +1,6 @@
 import { Button } from "@/core/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/core/hooks/useToast";
 import { useConcertStore } from "../store/useConcertStore";
 
@@ -11,11 +11,14 @@ interface BackToListButtonProps {
 
 export function BackToListButton({ companyId, isEditMode = false }: BackToListButtonProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { info } = useConcertStore();
 
   const handleBack = () => {
-    const orgId = isEditMode ? info.organizationId : companyId;
+    // 優先使用 props 中的 companyId，其次是 URL 參數，最後是 store 中的 organizationId
+    const orgId = companyId || searchParams.get("companyId") || (isEditMode ? info.organizationId : null);
+
     if (!orgId) {
       toast({
         title: "錯誤",
