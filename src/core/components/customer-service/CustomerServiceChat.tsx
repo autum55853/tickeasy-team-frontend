@@ -3,14 +3,11 @@ import {
   Send, 
   Bot, 
   User, 
-  Clock, 
   Star, 
   Phone, 
-  Search,
-  BookOpen,
   X
 } from 'lucide-react';
-import { useCustomerService, useKnowledgeSearch } from '@/core/hooks/useCustomerService';
+import { useCustomerService } from '@/core/hooks/useCustomerService';
 import { useCustomerServiceQuickReplies } from '@/store/customer-service';
 import { Message } from '@/core/types/customer-service';
 
@@ -45,11 +42,8 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
   } = useCustomerService();
 
   const quickReplies = useCustomerServiceQuickReplies();
-  const { search, searchResults, isSearching } = useKnowledgeSearch();
 
   const [inputValue, setInputValue] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'search' | 'faq'>('chat');
-  const [searchQuery, setSearchQuery] = useState('');
   const [showRating, setShowRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [ratingComment, setRatingComment] = useState('');
@@ -96,13 +90,6 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
     }
   };
 
-  // 處理知識庫搜尋
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      search(searchQuery, { limit: 5, threshold: 0.7 });
-    }
-  };
-
   // 處理評分提交
   const handleRatingSubmit = async () => {
     if (session && rating > 0) {
@@ -117,11 +104,7 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (activeTab === 'chat') {
-        handleSendMessage();
-      } else if (activeTab === 'search') {
-        handleSearch();
-      }
+      handleSendMessage();
     }
   };
 
@@ -158,18 +141,6 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
               <p className="text-sm whitespace-pre-wrap break-words">
                 {message.messageText}
               </p>
-              
-              {/* 元數據顯示 */}
-              {message.metadata && !isUser && (
-                <div className="text-xs text-gray-500 mt-1 space-y-1">
-                  {message.metadata.confidence && (
-                    <div>信心度: {(message.metadata.confidence * 100).toFixed(0)}%</div>
-                  )}
-                  {message.metadata.strategy && (
-                    <div>策略: {message.metadata.strategy}</div>
-                  )}
-                </div>
-              )}
             </div>
             
             {/* 時間戳 */}
@@ -188,13 +159,13 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="w-80 h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+    <div className="w-80 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
       {/* 標題欄 */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50 rounded-t-lg">
         <div className="flex items-center space-x-2">
           <Bot className="w-5 h-5 text-blue-600" />
           <div>
-            <h3 className="font-semibold text-gray-800">Tickeasy 客服</h3>
+            <h6 className="font-semibold text-gray-800">Tickeasy 客服</h6>
             <p className="text-xs text-gray-600">
               {isConnected ? '在線服務' : '連接中斷'}
               {session && (
@@ -216,45 +187,9 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
         </button>
       </div>
 
-      {/* 標籤導航 */}
-      <div className="flex border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab('chat')}
-          className={`flex-1 py-2 px-3 text-sm font-medium ${
-            activeTab === 'chat' 
-              ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          對話
-        </button>
-        <button
-          onClick={() => setActiveTab('search')}
-          className={`flex-1 py-2 px-3 text-sm font-medium ${
-            activeTab === 'search' 
-              ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          搜尋
-        </button>
-        <button
-          onClick={() => setActiveTab('faq')}
-          className={`flex-1 py-2 px-3 text-sm font-medium ${
-            activeTab === 'faq' 
-              ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50' 
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          常見
-        </button>
-      </div>
-
-      {/* 內容區域 */}
+      {/* 內容區域 - 只保留聊天功能 */}
       <div className="flex-1 overflow-hidden">
-        {/* 聊天標籤 */}
-        {activeTab === 'chat' && (
-          <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col">
             {/* 訊息列表 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {messages.length === 0 ? (
@@ -354,97 +289,7 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
               </div>
             </div>
           </div>
-        )}
-
-        {/* 搜尋標籤 */}
-        {activeTab === 'search' && (
-          <div className="h-full flex flex-col">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="搜尋知識庫..."
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={handleSearch}
-                  disabled={isSearching || !searchQuery.trim()}
-                  className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 transition-colors"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4">
-              {isSearching ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
-                  <p className="text-gray-600 text-sm">搜尋中...</p>
-                </div>
-              ) : searchResults.length > 0 ? (
-                <div className="space-y-3">
-                  {searchResults.map((result, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50">
-                      <h4 className="font-medium text-gray-800 text-sm">{result.title}</h4>
-                      <p className="text-xs text-gray-600 mt-1">
-                        {result.content.substring(0, 100)}...
-                      </p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">
-                          相似度: {(result.similarity * 100).toFixed(0)}%
-                        </span>
-                        <button
-                          onClick={() => {
-                            setActiveTab('chat');
-                            handleQuickReply(`請詳細說明：${result.title}`);
-                          }}
-                          className="text-blue-600 text-xs hover:underline"
-                        >
-                          詢問詳情
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-sm">輸入關鍵字搜尋相關資訊</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 常見問題標籤 */}
-        {activeTab === 'faq' && (
-          <div className="h-full overflow-y-auto p-4">
-            <div className="space-y-2">
-              {quickReplies.map((reply, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setActiveTab('chat');
-                    handleQuickReply(reply.text);
-                  }}
-                  className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm transition-colors"
-                >
-                  <div className="flex justify-between items-center">
-                    <span>{reply.text}</span>
-                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
-                      {reply.category}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
 
       {/* 評分對話框 */}
       {showRating && (
