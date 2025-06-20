@@ -55,7 +55,7 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const covertCardList = useMemo(() => {
     if (!rawConcertList) {

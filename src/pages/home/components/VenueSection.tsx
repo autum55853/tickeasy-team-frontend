@@ -52,7 +52,7 @@ export default function VenueSection() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const handlePrevClick = () => {
     setCurrentIndex((prev) => (prev === 0 ? venueCardData.length - cardsPerPage : prev - 1));
