@@ -50,6 +50,7 @@
   --text-tiny: 0.75rem;
   --primary-gradient-horizontal: linear-gradient(to right, #2d6ed0, #2bc6cc);
   --primary-gradient-vertical: linear-gradient(to bottom, #2d6ed0, #2bc6cc);
+  --line-green: #17d81d;
 }
 /* dark theme 本專案不會用*/
 .dark {

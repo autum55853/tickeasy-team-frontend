@@ -19,7 +19,7 @@ export default function ConcertSessionSection({
         <div className="relative rounded-lg border border-gray-300 p-8">
           <div className="absolute top-0 left-0 translate-x-1/4 -translate-y-1/2 bg-white px-2 text-2xl font-bold">請選擇場次與票券</div>
 
-          <div className="flex flex-col">
+          <div className="flex gap-4">
             {sessionData.map((session: sessionItem) => (
               <Button
                 key={session.sessionId}

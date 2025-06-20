@@ -81,9 +81,7 @@ export default function PaymentResultSection() {
               <p>
                 支付方式：<span className="ml-2">信用卡</span> {orderData.order.orderStatus === "paid" ? "(已付款)" : ""}
               </p>
-              <p className="text-lg font-semibold text-red-500">
-                退款政策：<span className="ml-2">{orderData.concert.refundPolicy}</span>
-              </p>
+              <p className="text-lg font-semibold text-red-500">退票需於開演前 7 日（含）以前申請，逾期恕不受理。</p>
               <Separator />
               <div className="flex flex-col items-center">
                 <div className="w-[70%]">
