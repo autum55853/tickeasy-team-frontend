@@ -21,6 +21,12 @@ export default {
       needLogin: false,
     },
     {
+      path: "/concert/preview/:concertId",
+      component: lazy(() => import("./views/previewConcertPage")),
+      meta: { title: "演唱會預覽" },
+      needLogin: true,
+    },
+    {
       path: "/concert/create/info",
       component: lazy(() => import("./views/createConInfoPage")),
       meta: { title: "建立演唱會-基本資料" },
