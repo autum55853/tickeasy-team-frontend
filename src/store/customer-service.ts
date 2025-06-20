@@ -38,9 +38,9 @@ interface CustomerServiceStore extends CustomerServiceState, CustomerServiceActi
 const DEFAULT_QUICK_REPLIES: QuickReplyOption[] = [
   { text: '如何購買門票？', category: '購票' },
   { text: '退票政策說明', category: '退票' },
-  { text: '如何舉辦活動', category: '活動' },
+  { text: '如何舉辦演唱會？', category: '演唱會' },
   { text: '付款方式查詢', category: '付款' },
-  { text: '活動時間地點', category: '活動資訊' },
+  { text: '演唱會時間地點', category: '活動資訊' },
 ];
 
 // 初始狀態
