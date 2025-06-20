@@ -237,7 +237,7 @@ export const useCustomerService = () => {
         throw error;
       }
     },
-    refetchInterval: 30000, // 每30秒檢查一次
+    refetchInterval: 300000, // 每5分鐘檢查一次（從30秒改為5分鐘）
     retry: (failureCount, error) => {
       console.log(`🔄 [健康檢查] 重試 ${failureCount}/3:`, error, new Date().toLocaleTimeString());
       return failureCount < 3;
