@@ -224,13 +224,32 @@ export const useCustomerService = () => {
   });
 
   // 健康檢查 query
-  const { data: healthStatus, isError: healthError } = useQuery({
+  const { data: healthStatus, isError: healthError, error: healthErrorDetail } = useQuery({
     queryKey: ['customer-service-health'],
-    queryFn: customerServiceAPI.healthCheck,
+    queryFn: async () => {
+      console.log('🔍 [健康檢查] 開始檢查...', new Date().toLocaleTimeString());
+      try {
+        const result = await customerServiceAPI.healthCheck();
+        console.log('✅ [健康檢查] 成功:', result, new Date().toLocaleTimeString());
+        return result;
+      } catch (error) {
+        console.error('❌ [健康檢查] 失敗:', error, new Date().toLocaleTimeString());
+        throw error;
+      }
+    },
     refetchInterval: 30000, // 每30秒檢查一次
-    retry: 3,
-    onError: () => setConnected(false),
-    onSuccess: () => setConnected(true),
+    retry: (failureCount, error) => {
+      console.log(`🔄 [健康檢查] 重試 ${failureCount}/3:`, error, new Date().toLocaleTimeString());
+      return failureCount < 3;
+    },
+    onError: (error) => {
+      console.error('🚨 [健康檢查] 最終失敗，設為斷線:', error, new Date().toLocaleTimeString());
+      setConnected(false);
+    },
+    onSuccess: (data) => {
+      console.log('🟢 [健康檢查] 最終成功，設為連線:', data, new Date().toLocaleTimeString());
+      setConnected(true);
+    },
   });
 
   // 便捷方法
@@ -298,12 +317,24 @@ export const useCustomerService = () => {
     setLoading(isProcessing);
   }, [isProcessing, setLoading]);
 
+  // 監控連線狀態變化
+  const finalIsConnected = isConnected && !healthError;
+  useEffect(() => {
+    console.log('🔌 [連線狀態] 狀態變化:', {
+      storeIsConnected: isConnected,
+      healthError: healthError,
+      healthErrorDetail: healthErrorDetail,
+      finalIsConnected: finalIsConnected,
+      timestamp: new Date().toISOString()
+    });
+  }, [isConnected, healthError, healthErrorDetail, finalIsConnected]);
+
   return {
     // 狀態
     messages,
     session,
     isLoading: isProcessing,
-    isConnected: isConnected && !healthError,
+    isConnected: finalIsConnected,
     
     // 操作方法
     quickReply,

@@ -4,7 +4,7 @@ import {
   Bot, 
   User, 
   Star, 
-  Phone, 
+  // Phone, // 暫時不用，等人工功能完成再加回
   X
 } from 'lucide-react';
 import { useCustomerService } from '@/core/hooks/useCustomerService';
@@ -113,6 +113,36 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
     const isUser = message.senderType === 'user';
     const isBot = message.senderType === 'bot';
 
+    // 處理訊息中的 https 連結
+    const renderMessageWithLinks = (text: string) => {
+      const httpsUrlRegex = /(https:\/\/[^\s]+)/g;
+      const parts = text.split(httpsUrlRegex);
+      
+      return parts.map((part, index) => {
+        if (part.match(httpsUrlRegex)) {
+          return (
+            <a
+              key={index}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`underline hover:opacity-80 break-all ${
+                isUser 
+                  ? 'text-blue-100 hover:text-white' 
+                  : 'text-blue-600 hover:text-blue-800'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {part}
+            </a>
+          );
+        }
+        return <span key={index}>{part}</span>;
+      });
+    };
+
     return (
       <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
         <div className={`flex max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -139,7 +169,7 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
                 : 'bg-gray-100 text-gray-800 rounded-bl-none'
             }`}>
               <p className="text-sm whitespace-pre-wrap break-words">
-                {message.messageText}
+                {renderMessageWithLinks(message.messageText)}
               </p>
             </div>
             
@@ -246,14 +276,15 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
             {session && session.status === 'active' && (
               <div className="px-4 py-2 border-t border-gray-100">
                 <div className="flex space-x-2">
-                  <button
+                  {/* 轉人工按鈕 - 暫時隱藏 */}
+                  {/* <button
                     onClick={() => requestTransfer('用戶主動申請')}
                     className="flex items-center space-x-1 px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full hover:bg-yellow-200 transition-colors"
                     disabled={isLoading}
                   >
-                    <Phone className="w-3 h-3" />
+                    <span>📞</span>
                     <span>轉人工</span>
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => setShowRating(true)}
                     className="flex items-center space-x-1 px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors"

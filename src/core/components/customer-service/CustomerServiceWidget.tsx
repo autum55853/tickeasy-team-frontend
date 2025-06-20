@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageCircle, X, Users, Bot } from 'lucide-react';
+import { MessageCircle, X, Bot } from 'lucide-react';
 import { 
   useCustomerServiceIsOpen,
   useCustomerServiceUnreadCount,
@@ -227,10 +227,7 @@ const CustomerServiceWidget: React.FC<CustomerServiceWidgetProps> = ({
             </div>
           </div>
           
-          <div className="flex items-center space-x-2 mt-3">
-            <Users className="w-4 h-4 text-green-500" />
-            <span className="text-xs text-green-600">現在有客服人員在線</span>
-          </div>
+          {/* 移除了 "現在有客服人員在線" 的文字 */}
         </div>
       )}
     </>

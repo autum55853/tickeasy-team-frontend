@@ -147,6 +147,13 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
       },
 
       setConnected: (connected: boolean) => {
+        const prevConnected = get().isConnected;
+        console.log('🔌 [Store] setConnected 呼叫:', {
+          from: prevConnected,
+          to: connected,
+          timestamp: new Date().toISOString(),
+          stack: new Error().stack?.split('\n').slice(1, 4).join('\n') // 只顯示前几層呼叫堆栈
+        });
         set({ isConnected: connected });
       },
 

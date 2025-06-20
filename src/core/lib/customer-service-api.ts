@@ -33,19 +33,56 @@ export class CustomerServiceAPI {
       headers.Authorization = `Bearer ${this.token}`;
     }
 
+    // 健康檢查的詳細日誌
+    if (endpoint === '/health') {
+      console.log('📞 [Request] 健康檢查請求開始:', {
+        url,
+        method: options.method || 'GET',
+        headers,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
       });
 
+      if (endpoint === '/health') {
+        console.log('📬 [Response] 健康檢查回應:', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries()),
+          timestamp: new Date().toISOString()
+        });
+      }
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+        if (endpoint === '/health') {
+          console.error('❌ [Response] 健康檢查 HTTP 錯誤:', errorMsg);
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
+      
+      if (endpoint === '/health') {
+        console.log('📊 [Data] 健康檢查數據:', data);
+      }
+      
       return data;
     } catch (error) {
+      if (endpoint === '/health') {
+        console.error('🚨 [Error] 健康檢查異常:', {
+          error: error instanceof Error ? error.message : '未知錯誤',
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       console.error('Customer Service API Request failed:', error);
       
       // 返回統一的錯誤格式
@@ -155,7 +192,19 @@ export class CustomerServiceAPI {
     timestamp: string;
     version: string;
   }>> {
-    return this.request('/health');
+    console.log('📋 [API] 健康檢查 API 呼叫開始:', this.baseUrl + '/health');
+    const startTime = Date.now();
+    
+    try {
+      const result = await this.request('/health');
+      const duration = Date.now() - startTime;
+      console.log(`🟢 [API] 健康檢查 API 成功 (${duration}ms):`, result);
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      console.error(`🔴 [API] 健康檢查 API 失敗 (${duration}ms):`, error);
+      throw error;
+    }
   }
 
   // 知識庫搜尋
