@@ -125,6 +125,7 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
               eventStartDate={concert.createdAt}
               eventEndDate={concert.updatedAt}
               imgBanner={concert.imgBanner}
+              companyId={companyInfoData.organizationId}
             />
           ))}
 

@@ -3,9 +3,9 @@ import axios, { AxiosResponse } from "axios";
 import { ConcertResponse, ConcertCreateResponse, Session, TicketType, Venue } from "@/pages/comm/types/Concert";
 import { useAuthStore } from "@/store/authStore";
 import dayjs from "dayjs";
+import type { ConcertSessionsData, CheckInData } from "@/pages/company/types/concertStatus";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-// const API_BASE_URL = "http://localhost:3000";
 
 // ========== 型別定義 ==========
 type UploadContext = "USER_AVATAR" | "VENUE_PHOTO" | "CONCERT_SEATING_TABLE" | "CONCERT_BANNER";
@@ -85,6 +85,49 @@ interface MusicTagsResponse {
   data: MusicTag[];
 }
 
+// 新增審核記錄相關型別
+interface AiResponse {
+  reasons: string[];
+  summary: string;
+  approved: boolean;
+  confidence: number;
+  rawResponse: {
+    reasons: string[];
+    summary: string;
+    approved: boolean;
+    confidence: number;
+    suggestions: string[];
+    flaggedContent: string[];
+    requiresManualReview: boolean;
+  };
+  suggestions: string[];
+  flaggedContent: string[];
+  requiresManualReview: boolean;
+}
+
+interface Review {
+  reviewId: string;
+  concertId: string;
+  reviewType: "manual_admin" | "ai_auto";
+  reviewStatus: "pending" | "approved" | "rejected";
+  reviewNote: string;
+  aiResponse: AiResponse | null;
+  reviewerId: string | null;
+  reviewerNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ConcertReviewsResponse {
+  status: string;
+  message: string;
+  data: {
+    concertId: string;
+    conInfoStatus: string;
+    reviews: Review[];
+  };
+}
+
 type ConcertState = {
   // 狀態
   info: {
@@ -126,6 +169,9 @@ type ConcertState = {
   } | null;
   locationTags: LocationTag[];
   musicTags: MusicTag[];
+  concertReviews: Review[] | null;
+  concertStatsData: ConcertSessionsData | null;
+  checkInData: CheckInData | null;
 
   // 基本操作
   setInfo: (info: Partial<ConcertState["info"]>) => void;
@@ -157,6 +203,9 @@ type ConcertState = {
   submitConcert: (concertId: string) => Promise<void>;
   cloneConcert: (concertId: string) => Promise<void>;
   incrementVisitCount: (concertId: string) => Promise<void>;
+  getConcertReviews: (concertId: string) => Promise<Review[]>;
+  getConcertSessions: (concertId: string) => Promise<void>;
+  getSessionCheckIns: (sessionId: string, page: number) => Promise<void>;
 };
 
 // ========== 工具函數 ==========
@@ -205,6 +254,9 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   organizationConcertsPagination: null,
   locationTags: [],
   musicTags: [],
+  concertReviews: null,
+  concertStatsData: null,
+  checkInData: null,
 
   // ========== 基本操作 ==========
   setInfo: (info) =>
@@ -817,6 +869,56 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       await axios.patch(`${API_BASE_URL}/api/v1/concerts/${concertId}/visit`);
     } catch (error) {
       console.error("incrementVisitCount error", error);
+    }
+  },
+  getConcertReviews: async (concertId: string) => {
+    try {
+      const token = useAuthStore.getState().getAuthToken();
+      if (!token) throw new Error("未登入");
+
+      const response = await axios.get<ConcertReviewsResponse>(`${API_BASE_URL}/api/v1/concerts/${concertId}/reviews`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status === "success") {
+        set({ concertReviews: response.data.data.reviews });
+        return response.data.data.reviews;
+      } else {
+        return Promise.reject(new Error("取得演唱會審核記錄失敗"));
+      }
+    } catch (error) {
+      console.error("getConcertReviews error", error);
+      return Promise.reject(error);
+    }
+  },
+  getConcertSessions: async (concertId: string) => {
+    const token = useAuthStore.getState().getAuthToken();
+    if (!token) throw new Error("未登入");
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/concerts/${concertId}/sessions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status === "success") {
+        set({ concertStatsData: response.data.data });
+      }
+    } catch (error) {
+      console.error("getConcertSessions error", error);
+      throw error;
+    }
+  },
+
+  getSessionCheckIns: async (sessionId: string, page: number) => {
+    const token = useAuthStore.getState().getAuthToken();
+    if (!token) throw new Error("未登入");
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/v1/sessions/${sessionId}/check-inused?page=${page}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.status === "success") {
+        set({ checkInData: response.data.data });
+      }
+    } catch (error) {
+      console.error("getSessionCheckIns error", error);
+      throw error;
     }
   },
 }));
