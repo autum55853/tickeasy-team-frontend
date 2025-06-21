@@ -4,9 +4,10 @@ export class CustomerServiceAPI {
   private baseUrl: string;
   private token?: string;
 
-  constructor(baseUrl = `${import.meta.env.VITE_API_BASE_URL}api/v1/smart-reply`) {
+  constructor(baseUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/smart-reply`) {
     this.baseUrl = baseUrl;
     // 從 localStorage 或其他地方獲取認證 token
+    console.log('🔑 [API] 初始化 CustomerServiceAPI:', this.baseUrl);
     this.token = localStorage.getItem('auth_token') || undefined;
   }
 
@@ -224,7 +225,7 @@ export class CustomerServiceAPI {
       ...(options.categories && { categories: options.categories.join(',') }),
     });
 
-    return this.request(`${import.meta.env.VITE_API_BASE_URL}api/v1/knowledge-base/search?${params}`, {
+    return this.request(`${import.meta.env.VITE_API_BASE_URL}/api/v1/knowledge-base/search?${params}`, {
       method: 'GET',
     });
   }
