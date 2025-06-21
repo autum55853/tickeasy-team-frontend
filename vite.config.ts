@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       port: env.VITE_PORT ? Number(env.VITE_PORT) : 3000,
       strictPort: true,
       // 允許的 host
-      allowedHosts: ["frontend-fj47.onrender.com", "localhost", ".onrender.com"],
+      allowedHosts: ["frontend-fz4o.onrender.com", "localhost", ".onrender.com"],
     },
   };
 });
