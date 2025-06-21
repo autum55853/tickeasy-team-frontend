@@ -21,7 +21,7 @@ export default function ScrollTopBtn() {
 
   return (
     <div
-      className={`bg-primary fixed right-10 bottom-10 z-50 flex h-18 w-18 scale-80 cursor-pointer flex-col items-center justify-center gap-y-1 rounded-full text-white transition-all duration-100 select-none hover:bg-neutral-600 lg:right-24 lg:scale-100 ${
+      className={`bg-primary fixed right-3 bottom-25 z-50 flex h-18 w-18 scale-80 cursor-pointer flex-col items-center justify-center gap-y-1 rounded-full text-white transition-all duration-100 select-none hover:bg-neutral-600 lg:right-5 lg:bottom-25 lg:scale-100 ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
       onClick={scrollToTop}
