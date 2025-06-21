@@ -8,7 +8,7 @@ import { CustomerServiceWidget } from "@/core/components/customer-service";
 const queryClient = new QueryClient();
 
 function App() {
-  const isCustomerServiceEnabled = import.meta.env.VITE_CUSTOMER_SERVICE_ENABLED === 'true';
+  const isCustomerServiceEnabled = 'true';
 
   return (
     <QueryClientProvider client={queryClient}>

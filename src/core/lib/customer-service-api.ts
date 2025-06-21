@@ -1,4 +1,4 @@
-import { ApiResponse, Message, Session, SmartReplyResponse, SearchResult } from '../types/customer-service';
+import { ApiResponse, Message, SmartReplyResponse, SearchResult } from '../types/customer-service';
 
 export class CustomerServiceAPI {
   private baseUrl: string;

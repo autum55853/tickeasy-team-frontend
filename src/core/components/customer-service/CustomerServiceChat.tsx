@@ -24,19 +24,15 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
   isOpen,
   onClose,
   userId,
-  userInfo,
   initialCategory = '一般諮詢',
-  initialMessage,
 }) => {
   const {
     messages,
     session,
     isLoading,
     isConnected,
-    quickReply,
     startSession,
     sendMessage,
-    requestTransfer,
     closeSession,
     markAsRead,
   } = useCustomerService();
