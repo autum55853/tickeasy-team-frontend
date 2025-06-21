@@ -4,7 +4,7 @@ export class CustomerServiceAPI {
   private baseUrl: string;
   private token?: string;
 
-  constructor(baseUrl = import.meta.env.VITE_CUSTOMER_SERVICE_API_URL || '/api/smart-reply') {
+  constructor(baseUrl = `${import.meta.env.VITE_API_BASE_URL}/api/smart-reply`) {
     this.baseUrl = baseUrl;
     // 從 localStorage 或其他地方獲取認證 token
     this.token = localStorage.getItem('auth_token') || undefined;
@@ -24,9 +24,9 @@ export class CustomerServiceAPI {
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string>),
     };
 
     if (this.token) {
@@ -102,7 +102,7 @@ export class CustomerServiceAPI {
     });
   }
 
-  async testKeywords(message: string): Promise<ApiResponse<any>> {
+  async testKeywords(message: string): Promise<ApiResponse<unknown>> {
     return this.request('/test', {
       method: 'POST',
       body: JSON.stringify({ message }),
@@ -196,7 +196,11 @@ export class CustomerServiceAPI {
     const startTime = Date.now();
     
     try {
-      const result = await this.request('/health');
+      const result = await this.request<{
+        status: string;
+        timestamp: string;
+        version: string;
+      }>('/health');
       const duration = Date.now() - startTime;
       console.log(`🟢 [API] 健康檢查 API 成功 (${duration}ms):`, result);
       return result;
@@ -220,10 +224,7 @@ export class CustomerServiceAPI {
       ...(options.categories && { categories: options.categories.join(',') }),
     });
 
-    // 知識庫搜尋可能使用不同的端點
-    const knowledgeBaseUrl = import.meta.env.VITE_KNOWLEDGE_BASE_API_URL || this.baseUrl;
-    
-    return this.request(`/knowledge-base/search?${params}`, {
+    return this.request(`${import.meta.env.VITE_API_BASE_URL}/api/v1/knowledge-base/search?${params}`, {
       method: 'GET',
     });
   }
