@@ -10,9 +10,8 @@ export default function Question() {
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
   const isRootPath = location.pathname === "/question";
-
   const handleSearch = (searchText: string) => {
-    console.log("handleSearch");
+    setSearchText(searchText);
   };
 
   return (
@@ -29,7 +28,7 @@ export default function Question() {
               <Separator className="bg-foreground my-3 h-[1px] w-full" />
               <div className="mx-auto flex w-full max-w-[1075px] flex-col justify-center text-center">
                 <QuestionButtonGroup />
-                <QuestionNormalList />
+                <QuestionNormalList searchText={searchText} />
               </div>
             </>
           ) : (

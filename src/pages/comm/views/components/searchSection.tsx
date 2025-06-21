@@ -1,5 +1,4 @@
 import { Icon } from "@iconify-icon/react";
-import { Button } from "@/core/components/ui/button";
 export default function SearchSection({
   searchText,
   setSearchText,
@@ -28,13 +27,6 @@ export default function SearchSection({
               }}
             />
           </div>
-          <Button
-            onClick={() => handleSearch(searchText)}
-            variant="destructive"
-            className="bg-foreground hover:bg-background hover:border-foreground hover:text-foreground h-[50px] w-[70px] text-white shadow-lg hover:border-2"
-          >
-            搜尋
-          </Button>
         </div>
       </div>
     </>
