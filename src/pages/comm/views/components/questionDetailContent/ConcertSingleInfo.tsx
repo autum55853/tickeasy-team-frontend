@@ -5,7 +5,7 @@ export default function ConcertSingleInfo() {
     {
       icon: "ph:number-circle-one",
       title: "前往所有演唱會列表",
-      description: "於頁面上方，點擊左上角「探索演唱會」，即可進入所有演唱會列表",
+      description: "於頁面上方，點擊左上角「探索頁面」，即可進入所有演唱會列表",
       images: ["questionDetailContent/checkAllConcerts-1.jpg"],
     },
     {
