@@ -40,7 +40,7 @@ export default function TicketHistorySection() {
   }, [error, toast]);
   useEffect(() => {
     refetch();
-  }, [pageStep]);
+  }, [pageStep, refetch]);
   return (
     <div className="mx-auto my-6 w-[90%]">
       {isLoading ? (

@@ -39,7 +39,7 @@ export default function Page() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
   return (
     <div className="mt-24 flex h-[calc(100vh-6rem)] flex-col pb-[400px]">
       <Header />

@@ -43,7 +43,7 @@ export default function BannerSection() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   return (
     <section className="relative mx-0 w-full">

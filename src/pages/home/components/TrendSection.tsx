@@ -44,7 +44,7 @@ export default function TrendSection() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
   return (
     <section className="relative mt-24 min-h-[100px]">
       {trendCardData.length > 0 ? (
