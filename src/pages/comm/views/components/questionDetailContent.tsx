@@ -15,7 +15,6 @@ import {
   MemberChangePersonalInfo,
   MemberOrganizeConcert,
 } from "./questionDetailContent/index";
-import { useEffect } from "react";
 import TicketPurchase from "./questionDetailContent/TicketPurchase";
 
 type QuestionComponentType = {
@@ -43,8 +42,6 @@ const questionComponents: QuestionComponentType = {
 export default function QuestionDetailContent() {
   const { activeQuestion } = useQuestionDetail();
   const DynamicComponent = questionComponents[activeQuestion];
-  useEffect(() => {
-    console.log(activeQuestion);
-  }, [activeQuestion]);
+
   return <div className="px-3">{DynamicComponent ? <DynamicComponent /> : <div>請選擇問題</div>}</div>;
 }
