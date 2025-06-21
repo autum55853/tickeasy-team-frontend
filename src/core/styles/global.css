@@ -148,7 +148,7 @@
     font-size: var(--text-body);
     line-height: 1.5;
     height: 100%;
-    overflow-y: hidden;
+    overflow-x: hidden;
   }
 
   /* Hide scrollbar but keep scrolling functionality */
@@ -211,8 +211,8 @@ html,
 body,
 #root,
 .app {
-  height: 100%;
-  overflow-x: hidden;
+  /* height: 100%;
+  overflow-x: hidden; */
 }
 .lk {
   outline: 1px solid red;

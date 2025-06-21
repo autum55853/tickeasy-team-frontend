@@ -79,20 +79,36 @@ export default function Footer() {
             <p>週一至週五 10:00~17:00</p>
           </div>
           <div className="col-span-6 flex justify-center gap-x-8">
-            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white">
-              <Icon icon="my-line" className="text-[40px]" />
+            <div className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-md bg-white hover:bg-[var(--line-green)]">
+              <a href="https://www.line.me/tw/" target="_blank" rel="noopener noreferrer">
+                <Icon icon="my-line" className="text-[38px] group-hover:text-white" />
+              </a>
             </div>
-            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white">
-              <Icon icon="my-facebook" className="text-[40px]" />
+            <div className="group hover:bg-primary flex h-16 w-16 cursor-pointer items-center justify-center rounded-md bg-white">
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                <Icon icon="my-facebook" className="inline-block text-[36px] group-hover:text-white" />
+              </a>
             </div>
-            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-white">
-              <Icon icon="my-youtube" className="text-[28px]" />
+            <div className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-md bg-white hover:bg-red-500">
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+                <Icon icon="my-youtube" className="text-[28px] group-hover:text-white" />
+              </a>
             </div>
           </div>
           <div className="col-span-3 mx-4 cursor-pointer text-right" onClick={() => navigate("/question")}>
             常見問題
           </div>
-          <div className="col-span-3 mx-4 cursor-pointer text-left">隠私權政策</div>
+          <div className="col-span-3 mx-4 cursor-pointer text-left">
+            <TermsDialog
+              title="隱私政策"
+              trigger={
+                <Button variant="link" className="text-md text-foreground h-auto p-0 hover:font-bold hover:underline">
+                  隱私政策
+                </Button>
+              }
+              type="privacy"
+            ></TermsDialog>
+          </div>
           <div className="col-span-6 mx-4 border-t border-neutral-200 pt-4 text-center">樂票網股份有限公司 © Tickeasy. All Rights Reserved.</div>
         </div>
       </footer>

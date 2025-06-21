@@ -41,8 +41,7 @@ export default function InsertCreditCardSection() {
     }
   }, [buyerSameAsMember]);
   useEffect(() => {
-    if (data?.user) {
-      // 確保有資料才更新
+    if (data && "user" in data) {
       setBuyerInfo({
         ...buyerInfo,
         name: data.user.name || "",
@@ -50,7 +49,7 @@ export default function InsertCreditCardSection() {
         mobilePhone: data.user.phone || "",
       });
     }
-  }, [data]); // 改為監聽 data 變化
+  }, [data]);
 
   // 處理錯誤
   useEffect(() => {

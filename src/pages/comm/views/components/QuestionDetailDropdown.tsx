@@ -18,7 +18,6 @@ export default function QuestionDetailDropdown({ faqType }: { faqType: QuestionT
   };
 
   useEffect(() => {
-    console.log("activeQuestion:", activeQuestion);
     if (!activeQuestion) {
       setActiveQuestion(faqDetails[faqType][0]);
     }
