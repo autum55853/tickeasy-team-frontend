@@ -1,6 +1,5 @@
 import { Card as RadixCard, Text, Box } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import building from "@/assets/images/building.svg";
 
 export default function CompanyCard({ title, companyId }: { title: string; companyId: string }) {
