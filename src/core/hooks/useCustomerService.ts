@@ -2,13 +2,13 @@ import { useCallback, useRef, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { customerServiceAPI } from '@/core/lib/customer-service-api';
 import { useCustomerServiceStore } from '@/store/customer-service';
-import { Message, Session } from '@/core/types/customer-service';
+import { Session } from '@/core/types/customer-service';
 
 export const useCustomerService = () => {
   const {
     messages,
     session,
-    isLoading,
+    // isLoading,
     isConnected,
     addMessage,
     setSession,
@@ -22,7 +22,7 @@ export const useCustomerService = () => {
   const maxRetries = 3;
 
   // 錯誤處理函數
-  const handleError = useCallback(async (error: any, retryFn?: () => Promise<void>) => {
+  const handleError = useCallback(async (error: unknown, retryFn?: () => void) => {
     console.error('Customer service error:', error);
     
     // 如果還有重試次數且有重試函數，進行重試
@@ -51,7 +51,7 @@ export const useCustomerService = () => {
   const quickReplyMutation = useMutation({
     mutationFn: ({ message, enableAI = true }: { message: string; enableAI?: boolean }) =>
       customerServiceAPI.quickReply(message, enableAI),
-    onSuccess: (response, variables) => {
+    onSuccess: (response) => {
       if (response.success && response.data) {
         addMessage({
           senderType: 'bot',
@@ -91,8 +91,8 @@ export const useCustomerService = () => {
       if (response.success && response.data) {
         const newSession: Session = {
           sessionId: response.data.sessionId,
-          status: response.data.status as any,
-          sessionType: response.data.sessionType as any,
+          status: response.data.status as 'active' | 'waiting' | 'closed',
+          sessionType: response.data.sessionType as 'bot' | 'human',
           category: response.data.category,
           priority: 'normal',
           createdAt: new Date().toISOString(),
@@ -153,7 +153,7 @@ export const useCustomerService = () => {
         
         // 更新會話狀態
         updateSession({ 
-          status: response.data.sessionStatus as any 
+          status: response.data.sessionStatus as 'active' | 'waiting' | 'closed'
         });
 
         resetRetryCount();
@@ -227,7 +227,7 @@ export const useCustomerService = () => {
   const { data: healthStatus, isError: healthError, error: healthErrorDetail } = useQuery({
     queryKey: ['customer-service-health'],
     queryFn: async () => {
-      console.log('🔍 [健康檢查] 開始檢查...', new Date().toLocaleTimeString());
+      // console.log('🔍 [健康檢查] 開始檢查...', new Date().toLocaleTimeString());
       try {
         const result = await customerServiceAPI.healthCheck();
         console.log('✅ [健康檢查] 成功:', result, new Date().toLocaleTimeString());
@@ -237,20 +237,24 @@ export const useCustomerService = () => {
         throw error;
       }
     },
-    refetchInterval: 300000, // 每5分鐘檢查一次（從30秒改為5分鐘）
+    refetchInterval: 300000, // 每5分鐘檢查一次
     retry: (failureCount, error) => {
       console.log(`🔄 [健康檢查] 重試 ${failureCount}/3:`, error, new Date().toLocaleTimeString());
       return failureCount < 3;
     },
-    onError: (error) => {
-      console.error('🚨 [健康檢查] 最終失敗，設為斷線:', error, new Date().toLocaleTimeString());
-      setConnected(false);
-    },
-    onSuccess: (data) => {
-      console.log('🟢 [健康檢查] 最終成功，設為連線:', data, new Date().toLocaleTimeString());
-      setConnected(true);
-    },
+
   });
+
+  // Handle health check results with useEffect
+  useEffect(() => {
+    if (healthError) {
+      console.error('🚨 [健康檢查] 最終失敗，設為斷線:', healthErrorDetail, new Date().toLocaleTimeString());
+      setConnected(false);
+    } else if (healthStatus) {
+      console.log('🟢 [健康檢查] 最終成功，設為連線:', healthStatus, new Date().toLocaleTimeString());
+      setConnected(true);
+    }
+  }, [healthError, healthErrorDetail, healthStatus, setConnected]);
 
   // 便捷方法
   const quickReply = useCallback(async (message: string, enableAI = true) => {
@@ -320,13 +324,13 @@ export const useCustomerService = () => {
   // 監控連線狀態變化
   const finalIsConnected = isConnected && !healthError;
   useEffect(() => {
-    console.log('🔌 [連線狀態] 狀態變化:', {
-      storeIsConnected: isConnected,
-      healthError: healthError,
-      healthErrorDetail: healthErrorDetail,
-      finalIsConnected: finalIsConnected,
-      timestamp: new Date().toISOString()
-    });
+    // console.log('🔌 [連線狀態] 狀態變化:', {
+    //   storeIsConnected: isConnected,
+    //   healthError: healthError,
+    //   healthErrorDetail: healthErrorDetail,
+    //   finalIsConnected: finalIsConnected,
+    //   timestamp: new Date().toISOString()
+    // });
   }, [isConnected, healthError, healthErrorDetail, finalIsConnected]);
 
   return {

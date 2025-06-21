@@ -4,7 +4,7 @@ export class CustomerServiceAPI {
   private baseUrl: string;
   private token?: string;
 
-  constructor(baseUrl = `${import.meta.env.VITE_API_BASE_URL}/api/smart-reply`) {
+  constructor(baseUrl = `${import.meta.env.VITE_API_BASE_URL}api/v1/smart-reply`) {
     this.baseUrl = baseUrl;
     // 從 localStorage 或其他地方獲取認證 token
     this.token = localStorage.getItem('auth_token') || undefined;
@@ -34,14 +34,14 @@ export class CustomerServiceAPI {
     }
 
     // 健康檢查的詳細日誌
-    if (endpoint === '/health') {
-      console.log('📞 [Request] 健康檢查請求開始:', {
-        url,
-        method: options.method || 'GET',
-        headers,
-        timestamp: new Date().toISOString()
-      });
-    }
+    // if (endpoint === '/health') {
+    //   console.log('📞 [Request] 健康檢查請求開始:', {
+    //     url,
+    //     method: options.method || 'GET',
+    //     headers,
+    //     timestamp: new Date().toISOString()
+    //   });
+    // }
 
     try {
       const response = await fetch(url, {
@@ -49,41 +49,41 @@ export class CustomerServiceAPI {
         headers,
       });
 
-      if (endpoint === '/health') {
-        console.log('📬 [Response] 健康檢查回應:', {
-          status: response.status,
-          statusText: response.statusText,
-          ok: response.ok,
-          headers: Object.fromEntries(response.headers.entries()),
-          timestamp: new Date().toISOString()
-        });
-      }
+      // if (endpoint === '/health') {
+      //   console.log('📬 [Response] 健康檢查回應:', {
+      //     status: response.status,
+      //     statusText: response.statusText,
+      //     ok: response.ok,
+      //     headers: Object.fromEntries(response.headers.entries()),
+      //     timestamp: new Date().toISOString()
+      //   });
+      // }
 
       if (!response.ok) {
         const errorMsg = `HTTP ${response.status}: ${response.statusText}`;
-        if (endpoint === '/health') {
-          console.error('❌ [Response] 健康檢查 HTTP 錯誤:', errorMsg);
-        }
+        // if (endpoint === '/health') {
+        //   console.error('❌ [Response] 健康檢查 HTTP 錯誤:', errorMsg);
+        // }
         throw new Error(errorMsg);
       }
 
       const data = await response.json();
       
-      if (endpoint === '/health') {
-        console.log('📊 [Data] 健康檢查數據:', data);
-      }
+      // if (endpoint === '/health') {
+      //   console.log('📊 [Data] 健康檢查數據:', data);
+      // }
       
       return data;
     } catch (error) {
-      if (endpoint === '/health') {
-        console.error('🚨 [Error] 健康檢查異常:', {
-          error: error instanceof Error ? error.message : '未知錯誤',
-          stack: error instanceof Error ? error.stack : undefined,
-          timestamp: new Date().toISOString()
-        });
-      }
+      // if (endpoint === '/health') {
+      //   console.error('🚨 [Error] 健康檢查異常:', {
+      //     error: error instanceof Error ? error.message : '未知錯誤',
+      //     stack: error instanceof Error ? error.stack : undefined,
+      //     timestamp: new Date().toISOString()
+      //   });
+      // }
       
-      console.error('Customer Service API Request failed:', error);
+      // console.error('Customer Service API Request failed:', error);
       
       // 返回統一的錯誤格式
       return {
@@ -192,7 +192,7 @@ export class CustomerServiceAPI {
     timestamp: string;
     version: string;
   }>> {
-    console.log('📋 [API] 健康檢查 API 呼叫開始:', this.baseUrl + '/health');
+    // console.log('📋 [API] 健康檢查 API 呼叫開始:', this.baseUrl + '/health');
     const startTime = Date.now();
     
     try {
@@ -224,7 +224,7 @@ export class CustomerServiceAPI {
       ...(options.categories && { categories: options.categories.join(',') }),
     });
 
-    return this.request(`${import.meta.env.VITE_API_BASE_URL}/api/v1/knowledge-base/search?${params}`, {
+    return this.request(`${import.meta.env.VITE_API_BASE_URL}api/v1/knowledge-base/search?${params}`, {
       method: 'GET',
     });
   }

@@ -3,7 +3,7 @@ import {
   Send, 
   Bot, 
   User, 
-  Star, 
+  // Star, 
   // Phone, // 暫時不用，等人工功能完成再加回
   X
 } from 'lucide-react';
@@ -15,7 +15,7 @@ interface CustomerServiceChatProps {
   isOpen: boolean;
   onClose: () => void;
   userId?: string;
-  userInfo?: Record<string, any>;
+  userInfo?: Record<string, unknown>;
   initialCategory?: string;
   initialMessage?: string;
 }
@@ -281,13 +281,13 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
                     <span>📞</span>
                     <span>轉人工</span>
                   </button> */}
-                  <button
+                  {/* <button
                     onClick={() => setShowRating(true)}
                     className="flex items-center space-x-1 px-3 py-1 text-xs bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors"
                   >
                     <Star className="w-3 h-3" />
                     <span>結束評分</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             )}
