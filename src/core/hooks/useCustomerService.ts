@@ -80,13 +80,24 @@ export const useCustomerService = () => {
     mutationFn: ({ 
       initialMessage, 
       category = '一般諮詢', 
-      userId 
+      userId,
+      skipUserMessage = false
     }: { 
       initialMessage?: string; 
       category?: string; 
-      userId?: string; 
-    }) =>
-      customerServiceAPI.startSession({ initialMessage, category, userId }),
+      userId?: string;
+      skipUserMessage?: boolean;
+    }) => {
+      // 如果不跳過用戶訊息且有初始訊息，則添加用戶訊息
+      if (!skipUserMessage && initialMessage) {
+        addMessage({ 
+          senderType: 'user', 
+          messageText: initialMessage,
+          sessionId: undefined, // 會話還未建立
+        });
+      }
+      return customerServiceAPI.startSession({ initialMessage, category, userId });
+    },
     onSuccess: (response, variables) => {
       if (response.success && response.data) {
         const newSession: Session = {
@@ -100,15 +111,6 @@ export const useCustomerService = () => {
         };
         
         setSession(newSession);
-        
-        // 如果有初始訊息，添加用戶訊息
-        if (variables.initialMessage) {
-          addMessage({ 
-            senderType: 'user', 
-            messageText: variables.initialMessage,
-            sessionId: newSession.sessionId,
-          });
-        }
         
         // 如果有機器人回覆，添加機器人訊息
         if (response.data.botMessage) {
@@ -137,8 +139,21 @@ export const useCustomerService = () => {
 
   // 發送訊息 mutation
   const sendMessageMutation = useMutation({
-    mutationFn: ({ sessionId, message }: { sessionId: string; message: string }) =>
-      customerServiceAPI.sendMessage(sessionId, message),
+    mutationFn: ({ sessionId, message, skipUserMessage = false }: { 
+      sessionId: string; 
+      message: string; 
+      skipUserMessage?: boolean;
+    }) => {
+      // 如果不跳過用戶訊息，則添加用戶訊息
+      if (!skipUserMessage) {
+        addMessage({ 
+          senderType: 'user', 
+          messageText: message,
+          sessionId: sessionId,
+        });
+      }
+      return customerServiceAPI.sendMessage(sessionId, message);
+    },
     onSuccess: (response, variables) => {
       if (response.success && response.data) {
         addMessage({
@@ -276,22 +291,15 @@ export const useCustomerService = () => {
     category = '一般諮詢',
     userId?: string
   ) => {
-    startSessionMutation.mutate({ initialMessage, category, userId });
+    startSessionMutation.mutate({ initialMessage, category, userId, skipUserMessage: false });
   }, [startSessionMutation]);
 
   const sendMessage = useCallback(async (message: string) => {
     if (!session || !message.trim()) return;
 
-    // 添加用戶訊息
-    addMessage({ 
-      senderType: 'user', 
-      messageText: message,
-      sessionId: session.sessionId,
-    });
-
-    // 發送到後端
-    sendMessageMutation.mutate({ sessionId: session.sessionId, message });
-  }, [session, addMessage, sendMessageMutation]);
+    // 發送到後端（會自動添加用戶訊息）
+    sendMessageMutation.mutate({ sessionId: session.sessionId, message, skipUserMessage: false });
+  }, [session, sendMessageMutation]);
 
   const requestTransfer = useCallback(async (reason?: string) => {
     if (!session) return;

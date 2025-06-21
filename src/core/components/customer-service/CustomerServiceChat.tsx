@@ -8,7 +8,7 @@ import {
   X
 } from 'lucide-react';
 import { useCustomerService } from '@/core/hooks/useCustomerService';
-import { useCustomerServiceQuickReplies } from '@/store/customer-service';
+import { useCustomerServiceQuickReplies, useCustomerServiceStore } from '@/store/customer-service';
 import { Message } from '@/core/types/customer-service';
 
 interface CustomerServiceChatProps {
@@ -35,6 +35,7 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
     sendMessage,
     closeSession,
     markAsRead,
+    mutations,
   } = useCustomerService();
 
   const quickReplies = useCustomerServiceQuickReplies();
@@ -79,10 +80,37 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({
 
   // 處理快速回覆
   const handleQuickReply = async (text: string) => {
-    if (!session) {
-      await startSession(text, initialCategory, userId);
-    } else {
-      await sendMessage(text);
+    // 立即添加用戶訊息到界面
+    const { addMessage, setLoading } = useCustomerServiceStore.getState();
+    addMessage({
+      senderType: 'user',
+      messageText: text,
+      sessionId: session?.sessionId,
+    });
+
+    // 立即設置載入狀態
+    setLoading(true);
+
+    try {
+      if (!session) {
+        // 對於 startSession，跳過添加用戶訊息（因為我們已經手動添加了）
+        mutations.startSession.mutate({ 
+          initialMessage: text, 
+          category: initialCategory, 
+          userId,
+          skipUserMessage: true 
+        });
+      } else {
+        // 對於已有 session，跳過添加用戶訊息（因為我們已經手動添加了）
+        mutations.sendMessage.mutate({ 
+          sessionId: session.sessionId, 
+          message: text,
+          skipUserMessage: true 
+        });
+      }
+    } catch (error) {
+      console.error('Quick reply error:', error);
+      setLoading(false);
     }
   };
 
