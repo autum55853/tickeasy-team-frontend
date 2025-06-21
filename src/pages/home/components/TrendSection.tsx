@@ -17,7 +17,7 @@ export default function TrendSection() {
   }).useGet();
 
   useEffect(() => {
-    if (data) {
+    if (Array.isArray(data)) {
       const covertData = data.map((item) => {
         return {
           title: item.conTitle,

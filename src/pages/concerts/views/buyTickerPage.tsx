@@ -21,10 +21,7 @@ export default function Page() {
   );
   const { data, error } = useRequest<Concert>(fetchConcertData).useGet();
   // 使用 useMemo 處理 sessionTicketData
-  const concertData = useMemo(
-    () => data || ({} as Concert), // 使用型別斷言
-    [data] // 只有當 data 改變時才重新計算
-  );
+  const concertData = useMemo(() => (data && "concertId" in data ? data : ({} as Concert)), [data]);
 
   // 處理錯誤
   useEffect(() => {

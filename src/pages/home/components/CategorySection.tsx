@@ -27,9 +27,9 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
   }).useGet();
 
   useEffect(() => {
-    if (musicTagsData) {
+    if (Array.isArray(musicTagsData)) {
       const covertOptions = musicTagsData
-        .map((item) => {
+        .map((item: MusicTag) => {
           return {
             label: item.musicTagName,
             value: item.musicTagName,

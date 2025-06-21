@@ -21,7 +21,7 @@ export default function Page() {
   }).useGet();
 
   useEffect(() => {
-    if (data) {
+    if (Array.isArray(data)) {
       setRawConcertList(data);
     }
   }, [data]);

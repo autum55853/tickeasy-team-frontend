@@ -15,7 +15,7 @@ export default function BannerSection() {
   }).useGet();
 
   useEffect(() => {
-    if (data) {
+    if (Array.isArray(data)) {
       // 前端要自己加上圖片索引 確保頁嵌更新一致，Key值要轉換(與CarouselItem的id一致)
       const covertData = data.map((item, index) => {
         return {
