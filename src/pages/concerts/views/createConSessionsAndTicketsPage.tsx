@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Footer from "@/core/components/global/footer";
 import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
 import Header from "@/core/components/global/header";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 import { Button } from "@/core/components/ui/button";
 import { Pencil, Trash2, Save, Calendar } from "lucide-react";
 import { useConcertStore } from "../store/useConcertStore";
@@ -35,6 +36,7 @@ export default function CreateConSessionsAndTicketsPage() {
     sessionEnd: "",
   });
   const [expandedTicketId, setExpandedTicketId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { handleUploadSeattable } = useSeattableUpload();
   const { toast } = useToast();
 
@@ -134,6 +136,9 @@ export default function CreateConSessionsAndTicketsPage() {
   };
 
   const handleSaveDraftWrapper = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     try {
       const result = await saveDraft();
       if (result?.concertId) {
@@ -148,8 +153,20 @@ export default function CreateConSessionsAndTicketsPage() {
 
         window.history.replaceState({}, "", `?${newQueryParams.toString()}`);
       }
+      toast({
+        title: "成功",
+        description: isEditMode ? "變更儲存成功" : "草稿儲存成功",
+        variant: "default",
+      });
     } catch (error) {
       console.error("儲存草稿失敗:", error);
+      toast({
+        title: "錯誤",
+        description: "儲存失敗，請重試",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -161,6 +178,9 @@ export default function CreateConSessionsAndTicketsPage() {
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
     try {
       const { info, saveDraft, submitConcert } = useConcertStore.getState();
 
@@ -216,7 +236,7 @@ export default function CreateConSessionsAndTicketsPage() {
         return;
       }
 
-      // 驗證場次資料
+      // 驗證場次資料 - 使用組件中的 sessions 而不是從 store 重新取得
       if (sessions.length === 0) {
         toast({
           title: "場次資料未完整",
@@ -254,7 +274,7 @@ export default function CreateConSessionsAndTicketsPage() {
         return;
       }
 
-      // 驗證票種資料
+      // 驗證票種資料 - 使用組件中的 sessions 而不是從 store 重新取得
       const ticketErrors: string[] = [];
       sessions.forEach((session, sessionIndex) => {
         if (session.ticketTypes.length === 0) {
@@ -300,14 +320,12 @@ export default function CreateConSessionsAndTicketsPage() {
 
       let concertId = info.concertId;
 
-      // 如果沒有 concertId，先儲存草稿
-      if (!concertId) {
-        const result = await saveDraft();
-        if (!result?.concertId) {
-          throw new Error("儲存草稿失敗");
-        }
-        concertId = result.concertId; // 使用 saveDraft 回傳的 concertId
+      // 無論是否有 concertId，都先儲存草稿確保資料同步
+      const result = await saveDraft();
+      if (!result?.concertId) {
+        throw new Error("儲存草稿失敗");
       }
+      concertId = result.concertId; // 使用 saveDraft 回傳的 concertId
 
       // 使用確定的 concertId 來送審
       await submitConcert(concertId);
@@ -328,11 +346,14 @@ export default function CreateConSessionsAndTicketsPage() {
         description: error instanceof Error ? error.message : "送審失敗",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <>
+      {isLoading && <LoadingSpin fullPage={true} />}
       <Header />
       {/* Breadcrumb */}
       <div className="mt-24 w-full bg-[#f3f3f3] px-2 py-4 sm:px-4 sm:py-6">
@@ -518,6 +539,7 @@ export default function CreateConSessionsAndTicketsPage() {
                 variant="outline"
                 className="w-full rounded border border-black px-2 py-1 text-xs text-black sm:w-auto sm:px-3 sm:py-2 sm:text-sm"
                 onClick={handleBack}
+                disabled={isLoading}
               >
                 上一步
               </Button>
@@ -526,6 +548,7 @@ export default function CreateConSessionsAndTicketsPage() {
                   variant="outline"
                   className="flex-1 rounded border-[#2986cc] bg-[#2986cc] px-2 py-1 text-xs text-white sm:flex-none sm:px-3 sm:py-2 sm:text-sm"
                   onClick={handleSaveDraftWrapper}
+                  disabled={isLoading}
                 >
                   {isEditMode ? "儲存變更" : "儲存草稿"}
                 </Button>
@@ -533,6 +556,7 @@ export default function CreateConSessionsAndTicketsPage() {
                   variant="outline"
                   className="flex-1 rounded border-[#2986cc] bg-[#2986cc] px-2 py-1 text-xs text-white sm:flex-none sm:px-3 sm:py-2 sm:text-sm"
                   onClick={handleSubmit}
+                  disabled={isLoading}
                 >
                   送審
                 </Button>
