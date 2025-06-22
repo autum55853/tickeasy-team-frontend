@@ -460,7 +460,7 @@ export default function CreateConSessionsAndTicketsPage() {
                               <div className="relative w-full md:flex-1">
                                 <span className="inline-block w-full rounded border px-2 py-1 text-xs sm:text-sm">
                                   <Calendar className="mr-1 inline-block h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5" />
-                                  {s.sessionDate || <span className="text-gray-400">請輸入場次日期</span>}
+                                  {s.sessionDate ? dayjs(s.sessionDate).format("YYYY-MM-DD") : <span className="text-gray-400">請輸入場次日期</span>}
                                 </span>
                               </div>
                               <div className="relative w-full md:flex-1">
