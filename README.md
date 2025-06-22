@@ -4,6 +4,12 @@ Tickeasy 是一個現代化的演唱會購票系統，旨在為用戶提供流�
 
 ## 專案概述
 
+### 測試帳號
+- (舉辦者) admin@gmail.com / admin1234
+- (參與者) user@gmail.com / user1234
+- (網站管理者) admin@gmail.com / admin1234
+
+
 本系統提供以下核心功能：
 
 ### 用戶功能
@@ -192,3 +198,5 @@ export const CreateSchema = Schema.omit({ id: true });
 // 導出 TypeScript 類型
 export type T_Schema = z.infer<typeof Schema>;
 ```
+
+
