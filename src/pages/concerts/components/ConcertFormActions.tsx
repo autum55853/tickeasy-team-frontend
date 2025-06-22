@@ -53,6 +53,7 @@ export function ConcertFormActions({ onSaveAndNext, isEditMode = false }: Concer
         description: "操作失敗，請重試",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
