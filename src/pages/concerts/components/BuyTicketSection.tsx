@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import BeforeBuyTicket from "./BeforeBuyTicket";
 import ConcertSessionSection from "./ConcertSessionSection";
 import PrecautionAndNeedtoKnow from "./PrecautionAndNeedtoKnow";
@@ -10,13 +10,13 @@ import { formatNumberToPrice } from "@/utils/formatToPrice";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
 import { useToast } from "@/core/hooks/useToast";
 import { useRequest } from "@/core/hooks/useRequest";
-import { ticketTypeItem } from "../types/ConcertData";
+// import { ticketTypeItem } from "../types/ConcertData";
 import { Concert } from "@/pages/comm/types/Concert";
 import { CreateOrderData, PaymentResultResponse } from "../types/BuyTicket";
-import LoadingSpin from "@/core/components/global/loadingSpin";
+// import LoadingSpin from "@/core/components/global/loadingSpin";
 import { AxiosResponse } from "axios";
 
-export default function BuyTicketSection({ concertData, concertSessionId }: { concertData: Concert; concertSessionId: string }) {
+export default function BuyTicketSection({ concertData }: { concertData: Concert }) {
   const { selectedSession, selectedTickets, buyerInfo, validateBuyerInfo, newOrderInfo, setNewOrderInfo } = useBuyTicketContext();
   // chooseSession+TicketType 選擇場次及票種 --> insertBuyerInfo 填寫購票人資訊
   const [buyTicketStep, setBuyTicketStep] = useState("chooseSession");
@@ -27,36 +27,38 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
     setTotalPrice(selectedTickets.reduce((acc, ticket) => acc + ticket.ticketPrice * ticket.quantity, 0));
   }, [selectedSession, selectedTickets, buyerInfo]);
   // 取得 取得票券資訊
-  interface ticketData {
-    tickets: ticketTypeItem[];
-  }
+  // interface ticketData {
+  //   tickets: ticketTypeItem[];
+  // }
+  // useEffect(() => {
+  //   console.log("selectedSession:", selectedSession);
+  // }, [selectedSession]);
+  // const { useGet } = useRequest<ticketData>({
+  //   queryKey: concertSessionId ? [concertSessionId] : [],
+  //   url: `/api/v1/ticket`,
+  // });
 
-  const { useGet } = useRequest<ticketData>({
-    queryKey: concertSessionId ? [concertSessionId] : [],
-    url: `/api/v1/ticket`,
-  });
+  // const { data, error, isLoading } = useGet(concertSessionId, !!concertSessionId && concertSessionId !== "undefined");
 
-  const { data, error, isLoading } = useGet(concertSessionId, !!concertSessionId && concertSessionId !== "undefined");
+  // // 使用 useMemo 處理 sessionTicketData
+  // const sessionTicketData = useMemo(() => {
+  //   if (!data) return [];
+  //   if ("tickets" in data) return data.tickets;
+  //   if ("data" in data && "tickets" in (data.data as unknown as { tickets: ticketTypeItem[] }))
+  //     return (data.data as unknown as { tickets: ticketTypeItem[] }).tickets;
+  //   return [];
+  // }, [data]);
 
-  // 使用 useMemo 處理 sessionTicketData
-  const sessionTicketData = useMemo(() => {
-    if (!data) return [];
-    if ("tickets" in data) return data.tickets;
-    if ("data" in data && "tickets" in (data.data as unknown as { tickets: ticketTypeItem[] }))
-      return (data.data as unknown as { tickets: ticketTypeItem[] }).tickets;
-    return [];
-  }, [data]);
-
-  // 處理錯誤
-  useEffect(() => {
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "錯誤",
-        description: error.message || "發生錯誤，請稍後再試",
-      });
-    }
-  }, [error, toast]);
+  // // 處理錯誤
+  // useEffect(() => {
+  //   if (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "錯誤",
+  //       description: error.message || "發生錯誤，請稍後再試",
+  //     });
+  //   }
+  // }, [error, toast]);
 
   //創建訂單
   const { useCreate: requestCreateOrder } = useRequest({
@@ -162,39 +164,30 @@ export default function BuyTicketSection({ concertData, concertSessionId }: { co
   return (
     <div className="flex h-full flex-col items-center gap-2 px-4 lg:gap-8 lg:px-12">
       <div className="mx-auto grid h-[70%] w-full grid-cols-1 lg:w-[90%] lg:grid-cols-2">
-        {isLoading && <LoadingSpin />}
-        {!isLoading && (
-          <>
-            {/* 演唱會資訊 */}
-            <div className="col-span-1 h-[70%] space-y-2 lg:px-3">
-              <div className="flex items-center justify-between">
-                <div className="text-lg font-semibold">{concertData.conTitle}</div>
-                <div>
-                  {concertData.eventStartDate} - {concertData.eventEndDate}
-                </div>
-              </div>
-              <div className="relative h-[350px] w-full">
-                <img src={concertData.imgBanner} alt={concertData.conTitle} className="h-full w-full object-cover" />
-              </div>
-              <div className="my-4">{buyTicketStep === "chooseSession" ? <BeforeBuyTicket /> : <PrecautionAndNeedtoKnow />}</div>
+        {/* 演唱會資訊 */}
+        <div className="col-span-1 h-[70%] space-y-2 lg:px-3">
+          <div className="flex items-center justify-between">
+            <div className="text-lg font-semibold">{concertData.conTitle}</div>
+            <div>
+              {concertData.eventStartDate} - {concertData.eventEndDate}
             </div>
-            <div className="col-span-1 h-[30%] space-y-2 lg:px-3">
-              <div className="flex justify-center gap-2">
-                {/* 場次選擇 */}
-                {buyTicketStep === "chooseSession" && (
-                  <ConcertSessionSection
-                    sessionData={concertData?.sessions || []}
-                    refundPolicy={concertData?.refundPolicy || ""}
-                    sessionTicketData={sessionTicketData || []}
-                  />
-                )}
-                {/* 購票人資訊 */}
-                {buyTicketStep === "insertBuyerInfo" && <InsertBuyerInfoSection />}
-                {buyTicketStep === "confirmOrder" && <ConfirmOrderSection concertData={concertData} totalPrice={totalPrice} />}
-              </div>
-            </div>
-          </>
-        )}
+          </div>
+          <div className="relative h-[350px] w-full">
+            <img src={concertData.imgBanner} alt={concertData.conTitle} className="h-full w-full object-cover" />
+          </div>
+          <div className="my-4">{buyTicketStep === "chooseSession" ? <BeforeBuyTicket /> : <PrecautionAndNeedtoKnow />}</div>
+        </div>
+        <div className="col-span-1 h-[30%] space-y-2 lg:px-3">
+          <div className="flex justify-center gap-2">
+            {/* 場次選擇 */}
+            {buyTicketStep === "chooseSession" && (
+              <ConcertSessionSection sessionData={concertData?.sessions || []} sessionTicketData={selectedSession?.ticketTypes || []} />
+            )}
+            {/* 購票人資訊 */}
+            {buyTicketStep === "insertBuyerInfo" && <InsertBuyerInfoSection />}
+            {buyTicketStep === "confirmOrder" && <ConfirmOrderSection concertData={concertData} totalPrice={totalPrice} />}
+          </div>
+        </div>
       </div>
       <Separator />
       <div className="flex w-[90%] justify-end">

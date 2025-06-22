@@ -16,6 +16,8 @@ interface SingleDatePickerProps {
   format?: string;
   defaultMonth?: Date;
   disabled?: boolean;
+  disableFuture?: boolean;
+  disablePast?: boolean;
 }
 
 export function SingleDatePicker({
@@ -26,6 +28,8 @@ export function SingleDatePicker({
   format = "YYYY-MM-DD",
   defaultMonth,
   disabled,
+  disableFuture,
+  disablePast,
 }: SingleDatePickerProps) {
   return (
     <Popover>
@@ -48,6 +52,11 @@ export function SingleDatePicker({
           }}
           defaultMonth={date || (defaultMonth ? dayjs(defaultMonth).toDate() : undefined)}
           required
+          disabled={(date) => {
+            if (disableFuture && dayjs(date).isAfter(dayjs(), "day")) return true;
+            if (disablePast && dayjs(date).isBefore(dayjs(), "day")) return true;
+            return false;
+          }}
         />
       </PopoverContent>
     </Popover>

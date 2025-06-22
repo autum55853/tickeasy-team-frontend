@@ -22,7 +22,7 @@ const formSchema = z.object({
   orgPhone: z
     .string()
     .trim()
-    .regex(/^0\d{1}-\d{9,10}$/, "必須為 0X-XXXXXXX 格式, 共10碼或11碼"),
+    .regex(/^0\d{8,9}$/, "必須為 0 開頭的 9 或 10 碼數字"),
   orgWebsite: z.string().trim().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
@@ -88,13 +88,13 @@ export default function CompanyInfoSection({
     }
   }, [companyInfoData, reset]);
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ""); // 移除所有非數字字符
-    if (value.length > 1) {
-      value = value.slice(0, 2) + "-" + value.slice(2); // 在第二個字符後插入 '-'
-    }
-    e.target.value = value;
-  };
+  // const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   let value = e.target.value.replace(/\D/g, ""); // 移除所有非數字字符
+  //   if (value.length > 1) {
+  //     value = value.slice(0, 2) + "-" + value.slice(2); // 在第二個字符後插入 '-'
+  //   }
+  //   e.target.value = value;
+  // };
 
   //串接 更新公司的詳細資料
   const { useUpdate: requestUpdateCompany } = useRequest({
@@ -217,7 +217,6 @@ export default function CompanyInfoSection({
                         {...register(item.field)}
                         error={!!errors[item.field]}
                         errorMessage={errors[item.field]?.message}
-                        onChange={item.field === "orgPhone" ? handlePhoneChange : undefined}
                       />
                     ) : (
                       <div className="p-3 lg:p-5">

@@ -16,7 +16,10 @@ export function TicketStepper({
   ticketTypeName: string;
 }) {
   const [count, setCount] = useState(initial);
-  const { selectedTickets, setSelectedTickets } = useBuyTicketContext();
+  const { selectedTickets, setSelectedTickets, selectedSession } = useBuyTicketContext();
+  useEffect(() => {
+    setCount(0);
+  }, [selectedSession]);
   useEffect(() => {
     if (count === 0) {
       setSelectedTickets(selectedTickets.filter((ticket) => ticket.ticketTypeId !== ticketTypeId));
