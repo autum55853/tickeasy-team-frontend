@@ -38,7 +38,7 @@ export default function Page() {
     <Layout>
       <BuyTicketProvider>
         <div className="min-h-[calc(100vh-6rem)]">
-          <BuyTicketSection concertData={concertData} concertSessionId={concertData?.sessions?.[0]?.sessionId} />
+          <BuyTicketSection concertData={concertData} />
         </div>
       </BuyTicketProvider>
     </Layout>

@@ -10,7 +10,7 @@ interface ModalVerifyEmailProps {
 
 export function ModalVerifyEmail({ children, setIsInertVerifyCode }: ModalVerifyEmailProps) {
   return (
-    <div className="fixed inset-0 z-50 my-5 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 my-5 block flex items-center justify-center bg-black/50 lg:hidden">
       <div className="max-h-[90vh] w-[80%] overflow-y-auto rounded-lg bg-white px-5 py-4 md:w-[30%] md:p-5">
         <div className="flex justify-end">
           <Button

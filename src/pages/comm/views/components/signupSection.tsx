@@ -8,6 +8,8 @@ import { useRequest } from "@/core/hooks/useRequest";
 import { useToast } from "@/core/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
 import { useNavigate } from "react-router-dom";
+import { SingleDatePicker } from "@/core/components/ui/singleDatePicker";
+
 export function SignupSection() {
   const { toast } = useToast();
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -24,7 +26,7 @@ export function SignupSection() {
   });
   // 檢查密碼是否一致
   const [isCheckedPassword, setIsCheckedPassword] = useState(false);
-  const { email, setEmail, isValid, errorMessage } = useEmailValidation();
+  const { setEmail, isValid, errorMessage: emailErrorMessage } = useEmailValidation();
   const [error, setError] = useState({
     name: {
       error: false,
@@ -143,10 +145,11 @@ export function SignupSection() {
               setSignupData({ ...signupData, email: e.target.value });
               setEmail(e.target.value);
             }}
+            error={emailErrorMessage ? true : false}
+            errorMessage={emailErrorMessage}
           />
-          {!isValid && email && <p className="absolute top-full left-0 mt-1 text-sm text-red-500">{errorMessage}</p>}
         </div>
-        <div className="flex w-full">
+        <div className="flex w-full flex-col items-center lg:flex-row">
           <Input
             type="tel"
             label="手機號碼"
@@ -157,13 +160,27 @@ export function SignupSection() {
               checkPhone(e);
             }}
           />
-          <Input
-            type="date"
-            label="出生日期"
-            id="birthday"
-            placeholder="年 月 日"
-            className="ml-2"
-            onChange={(e) => setSignupData({ ...signupData, birthday: e.target.value })}
+          <SingleDatePicker
+            inputClassName="ml-1"
+            date={signupData.birthday ? new Date(signupData.birthday) : null}
+            setDate={(date) =>
+              setSignupData((prev) => ({
+                ...prev,
+                birthday: date
+                  ? date
+                      .toLocaleDateString("zh-TW", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                      .split("/")
+                      .join("-")
+                  : "",
+              }))
+            }
+            defaultMonth={new Date(new Date().setFullYear(new Date().getFullYear() - 20))}
+            placeholder="請選擇出生年月日"
+            disableFuture
           />
         </div>
         {error["phone"].error && <p className="text-sm text-red-500">{error["phone"].errorMessage}</p>}

@@ -160,6 +160,7 @@ export default function ProfileInfo({
               defaultMonth={dayjs().subtract(20, "year").startOf("year").toDate()}
               placeholder="請選擇出生年月日"
               disabled={isPending}
+              disableFuture
             />
           </div>
           <div className="flex h-[40px] items-center">
@@ -282,7 +283,7 @@ export default function ProfileInfo({
                     {isInertVerifyCode ? (
                       <>
                         <ModalVerifyEmail active={isInertVerifyCode} setIsInertVerifyCode={setIsInertVerifyCode}>
-                          <div className="mb-2 block flex flex-col items-center lg:hidden">
+                          <div className="mb-2 flex flex-col items-center">
                             <Input
                               height={40}
                               type="text"

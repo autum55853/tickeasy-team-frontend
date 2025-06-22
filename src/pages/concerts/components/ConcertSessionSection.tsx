@@ -3,16 +3,8 @@ import { sessionData, sessionItem, ticketTypeItem } from "@/pages/concerts/types
 import Separator from "@/core/components/ui/separator";
 import TicketTypeAccordion from "./TicketTypeAccordion";
 import { useBuyTicketContext } from "../hook/useBuyTicketContext";
-export default function ConcertSessionSection({
-  sessionData,
-  refundPolicy,
-  sessionTicketData,
-}: {
-  sessionData: sessionData;
-  refundPolicy: string;
-  sessionTicketData: ticketTypeItem[];
-}) {
-  const { selectedSession, setSelectedSession } = useBuyTicketContext();
+export default function ConcertSessionSection({ sessionData, sessionTicketData }: { sessionData: sessionData; sessionTicketData: ticketTypeItem[] }) {
+  const { selectedSession, setSelectedSession, setSelectedTickets } = useBuyTicketContext();
   return (
     <>
       <div className="flex w-full flex-col">
@@ -25,7 +17,10 @@ export default function ConcertSessionSection({
                 key={session.sessionId}
                 variant="outline"
                 className={`flex h-full w-[120px] flex-col ${selectedSession?.sessionId === session.sessionId ? "text-secondary bg-blue-500" : ""}`}
-                onClick={() => setSelectedSession(session)}
+                onClick={() => {
+                  setSelectedTickets([]);
+                  setSelectedSession(session);
+                }}
               >
                 {session.sessionDate}
                 <span>{session.sessionStart}</span>
@@ -33,7 +28,11 @@ export default function ConcertSessionSection({
             ))}
           </div>
           <Separator />
-          <TicketTypeAccordion ticketTypes={sessionTicketData} refundPolicy={refundPolicy} />
+          {selectedSession ? (
+            <TicketTypeAccordion ticketTypes={sessionTicketData} />
+          ) : (
+            <div className="text-center text-sm text-gray-500">請先選擇場次</div>
+          )}
         </div>
       </div>
     </>

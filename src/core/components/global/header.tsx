@@ -104,7 +104,7 @@ export default function Header() {
             searchText={searchText}
             setSearchText={setSearchText}
           />
-          <DesktopMenuList menuOpen={menu} accountButtonRef={accountButtonRef} />
+          <DesktopMenuList menuOpen={menu} setMenuOpen={setMenu} accountButtonRef={accountButtonRef} />
         </div>
 
         {/* 手機版 */}

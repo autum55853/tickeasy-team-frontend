@@ -15,7 +15,7 @@ export default function DesktopSearchBar({
   return (
     <>
       {desktopSearchBlock && (
-        <div className="fixed top-20 left-1/2 h-[128px] w-full max-w-[1075px] -translate-x-1/2 transform rounded-[24px] bg-white p-6 shadow-sm lg:block">
+        <div className="fixed top-20 left-1/2 z-99 h-[128px] w-full max-w-[1075px] -translate-x-1/2 transform rounded-[24px] bg-white p-6 shadow-sm lg:block">
           <div className="flex h-full items-center justify-between gap-x-2 p-2">
             <div onClick={() => setDesktopSearchBlock(false)} className="flex w-[40px] cursor-pointer items-center justify-center">
               <Icon icon="my-close" className="text-2xl" />
