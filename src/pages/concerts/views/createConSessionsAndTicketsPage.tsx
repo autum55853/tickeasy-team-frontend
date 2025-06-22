@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Footer from "@/core/components/global/footer";
 import ScrollTopBtn from "@/core/components/global/ScrollTopBtn";
 import Header from "@/core/components/global/header";
@@ -10,7 +10,7 @@ import { useNavigate, useSearchParams, useLocation, useParams } from "react-rout
 import { useSeattableUpload } from "../hook/useSeattableUpload";
 import { Session, TicketType } from "@/pages/comm/types/Concert";
 import dayjs from "dayjs";
-import { TicketTypeTable } from "../components/TicketTypeTable";
+import { TicketTypeTable, TicketTypeTableRef } from "../components/TicketTypeTable";
 import { BackToListButton } from "../components/BackToListButton";
 import { useToast } from "@/core/hooks/useToast";
 import { SingleDatePicker } from "@/core/components/ui/singleDatePicker";
@@ -39,6 +39,9 @@ export default function CreateConSessionsAndTicketsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { handleUploadSeattable } = useSeattableUpload();
   const { toast } = useToast();
+
+  // 用於儲存所有 TicketTypeTable 的 ref
+  const ticketTableRefs = useRef<{ [sessionId: string]: TicketTypeTableRef | null }>({});
 
   useEffect(() => {
     if (!concertId) {
@@ -75,6 +78,36 @@ export default function CreateConSessionsAndTicketsPage() {
   };
 
   const handleSave = (id: string) => {
+    // 驗證新增的場次資料完整性
+    const session = sessions.find((s) => s.sessionId === id);
+    if (session && id.startsWith("tmp-")) {
+      const validationErrors: string[] = [];
+      const sessionIndex = sessions.findIndex((s) => s.sessionId === id) + 1;
+
+      if (!editBuffer.sessionTitle?.trim()) {
+        validationErrors.push(`場次${sessionIndex}名稱`);
+      }
+      if (!editBuffer.sessionDate?.trim()) {
+        validationErrors.push(`場次${sessionIndex}日期`);
+      }
+      if (!editBuffer.sessionStart?.trim()) {
+        validationErrors.push(`場次${sessionIndex}開始時間`);
+      }
+      if (!editBuffer.sessionEnd?.trim()) {
+        validationErrors.push(`場次${sessionIndex}結束時間`);
+      }
+
+      // 如果有驗證錯誤，顯示 toast 並停止儲存
+      if (validationErrors.length > 0) {
+        toast({
+          title: "場次資料未完整",
+          description: `請填寫以下欄位：${validationErrors.join("、")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     // 確保時間格式為 HH:mm
     const formatTime = (time: string) => {
       if (!time) return "";
@@ -138,8 +171,109 @@ export default function CreateConSessionsAndTicketsPage() {
   const handleSaveDraftWrapper = async () => {
     if (isLoading) return;
 
+    // 驗證新增的場次資料完整性
+    const sessionErrors: string[] = [];
+    sessions.forEach((session, index) => {
+      // 檢查是否為新增的場次（使用臨時 ID 判斷）
+      const isNewSession = session.sessionId.startsWith("tmp-");
+
+      if (isNewSession) {
+        if (!session.sessionTitle?.trim()) {
+          sessionErrors.push(`場次${index + 1}名稱`);
+        }
+        if (!session.sessionDate?.trim()) {
+          sessionErrors.push(`場次${index + 1}日期`);
+        }
+        if (!session.sessionStart?.trim()) {
+          sessionErrors.push(`場次${index + 1}開始時間`);
+        }
+        if (!session.sessionEnd?.trim()) {
+          sessionErrors.push(`場次${index + 1}結束時間`);
+        }
+      }
+    });
+
+    // 驗證新增的票種資料完整性
+    const ticketErrors: string[] = [];
+    sessions.forEach((session, sessionIndex) => {
+      session.ticketTypes.forEach((ticket, ticketIndex) => {
+        // 檢查是否為新增的票種（使用臨時 ID 判斷）
+        const isNewTicket = ticket.ticketTypeId.startsWith("tmp-");
+
+        if (isNewTicket) {
+          if (!ticket.ticketTypeName?.trim()) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}名稱`);
+          }
+          if (!ticket.sellBeginDate?.trim()) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售開始時間`);
+          }
+          if (!ticket.sellEndDate?.trim()) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售結束時間`);
+          }
+          if (!ticket.ticketTypePrice || ticket.ticketTypePrice <= 0) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}價格`);
+          }
+          if (!ticket.totalQuantity || ticket.totalQuantity <= 0) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}數量`);
+          }
+        }
+      });
+    });
+
+    // 如果有錯誤，顯示 toast 並停止儲存
+    if (sessionErrors.length > 0 || ticketErrors.length > 0) {
+      const allErrors = [...sessionErrors, ...ticketErrors];
+      toast({
+        title: "資料未完整",
+        description: `請填寫以下欄位：${allErrors.join("、")}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
+      // 強制儲存所有正在編輯的 session 資料
+      if (editingSessionId) {
+        const formatTime = (time: string) => {
+          if (!time) return "";
+          if (/^\d{2}:\d{2}$/.test(time)) return time;
+          try {
+            const [hours, minutes] = time.split(":");
+            return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+          } catch {
+            return "";
+          }
+        };
+
+        updateSession({
+          sessionId: editingSessionId,
+          sessionDate: editBuffer.sessionDate || "",
+          sessionStart: formatTime(editBuffer.sessionStart),
+          sessionEnd: formatTime(editBuffer.sessionEnd),
+          sessionTitle: editBuffer.sessionTitle || "",
+        });
+        setEditingSessionId(null);
+      }
+
+      // 強制儲存所有正在編輯的 ticket 資料
+      try {
+        Object.values(ticketTableRefs.current).forEach((ref) => {
+          if (ref) {
+            ref.saveAllEditingTickets();
+          }
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          toast({
+            title: "票種資料未完整",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
       const result = await saveDraft();
       if (result?.concertId) {
         const queryParams = new URLSearchParams(window.location.search);
@@ -236,7 +370,7 @@ export default function CreateConSessionsAndTicketsPage() {
         return;
       }
 
-      // 驗證場次資料 - 使用組件中的 sessions 而不是從 store 重新取得
+      // 驗證場次資料 - 只驗證新增的場次
       if (sessions.length === 0) {
         toast({
           title: "場次資料未完整",
@@ -248,20 +382,25 @@ export default function CreateConSessionsAndTicketsPage() {
 
       const sessionErrors: string[] = [];
       sessions.forEach((session, index) => {
-        if (!session.sessionTitle?.trim()) {
-          sessionErrors.push(`場次${index + 1}名稱`);
-        }
-        if (!session.sessionDate?.trim()) {
-          sessionErrors.push(`場次${index + 1}日期`);
-        }
-        if (!session.sessionStart?.trim()) {
-          sessionErrors.push(`場次${index + 1}開始時間`);
-        }
-        if (!session.sessionEnd?.trim()) {
-          sessionErrors.push(`場次${index + 1}結束時間`);
-        }
-        if (!session.imgSeattable?.trim()) {
-          sessionErrors.push(`場次${index + 1}座位圖`);
+        // 檢查是否為新增的場次（使用臨時 ID 判斷）
+        const isNewSession = session.sessionId.startsWith("tmp-");
+
+        if (isNewSession) {
+          if (!session.sessionTitle?.trim()) {
+            sessionErrors.push(`場次${index + 1}名稱`);
+          }
+          if (!session.sessionDate?.trim()) {
+            sessionErrors.push(`場次${index + 1}日期`);
+          }
+          if (!session.sessionStart?.trim()) {
+            sessionErrors.push(`場次${index + 1}開始時間`);
+          }
+          if (!session.sessionEnd?.trim()) {
+            sessionErrors.push(`場次${index + 1}結束時間`);
+          }
+          if (!session.imgSeattable?.trim()) {
+            sessionErrors.push(`場次${index + 1}座位圖`);
+          }
         }
       });
 
@@ -274,36 +413,45 @@ export default function CreateConSessionsAndTicketsPage() {
         return;
       }
 
-      // 驗證票種資料 - 使用組件中的 sessions 而不是從 store 重新取得
+      // 驗證票種資料 - 只驗證新增的票種
       const ticketErrors: string[] = [];
       sessions.forEach((session, sessionIndex) => {
         if (session.ticketTypes.length === 0) {
-          ticketErrors.push(`場次${sessionIndex + 1}票種`);
+          // 檢查是否為新增的場次，如果是新增場次但沒有票種，則需要驗證
+          const isNewSession = session.sessionId.startsWith("tmp-");
+          if (isNewSession) {
+            ticketErrors.push(`場次${sessionIndex + 1}票種`);
+          }
         } else {
           session.ticketTypes.forEach((ticket, ticketIndex) => {
-            if (!ticket.ticketTypeName?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}名稱`);
-            }
-            if (!ticket.sellBeginDate?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售開始時間`);
-            }
-            if (!ticket.sellEndDate?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售結束時間`);
-            }
-            if (!ticket.ticketTypePrice || ticket.ticketTypePrice <= 0) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}價格`);
-            }
-            if (!ticket.totalQuantity || ticket.totalQuantity <= 0) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}數量`);
-            }
-            if (!ticket.entranceType?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}入場方式`);
-            }
-            if (!ticket.ticketBenefits?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}票種福利`);
-            }
-            if (!ticket.ticketRefundPolicy?.trim()) {
-              ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}退票政策`);
+            // 檢查是否為新增的票種（使用臨時 ID 判斷）
+            const isNewTicket = ticket.ticketTypeId.startsWith("tmp-");
+
+            if (isNewTicket) {
+              if (!ticket.ticketTypeName?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}名稱`);
+              }
+              if (!ticket.sellBeginDate?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售開始時間`);
+              }
+              if (!ticket.sellEndDate?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}販售結束時間`);
+              }
+              if (!ticket.ticketTypePrice || ticket.ticketTypePrice <= 0) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}價格`);
+              }
+              if (!ticket.totalQuantity || ticket.totalQuantity <= 0) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}數量`);
+              }
+              if (!ticket.entranceType?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}入場方式`);
+              }
+              if (!ticket.ticketBenefits?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}票種福利`);
+              }
+              if (!ticket.ticketRefundPolicy?.trim()) {
+                ticketErrors.push(`場次${sessionIndex + 1}票種${ticketIndex + 1}退票政策`);
+              }
             }
           });
         }
@@ -319,6 +467,47 @@ export default function CreateConSessionsAndTicketsPage() {
       }
 
       let concertId = info.concertId;
+
+      // 強制儲存所有正在編輯的 session 資料
+      if (editingSessionId) {
+        const formatTime = (time: string) => {
+          if (!time) return "";
+          if (/^\d{2}:\d{2}$/.test(time)) return time;
+          try {
+            const [hours, minutes] = time.split(":");
+            return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+          } catch {
+            return "";
+          }
+        };
+
+        updateSession({
+          sessionId: editingSessionId,
+          sessionDate: editBuffer.sessionDate || "",
+          sessionStart: formatTime(editBuffer.sessionStart),
+          sessionEnd: formatTime(editBuffer.sessionEnd),
+          sessionTitle: editBuffer.sessionTitle || "",
+        });
+        setEditingSessionId(null);
+      }
+
+      // 強制儲存所有正在編輯的 ticket 資料
+      try {
+        Object.values(ticketTableRefs.current).forEach((ref) => {
+          if (ref) {
+            ref.saveAllEditingTickets();
+          }
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          toast({
+            title: "票種資料未完整",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
 
       // 無論是否有 concertId，都先儲存草稿確保資料同步
       const result = await saveDraft();
@@ -525,6 +714,16 @@ export default function CreateConSessionsAndTicketsPage() {
                             handleDeleteTicket={deleteTicket}
                             handleAddTicketType={handleAddTicketTypeWrapper}
                             setExpandedTicketId={setExpandedTicketId}
+                            onValidationError={(error) => {
+                              toast({
+                                title: "票種資料未完整",
+                                description: error,
+                                variant: "destructive",
+                              });
+                            }}
+                            ref={(el) => {
+                              ticketTableRefs.current[s.sessionId] = el;
+                            }}
                           />
                         </div>
                       )}

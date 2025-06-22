@@ -428,22 +428,22 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
           const sessionDate = s.sessionDate ? s.sessionDate.split("T")[0] : "";
 
           const sessionData = {
-            ...(s.sessionTitle && { sessionTitle: s.sessionTitle }),
-            ...(sessionDate && { sessionDate }),
-            ...(s.sessionStart && { sessionStart: s.sessionStart }),
-            ...(s.sessionEnd && { sessionEnd: s.sessionEnd }),
-            ...(s.imgSeattable && { imgSeattable: s.imgSeattable }),
+            sessionTitle: s.sessionTitle || "",
+            sessionDate: sessionDate || "",
+            sessionStart: s.sessionStart || "",
+            sessionEnd: s.sessionEnd || "",
+            imgSeattable: s.imgSeattable || "",
             ticketTypes: s.ticketTypes.map((t) => {
               try {
                 return {
-                  ...(t.ticketTypeName && { ticketTypeName: t.ticketTypeName }),
-                  ...(t.entranceType && { entranceType: t.entranceType }),
-                  ...(t.ticketBenefits && { ticketBenefits: t.ticketBenefits }),
-                  ...(t.ticketRefundPolicy && { ticketRefundPolicy: t.ticketRefundPolicy }),
-                  ...(t.ticketTypePrice && { ticketTypePrice: Number(t.ticketTypePrice) }),
-                  ...(t.totalQuantity && { totalQuantity: t.totalQuantity }),
-                  ...(t.sellBeginDate && { sellBeginDate: t.sellBeginDate }),
-                  ...(t.sellEndDate && { sellEndDate: t.sellEndDate }),
+                  ticketTypeName: t.ticketTypeName || "",
+                  entranceType: t.entranceType || "",
+                  ticketBenefits: t.ticketBenefits || "",
+                  ticketRefundPolicy: t.ticketRefundPolicy || "",
+                  ticketTypePrice: t.ticketTypePrice ? Number(t.ticketTypePrice) : 0,
+                  totalQuantity: t.totalQuantity || 0,
+                  sellBeginDate: t.sellBeginDate || "",
+                  sellEndDate: t.sellEndDate || "",
                 };
               } catch (e) {
                 console.error("[saveDraft] ticketType 處理失敗:", t, e);
