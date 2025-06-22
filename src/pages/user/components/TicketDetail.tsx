@@ -1,5 +1,5 @@
 import { formatNumberToPrice } from "@/utils/formatToPrice";
-import { formatLocalTimeToDate } from "@/utils/formatTime";
+import { formatLocalTime, formatLocalTimeToDate } from "@/utils/formatTime";
 import Separator from "@/core/components/ui/separator";
 import QRCode from "react-qr-code";
 import { ticketHistoryItem, orderTicket } from "../types/ticketHistory";
@@ -23,7 +23,7 @@ export const TicketDetail = ({ ticketData, orderTicket }: TicketDetailProps) => 
               地址: <span className="ml-4 font-bold">{ticketData.concertAddress}</span>
             </p>
             <p>
-              日期: <span className="ml-4 font-bold">{ticketData.sessionDate}</span>
+              日期: <span className="ml-4 font-bold">{formatLocalTime(ticketData.sessionDate)}</span>
             </p>
             <div className="mt-4 flex items-center">
               <QRCode value={ticketData.qrCode || ""} style={{ height: "auto", width: "60%" }} />
@@ -34,7 +34,7 @@ export const TicketDetail = ({ ticketData, orderTicket }: TicketDetailProps) => 
               訂單編號<span className="ml-4 font-bold">{ticketData.orderNumber}</span>
             </p>
             <p>
-              購票日期<span className="ml-4 font-bold">{ticketData.orderCreatedAt}</span>
+              購票日期<span className="ml-4 font-bold">{formatLocalTime(ticketData.orderCreatedAt)}</span>
             </p>
             <p>
               支付方式<span className="ml-4 font-bold">信用卡</span>
@@ -49,7 +49,7 @@ export const TicketDetail = ({ ticketData, orderTicket }: TicketDetailProps) => 
             <p>
               場次／票券
               <span className="ml-4 font-bold">
-                {formatLocalTimeToDate(ticketData.sessionDate)} {ticketData.sessionStart} / {ticketData.ticketTypeName}
+                {formatLocalTimeToDate(formatLocalTime(ticketData.sessionDate))} {ticketData.sessionStart} / {ticketData.ticketTypeName}
               </span>
             </p>
             <p>
