@@ -152,6 +152,18 @@ export default function CompanyConcertCard({ concertId, conTitle, eventStartDate
               </>
             )}
 
+            {conInfoStatus === "finished" && (
+              <Button
+                variant="ghost"
+                className="flex flex-col items-center p-2 hover:bg-gray-100"
+                size="icon"
+                onClick={() => navigate(`/company/concert/status/${concertId}?companyId=${companyId}`)}
+              >
+                <BarChart3 className="h-5 w-5 text-gray-600" />
+                <span className="mt-1 text-xs text-gray-600">查看</span>
+              </Button>
+            )}
+
             {conInfoStatus !== "published" && (
               <Button variant="ghost" className="flex flex-col items-center p-2 hover:bg-gray-100" size="icon" onClick={handlePreview}>
                 <Eye className="h-5 w-5 text-gray-600" />
@@ -250,7 +262,7 @@ function RejectionReasonDialog({ concertId, conTitle }: { concertId: string; con
           <span className="mt-1 text-xs text-gray-600">退回理由</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[80vh] w-[calc(100vw-2rem)] max-w-lg overflow-hidden">
         <DialogHeader>
           <DialogTitle>退回理由 - {conTitle}</DialogTitle>
           <DialogDescription>以下是演唱會的退回理由</DialogDescription>
@@ -261,7 +273,7 @@ function RejectionReasonDialog({ concertId, conTitle }: { concertId: string; con
             <div className="text-gray-500">載入中...</div>
           </div>
         ) : concertReviews && concertReviews.length > 0 ? (
-          <div className="space-y-4">
+          <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-2">
             {concertReviews.map((review) => (
               <div key={review.reviewId} className="rounded-lg border p-4">
                 <div className="mb-3 flex items-center justify-between">
