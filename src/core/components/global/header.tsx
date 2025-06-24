@@ -19,6 +19,8 @@ export default function Header() {
   const [searchText, setSearchText] = useState("");
   const accountButtonRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const mobileMenuButtonRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // 從 store 中獲取登入狀態
@@ -43,13 +45,21 @@ export default function Header() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      
-      // 檢查點擊是否在帳號按鈕或選單內部
+
+      // 桌面版：檢查點擊是否在帳號按鈕或選單內部
       const isClickInsideAccountButton = accountButtonRef.current?.contains(target);
       const isClickInsideMenu = menuRef.current?.contains(target);
-      
-      // 只有當點擊在帳號按鈕和選單外部時才關閉選單
-      if (menu && !isClickInsideAccountButton && !isClickInsideMenu) {
+
+      // 手機版：檢查點擊是否在選單按鈕或選單內部
+      const isClickInsideMobileMenuButton = mobileMenuButtonRef.current?.contains(target);
+      const isClickInsideMobileMenu = mobileMenuRef.current?.contains(target);
+
+      // 桌面版和手機版都需要檢查
+      const isDesktopClickOutside = !isClickInsideAccountButton && !isClickInsideMenu;
+      const isMobileClickOutside = !isClickInsideMobileMenuButton && !isClickInsideMobileMenu;
+
+      // 只有當點擊在所有相關元素外部時才關閉選單
+      if (menu && isDesktopClickOutside && isMobileClickOutside) {
         setMenu(false);
       }
     };
@@ -117,13 +127,24 @@ export default function Header() {
         <div className="block lg:hidden">
           <div className="flex items-center justify-between p-4">
             <img onClick={() => navigate("/")} src={Logo} alt="Logo" />
-            {menu ? (
-              <Icon icon="my-close" className="text-4xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
-            ) : (
-              <Icon icon="my-menu" className="text-2xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
-            )}
+            <div ref={mobileMenuButtonRef}>
+              {menu ? (
+                <Icon icon="my-close" className="text-4xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
+              ) : (
+                <Icon icon="my-menu" className="text-2xl transition-all duration-300" onClick={() => toggleMenu(!menu)} />
+              )}
+            </div>
           </div>
-          <MobileMenuList menuOpen={menu} isLogin={isLogin} handleSearch={handleSearch} searchText={searchText} setSearchText={setSearchText} />
+          <div ref={mobileMenuRef}>
+            <MobileMenuList
+              menuOpen={menu}
+              isLogin={isLogin}
+              handleSearch={handleSearch}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              setMenuOpen={setMenu}
+            />
+          </div>
         </div>
       </header>
     </>
