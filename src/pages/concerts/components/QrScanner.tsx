@@ -25,6 +25,19 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
   const elementId = "qr-reader";
 
   // ----- functions -----
+  const stopScanner = useCallback(() => {
+    if (scannerRef.current) {
+      try {
+        scannerRef.current.clear();
+      } catch (error) {
+        console.warn("停止掃描器時發生錯誤:", error);
+      }
+      scannerRef.current = null;
+    }
+    setIsScanning(false);
+    initializingRef.current = false;
+  }, []);
+
   const initializeScanner = useCallback(async () => {
     if (scannerRef.current || initializingRef.current) return;
     initializingRef.current = true;
@@ -91,20 +104,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
     } finally {
       initializingRef.current = false;
     }
-  }, []);
-
-  const stopScanner = useCallback(() => {
-    if (scannerRef.current) {
-      try {
-        scannerRef.current.clear();
-      } catch (error) {
-        console.warn("停止掃描器時發生錯誤:", error);
-      }
-      scannerRef.current = null;
-    }
-    setIsScanning(false);
-    initializingRef.current = false;
-  }, []);
+  }, [onScan, onError, stopScanner]);
 
   // ----- effect -----
   useEffect(() => {

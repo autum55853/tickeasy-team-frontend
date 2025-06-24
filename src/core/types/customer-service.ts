@@ -1,5 +1,5 @@
 // API 響應類型
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
@@ -10,10 +10,10 @@ export interface ApiResponse<T = any> {
 export interface Message {
   id: string;
   sessionId?: string;
-  senderType: 'user' | 'bot' | 'agent';
+  senderType: "user" | "bot" | "agent";
   senderId?: string;
   messageText: string;
-  messageType: 'text' | 'image' | 'file' | 'quick_reply';
+  messageType: "text" | "image" | "file" | "quick_reply";
   metadata?: MessageMetadata;
   isRead: boolean;
   createdAt: string;
@@ -24,7 +24,7 @@ export interface MessageMetadata {
   confidence?: number;
   faqId?: number;
   intentType?: string;
-  sentiment?: 'positive' | 'neutral' | 'negative';
+  sentiment?: "positive" | "neutral" | "negative";
   transferReason?: string;
   fileUrl?: string;
   fileName?: string;
@@ -48,10 +48,10 @@ export interface FaqSuggestion {
 export interface Session {
   sessionId: string;
   userId?: string;
-  sessionType: 'bot' | 'human' | 'mixed';
-  status: 'active' | 'waiting' | 'closed' | 'transferred';
+  sessionType: "bot" | "human" | "mixed";
+  status: "active" | "waiting" | "closed" | "transferred";
   agentId?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: "low" | "normal" | "high" | "urgent";
   category: string;
   firstResponseAt?: string;
   createdAt: string;
@@ -64,7 +64,7 @@ export interface Session {
 
 // 智能回覆相關類型
 export interface SmartReplyResponse {
-  type: 'tutorial' | 'faq' | 'neutral' | 'ai_fallback';
+  type: "tutorial" | "faq" | "neutral" | "ai_fallback";
   message: string;
   tutorial?: {
     title: string;
@@ -107,18 +107,18 @@ export interface SearchResult {
   title: string;
   content: string;
   similarity: number;
-  type: 'knowledge_base' | 'faq';
+  type: "knowledge_base" | "faq";
   category?: string;
   keywords?: string[];
 }
 
 // 客服組件 Props 類型
 export interface CustomerServiceWidgetProps {
-  position?: 'bottom-right' | 'bottom-left';
-  theme?: 'light' | 'dark';
+  position?: "bottom-right" | "bottom-left";
+  theme?: "light" | "dark";
   primaryColor?: string;
   userId?: string;
-  userInfo?: Record<string, any>;
+  userInfo?: Record<string, unknown>;
 }
 
 export interface CustomerServiceChatProps {

@@ -11,24 +11,24 @@ export default function GoogleAuthCallbackPage() {
   const setCookie = useAuthStore((state) => state.setCookie);
   const handledRef = useRef(false);
 
-  const fetchUserProfile = async (token: string) => {
-    try {
-      // 先設置 token 到 cookie，這樣 axios 攔截器會自動添加認證標頭
-      setCookie(token);
-      
-      // 使用 token 呼叫用戶資料 API
-      const userData = await axiosInstance.get('/api/v1/users/profile');
-      return userData;
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      throw error;
-    }
-  };
-
   useEffect(() => {
     if (handledRef.current) return;
     handledRef.current = true;
-    
+
+    const fetchUserProfile = async (token: string) => {
+      try {
+        // 先設置 token 到 cookie，這樣 axios 攔截器會自動添加認證標頭
+        setCookie(token);
+
+        // 使用 token 呼叫用戶資料 API
+        const userData = await axiosInstance.get("/api/v1/users/profile");
+        return userData;
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        throw error;
+      }
+    };
+
     // 從 URL 中獲取授權碼
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
@@ -50,7 +50,7 @@ export default function GoogleAuthCallbackPage() {
         .then((userData) => {
           // 設置用戶資訊，與一般登入保持一致
           setAuth(userData.data?.user?.email || "", userData.data?.user?.role || "");
-          
+
           toast({
             title: "登入成功",
             description: "導向首頁",
