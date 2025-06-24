@@ -207,22 +207,15 @@ export class CustomerServiceAPI {
     }>
   > {
     // console.log('📋 [API] 健康檢查 API 呼叫開始:', this.baseUrl + '/health');
-    const startTime = Date.now();
 
-    try {
-      const result = await this.request<{
-        status: string;
-        timestamp: string;
-        version: string;
-      }>("/health");
-      const duration = Date.now() - startTime;
-      console.log(`🟢 [API] 健康檢查 API 成功 (${duration}ms):`, result);
-      return result;
-    } catch (error) {
-      const duration = Date.now() - startTime;
-      console.error(`🔴 [API] 健康檢查 API 失敗 (${duration}ms):`, error);
-      throw error;
-    }
+    const result = await this.request<{
+      status: string;
+      timestamp: string;
+      version: string;
+    }>("/health");
+    // const duration = Date.now() - startTime;
+    // console.log(`🟢 [API] 健康檢查 API 成功 (${duration}ms):`, result);
+    return result;
   }
 
   // 知識庫搜尋
