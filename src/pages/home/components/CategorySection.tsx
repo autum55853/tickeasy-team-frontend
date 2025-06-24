@@ -38,9 +38,11 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
         })
         .filter(Boolean);
       setOptions(covertOptions);
-      setSelectedCategory(covertOptions[0]);
+      if (covertOptions.length > 0 && !selectedCategory) {
+        setSelectedCategory(covertOptions[0]);
+      }
     }
-  }, [musicTagsData]);
+  }, [musicTagsData, selectedCategory]);
 
   // 處理錯誤
   useEffect(() => {
