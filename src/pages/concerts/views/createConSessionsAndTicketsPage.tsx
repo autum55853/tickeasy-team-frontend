@@ -382,6 +382,7 @@ export default function CreateConSessionsAndTicketsPage() {
     }
 
     if (basicInfoErrors.length > 0) {
+      // console.log("basicInfoErrors:", basicInfoErrors);
       toast({
         title: "基本資料未完整",
         description: `請填寫以下欄位：${basicInfoErrors.join("、")}`,
@@ -608,8 +609,12 @@ export default function CreateConSessionsAndTicketsPage() {
                 {/* Header */}
                 <div className="hidden grid-cols-[60px_120px_1fr_180px] gap-4 border-b px-4 py-2 md:grid">
                   <div className="text-xs font-bold sm:text-sm">序號</div>
-                  <div className="text-xs font-bold sm:text-sm">場次名稱</div>
-                  <div className="text-xs font-bold sm:text-sm">舉辦時間</div>
+                  <div className="text-xs font-bold sm:text-sm">
+                    場次名稱<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
+                  <div className="text-xs font-bold sm:text-sm">
+                    舉辦時間<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
                   <div className="text-xs font-bold sm:text-sm"></div>
                 </div>
                 {/* Body */}
@@ -629,7 +634,7 @@ export default function CreateConSessionsAndTicketsPage() {
                               className="w-full rounded border px-2 py-1 text-center text-xs placeholder:text-gray-400 sm:text-sm"
                               value={editBuffer.sessionTitle}
                               onChange={(e) => setEditBuffer((buf) => ({ ...buf, sessionTitle: e.target.value }))}
-                              placeholder="請輸入場次名稱"
+                              placeholder="請輸入場次名稱(必填)"
                             />
                           ) : (
                             <span className="inline-block w-full rounded border px-2 py-1 text-center text-xs sm:text-sm">
@@ -650,7 +655,7 @@ export default function CreateConSessionsAndTicketsPage() {
                                       sessionDate: date ? dayjs(date).format("YYYY-MM-DD") : "",
                                     }))
                                   }
-                                  placeholder="請輸入場次日期"
+                                  placeholder="請輸入場次日期(必填)"
                                   inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
                                 />
                               </div>
@@ -658,7 +663,7 @@ export default function CreateConSessionsAndTicketsPage() {
                                 <TimeOnlyPicker
                                   value={editBuffer.sessionStart}
                                   onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionStart: time }))}
-                                  placeholder="請選擇開始時間"
+                                  placeholder="請選擇開始時間(必填)"
                                   inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
                                 />
                               </div>
@@ -666,7 +671,7 @@ export default function CreateConSessionsAndTicketsPage() {
                                 <TimeOnlyPicker
                                   value={editBuffer.sessionEnd}
                                   onChange={(time: string) => setEditBuffer((buf) => ({ ...buf, sessionEnd: time }))}
-                                  placeholder="請選擇結束時間"
+                                  placeholder="請選擇結束時間(必填)"
                                   inputClassName="w-full text-xs sm:text-sm placeholder:text-gray-400"
                                 />
                               </div>
@@ -732,7 +737,7 @@ export default function CreateConSessionsAndTicketsPage() {
                               className="border-black px-2 py-1 text-xs text-black sm:px-3 sm:py-2 sm:text-sm"
                               onClick={() => handleUploadSeattable(s.sessionId)}
                             >
-                              上傳座位圖
+                              上傳座位圖<span className="ml-1 text-lg text-red-500">*</span>
                             </Button>
                           </div>
                           <TicketTypeTable

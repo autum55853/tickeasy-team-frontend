@@ -190,10 +190,18 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
           <table className="w-full">
             <thead>
               <tr>
-                <th className="border-b px-3 py-2 text-left">票種名稱</th>
-                <th className="border-b px-3 py-2 text-left">販售時間</th>
-                <th className="border-b px-3 py-2 text-left">價格</th>
-                <th className="border-b px-3 py-2 text-left">數量</th>
+                <th className="border-b px-3 py-2 text-left">
+                  票種名稱<span className="ml-1 text-lg text-red-500">*</span>
+                </th>
+                <th className="border-b px-3 py-2 text-left">
+                  販售時間<span className="ml-1 text-lg text-red-500">*</span>
+                </th>
+                <th className="border-b px-3 py-2 text-left">
+                  價格<span className="ml-1 text-lg text-red-500">*</span>
+                </th>
+                <th className="border-b px-3 py-2 text-left">
+                  數量<span className="ml-1 text-lg text-red-500">*</span>
+                </th>
                 <th className="border-b px-3 py-2"></th>
               </tr>
             </thead>
@@ -204,6 +212,7 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
                     <td className="px-3 py-2 text-blue-700">
                       {isEditing(t.ticketTypeId) ? (
                         <input
+                          placeholder="請輸入票種名稱(必填)"
                           type="text"
                           className="w-full rounded border px-3 py-2"
                           value={editBuffers[t.ticketTypeId]?.ticketTypeName ?? t.ticketTypeName}
@@ -219,7 +228,7 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
                           <DateTimePicker
                             date={editBuffers[t.ticketTypeId]?.sellBeginDate ? new Date(editBuffers[t.ticketTypeId]?.sellBeginDate as string) : null}
                             setDate={(date) => handleBufferChange(t.ticketTypeId, "sellBeginDate", date ? date.toISOString() : "")}
-                            placeholder="開始時間"
+                            placeholder="開始時間(必填)"
                             inputClassName="w-full px-3 py-2"
                             format="YYYY/MM/DD HH:mm"
                           />
@@ -227,7 +236,7 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
                           <DateTimePicker
                             date={editBuffers[t.ticketTypeId]?.sellEndDate ? new Date(editBuffers[t.ticketTypeId]?.sellEndDate as string) : null}
                             setDate={(date) => handleBufferChange(t.ticketTypeId, "sellEndDate", date ? date.toISOString() : "")}
-                            placeholder="結束時間"
+                            placeholder="結束時間(必填)"
                             inputClassName="w-full px-3 py-2"
                             format="YYYY/MM/DD HH:mm"
                           />
@@ -239,6 +248,7 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
                     <td className="px-3 py-2">
                       {isEditing(t.ticketTypeId) ? (
                         <input
+                          placeholder="請輸入價格(必填)"
                           type="text"
                           className="w-full rounded border px-3 py-2"
                           value={editBuffers[t.ticketTypeId]?.ticketTypePrice ?? t.ticketTypePrice}
@@ -251,6 +261,7 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
                     <td className="px-3 py-2">
                       {isEditing(t.ticketTypeId) ? (
                         <input
+                          placeholder="請輸入數量(必填)"
                           type="text"
                           className="w-full rounded border px-3 py-2"
                           value={editBuffers[t.ticketTypeId]?.totalQuantity ?? t.totalQuantity}
@@ -314,9 +325,12 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
               <div className="space-y-4">
                 {/* 票種名稱 */}
                 <div>
-                  <div className="mb-1 font-bold">票種名稱</div>
+                  <div className="mb-1 font-bold">
+                    票種名稱<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
                   {isEditing(t.ticketTypeId) ? (
                     <input
+                      placeholder="請輸入票種名稱(必填)"
                       type="text"
                       className="w-full rounded border px-3 py-2"
                       value={editBuffers[t.ticketTypeId]?.ticketTypeName ?? t.ticketTypeName}
@@ -329,20 +343,22 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
 
                 {/* 販售時間 */}
                 <div>
-                  <div className="mb-1 font-bold">販售時間</div>
+                  <div className="mb-1 font-bold">
+                    販售時間<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
                   {isEditing(t.ticketTypeId) ? (
                     <div className="flex flex-col gap-2">
                       <DateTimePicker
                         date={editBuffers[t.ticketTypeId]?.sellBeginDate ? new Date(editBuffers[t.ticketTypeId]?.sellBeginDate as string) : null}
                         setDate={(date) => handleBufferChange(t.ticketTypeId, "sellBeginDate", date ? date.toISOString() : "")}
-                        placeholder="開始時間"
+                        placeholder="開始時間(必填)"
                         inputClassName="w-full px-3 py-2"
                         format="YYYY/MM/DD HH:mm"
                       />
                       <DateTimePicker
                         date={editBuffers[t.ticketTypeId]?.sellEndDate ? new Date(editBuffers[t.ticketTypeId]?.sellEndDate as string) : null}
                         setDate={(date) => handleBufferChange(t.ticketTypeId, "sellEndDate", date ? date.toISOString() : "")}
-                        placeholder="結束時間"
+                        placeholder="結束時間(必填)"
                         inputClassName="w-full px-3 py-2"
                         format="YYYY/MM/DD HH:mm"
                       />
@@ -357,9 +373,12 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
 
                 {/* 價格 */}
                 <div>
-                  <div className="mb-1 font-bold">價格</div>
+                  <div className="mb-1 font-bold">
+                    價格<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
                   {isEditing(t.ticketTypeId) ? (
                     <input
+                      placeholder="請輸入價格(必填)"
                       type="text"
                       className="w-full rounded border px-3 py-2"
                       value={editBuffers[t.ticketTypeId]?.ticketTypePrice ?? t.ticketTypePrice}
@@ -372,9 +391,12 @@ export const TicketTypeTable = forwardRef<TicketTypeTableRef, TicketTypeTablePro
 
                 {/* 數量 */}
                 <div>
-                  <div className="mb-1 font-bold">數量</div>
+                  <div className="mb-1 font-bold">
+                    數量<span className="ml-1 text-lg text-red-500">*</span>
+                  </div>
                   {isEditing(t.ticketTypeId) ? (
                     <input
+                      placeholder="請輸入數量(必填)"
                       type="text"
                       className="w-full rounded border px-3 py-2"
                       value={editBuffers[t.ticketTypeId]?.totalQuantity ?? t.totalQuantity}
@@ -469,24 +491,33 @@ function TicketInfo({
           {isEditing ? (
             <div className="space-y-2">
               <div>
-                <label className="block text-sm font-medium">入場方式：</label>
+                <label className="block text-sm font-medium">
+                  入場方式<span className="ml-1 text-lg text-red-500">*</span>：
+                </label>
                 <input
+                  placeholder="請輸入入場方式(必填)"
                   className="w-full rounded border px-3 py-2"
                   value={editBuffers[ticket.ticketTypeId]?.entranceType ?? ticket.entranceType}
                   onChange={(e) => handleBufferChange(ticket.ticketTypeId, "entranceType", e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium">票種福利：</label>
+                <label className="block text-sm font-medium">
+                  票種福利<span className="ml-1 text-lg text-red-500">*</span>：
+                </label>
                 <input
+                  placeholder="請輸入票種福利(必填)"
                   className="w-full rounded border px-3 py-2"
                   value={editBuffers[ticket.ticketTypeId]?.ticketBenefits ?? ticket.ticketBenefits}
                   onChange={(e) => handleBufferChange(ticket.ticketTypeId, "ticketBenefits", e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium">票種退票政策：</label>
+                <label className="block text-sm font-medium">
+                  票種退票政策<span className="ml-1 text-lg text-red-500">*</span>：
+                </label>
                 <input
+                  placeholder="請輸入票種退票政策(必填)"
                   className="w-full rounded border px-3 py-2"
                   value={editBuffers[ticket.ticketTypeId]?.ticketRefundPolicy ?? ticket.ticketRefundPolicy}
                   onChange={(e) => handleBufferChange(ticket.ticketTypeId, "ticketRefundPolicy", e.target.value)}

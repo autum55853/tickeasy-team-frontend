@@ -78,11 +78,12 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
       setIsScanning(true);
     } catch (err: unknown) {
       const domErr = err as DOMException | null;
-      const msg = domErr?.name === "NotAllowedError"
-        ? "相機存取被拒絕，請檢查瀏覽器設定"
-        : domErr?.name === "NotFoundError"
-        ? "未偵測到相機裝置"
-        : "無法訪問相機，請檢查權限設置";
+      const msg =
+        domErr?.name === "NotAllowedError"
+          ? "相機存取被拒絕，請檢查瀏覽器設定"
+          : domErr?.name === "NotFoundError"
+            ? "未偵測到相機裝置"
+            : "無法訪問相機，請檢查權限設置";
       console.error("初始化掃描器失敗:", err);
       setHasCamera(false);
       setError(msg);
@@ -130,7 +131,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
     if (file) {
       // 這裡可以實作檔案上傳掃描 QR Code 的功能
       // 需要使用 html5-qrcode 的檔案掃描功能
-      console.log("檔案上傳功能待實作");
+      // console.log("檔案上傳功能待實作");
     }
   };
 

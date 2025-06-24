@@ -26,39 +26,6 @@ export default function BuyTicketSection({ concertData }: { concertData: Concert
   useEffect(() => {
     setTotalPrice(selectedTickets.reduce((acc, ticket) => acc + ticket.ticketPrice * ticket.quantity, 0));
   }, [selectedSession, selectedTickets, buyerInfo]);
-  // 取得 取得票券資訊
-  // interface ticketData {
-  //   tickets: ticketTypeItem[];
-  // }
-  // useEffect(() => {
-  //   console.log("selectedSession:", selectedSession);
-  // }, [selectedSession]);
-  // const { useGet } = useRequest<ticketData>({
-  //   queryKey: concertSessionId ? [concertSessionId] : [],
-  //   url: `/api/v1/ticket`,
-  // });
-
-  // const { data, error, isLoading } = useGet(concertSessionId, !!concertSessionId && concertSessionId !== "undefined");
-
-  // // 使用 useMemo 處理 sessionTicketData
-  // const sessionTicketData = useMemo(() => {
-  //   if (!data) return [];
-  //   if ("tickets" in data) return data.tickets;
-  //   if ("data" in data && "tickets" in (data.data as unknown as { tickets: ticketTypeItem[] }))
-  //     return (data.data as unknown as { tickets: ticketTypeItem[] }).tickets;
-  //   return [];
-  // }, [data]);
-
-  // // 處理錯誤
-  // useEffect(() => {
-  //   if (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "錯誤",
-  //       description: error.message || "發生錯誤，請稍後再試",
-  //     });
-  //   }
-  // }, [error, toast]);
 
   //創建訂單
   const { useCreate: requestCreateOrder } = useRequest({

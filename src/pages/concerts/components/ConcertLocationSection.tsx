@@ -92,7 +92,9 @@ export function ConcertLocationSection({
     <div className="space-y-4">
       {/* 地點名稱 */}
       <div>
-        <label className="mb-1 block font-medium text-gray-700">地點名稱</label>
+        <label className="mb-1 block font-medium text-gray-700">
+          地點名稱<span className="ml-1 text-lg text-red-500">*</span>
+        </label>
         <Select<VenueOption>
           value={selectedVenueOption}
           onChange={handleVenueChange}
@@ -109,7 +111,9 @@ export function ConcertLocationSection({
 
       {/* 地址 */}
       <div>
-        <label className="mb-1 block font-medium text-gray-700">地址</label>
+        <label className="mb-1 block font-medium text-gray-700">
+          地址<span className="ml-1 text-lg text-red-500">*</span>
+        </label>
         <div className="flex gap-2">
           <input className="flex-1 rounded border border-gray-300 bg-gray-50 p-2" value={venueAddress} readOnly />
           {venueAddress && (

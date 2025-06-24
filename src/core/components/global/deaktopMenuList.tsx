@@ -22,7 +22,6 @@ export default function DesktopMenuList({
 
   const handleNavigation = useCallback(
     (path: string) => {
-      console.log("Click:", path);
       setMenuOpen(false);
       navigate(path);
     },

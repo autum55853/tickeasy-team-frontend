@@ -111,7 +111,8 @@ export default function CreateConInfoPage() {
               {/* 簡介 */}
               <div className="mt-4">
                 <label className="mb-1 block font-medium text-gray-700">
-                  簡介 <span className="text-sm text-gray-400">上限3,000字</span>
+                  簡介<span className="ml-1 text-lg text-red-500">*</span>
+                  <span className="text-sm text-gray-400">上限3,000字</span>
                 </label>
                 <textarea
                   className="w-full rounded border border-gray-300 p-3"

@@ -96,7 +96,6 @@ export default function EticketCard({
   const requestRefundMutation = requestRefund({
     onSuccess: (response) => {
       const res = response;
-      console.log("requestRefundMutation res:", res);
       if (res) {
         toast({
           title: "成功",
