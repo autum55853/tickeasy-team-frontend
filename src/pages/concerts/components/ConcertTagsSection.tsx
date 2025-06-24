@@ -85,7 +85,9 @@ export function ConcertTagsSection({
       <h5 className="mb-4 font-medium text-gray-800">演唱會標籤</h5>
       {/* 地區 */}
       <div>
-        <label className="mb-1 block font-medium text-gray-700">地區</label>
+        <label className="mb-1 block font-medium text-gray-700">
+          地區<span className="ml-1 text-lg text-red-500">*</span>
+        </label>
         <Select<TagOption>
           value={selectedLocationTagOption}
           onChange={handleLocationTagChange}
@@ -108,7 +110,9 @@ export function ConcertTagsSection({
       </div>
       {/* 音樂 */}
       <div className="mt-4">
-        <label className="mb-1 block font-medium text-gray-700">音樂類型</label>
+        <label className="mb-1 block font-medium text-gray-700">
+          音樂類型<span className="ml-1 text-lg text-red-500">*</span>
+        </label>
         <Select<TagOption>
           value={selectedMusicTagOption}
           onChange={handleMusicTagChange}
