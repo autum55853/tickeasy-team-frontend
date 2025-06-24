@@ -10,16 +10,31 @@ export default function MobileMenuList({
   handleSearch,
   searchText,
   setSearchText,
+  setMenuOpen,
 }: {
   menuOpen: boolean;
   isLogin: boolean;
   handleSearch: (text: string) => void;
   searchText: string;
   setSearchText: (text: string) => void;
+  setMenuOpen: (menuOpen: boolean) => void;
 }) {
   const { handleLogout } = useLogout();
   const navigate = useNavigate();
   const role = useAuthStore((state) => state.role);
+
+  // 處理導航並關閉選單
+  const handleNavigateAndClose = (path: string) => {
+    navigate(path);
+    setMenuOpen(false);
+  };
+
+  // 處理登出並關閉選單
+  const handleLogoutAndClose = () => {
+    handleLogout();
+    setMenuOpen(false);
+  };
+
   return (
     <div
       className={`fixed top-18 left-0 z-99 h-screen w-full transition-all duration-100 ease-in-out lg:hidden ${
@@ -30,10 +45,10 @@ export default function MobileMenuList({
         {isLogin ? (
           /* 已登入 */
           <ul className="flex flex-col space-y-4">
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user/about/history")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/user/about/history")}>
               查看票券
             </li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/concerts")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/concerts")}>
               探索頁面
             </li>
             <li className="p-2">
@@ -42,21 +57,30 @@ export default function MobileMenuList({
                 <span>帳號</span>
               </div>
               <ul className="mt-4 ml-8 flex flex-col space-y-4">
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/user")}>
+                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/user")}>
                   會員中心
                 </li>
-                <li className="cursor-pointer p-2 hover:bg-neutral-100" onClick={() => navigate("/company")}>
+                <li className="cursor-pointer p-2 hover:bg-neutral-100" onClick={() => handleNavigateAndClose("/company")}>
                   舉辦演唱會
                 </li>
-                <li className="cursor-pointer rounded-md p-2 text-start hover:bg-blue-100" onClick={() => navigate("/user/about/history")}>
+                <li
+                  className="cursor-pointer rounded-md p-2 text-start hover:bg-blue-100"
+                  onClick={() => handleNavigateAndClose("/user/about/history")}
+                >
                   查看參與的演唱會
                 </li>
                 {(role === "admin" || role === "superuser") && (
-                  <li className="cursor-pointer p-2 hover:bg-neutral-100" onClick={redirectToDashboard}>
+                  <li
+                    className="cursor-pointer p-2 hover:bg-neutral-100"
+                    onClick={() => {
+                      redirectToDashboard();
+                      setMenuOpen(false);
+                    }}
+                  >
                     後台管理
                   </li>
                 )}
-                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={handleLogout}>
+                <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={handleLogoutAndClose}>
                   登出
                 </li>
               </ul>
@@ -65,13 +89,13 @@ export default function MobileMenuList({
         ) : (
           /* 未登入 */
           <ul className="flex flex-col space-y-4">
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/concerts")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/concerts")}>
               探索頁面
             </li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/login")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/login")}>
               登入
             </li>
-            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => navigate("/signup")}>
+            <li className="cursor-pointer rounded-md p-2 hover:bg-blue-100" onClick={() => handleNavigateAndClose("/signup")}>
               註冊
             </li>
           </ul>
