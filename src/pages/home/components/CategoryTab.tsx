@@ -23,7 +23,7 @@ export default function CategoryTab({ tabs, selectedCategory, setSelectedCategor
 
   return (
     <Tabs
-      value={selectedCategory?.value}
+      value={selectedCategory?.value || ""}
       className="mx-auto w-full"
       onValueChange={(value) => {
         const selected = tabs.find((tab) => tab.value === value);

@@ -18,6 +18,7 @@ export default function Header() {
   const [desktopSearchBlock, setDesktopSearchBlock] = useState(false);
   const [searchText, setSearchText] = useState("");
   const accountButtonRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   // 從 store 中獲取登入狀態
@@ -41,10 +42,15 @@ export default function Header() {
   // 添加點擊外部關閉 menu 的處理函數
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menu && accountButtonRef.current && !accountButtonRef.current.contains(event.target as Node)) {
-        setTimeout(() => {
-          setMenu(false);
-        }, 100);
+      const target = event.target as Node;
+      
+      // 檢查點擊是否在帳號按鈕或選單內部
+      const isClickInsideAccountButton = accountButtonRef.current?.contains(target);
+      const isClickInsideMenu = menuRef.current?.contains(target);
+      
+      // 只有當點擊在帳號按鈕和選單外部時才關閉選單
+      if (menu && !isClickInsideAccountButton && !isClickInsideMenu) {
+        setMenu(false);
       }
     };
 
@@ -104,7 +110,7 @@ export default function Header() {
             searchText={searchText}
             setSearchText={setSearchText}
           />
-          <DesktopMenuList menuOpen={menu} setMenuOpen={setMenu} accountButtonRef={accountButtonRef} />
+          <DesktopMenuList menuOpen={menu} setMenuOpen={setMenu} accountButtonRef={accountButtonRef} menuRef={menuRef} />
         </div>
 
         {/* 手機版 */}

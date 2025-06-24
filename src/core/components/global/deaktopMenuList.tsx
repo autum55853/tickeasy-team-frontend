@@ -8,10 +8,12 @@ export default function DesktopMenuList({
   menuOpen,
   setMenuOpen,
   accountButtonRef,
+  menuRef,
 }: {
   menuOpen: boolean;
   setMenuOpen: (menuOpen: boolean) => void;
   accountButtonRef: RefObject<HTMLDivElement | null>;
+  menuRef: RefObject<HTMLDivElement | null>;
 }) {
   const [position, setPosition] = useState({ top: -1000, right: 0 });
   const { handleLogout } = useLogout();
@@ -53,6 +55,7 @@ export default function DesktopMenuList({
   }, [menuOpen]);
   return (
     <div
+      ref={menuRef}
       className={`fixed z-50 bg-white transition-opacity ${menuOpen ? "pointer-events-auto block opacity-100" : "hidden opacity-0"}`}
       style={{
         top: `${position.top + 10}px`,

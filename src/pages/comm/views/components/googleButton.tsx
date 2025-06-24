@@ -1,8 +1,10 @@
 import { Icon } from "@iconify/react";
 
 export function GoogleButton() {
-  const redirectUri = "/callback";
-  const googleAuthUrl = `https://tickeasy-team-backend.onrender.com/api/v1/auth/google?state=${encodeURIComponent(redirectUri)}`;
+  const currentOrigin = window.location.origin;
+  const fullRedirectUri = `${currentOrigin}${'/callback'}`;
+  console.log(fullRedirectUri)
+  const googleAuthUrl = `https://tickeasy-team-backend.onrender.com/api/v1/auth/google?state=${encodeURIComponent(fullRedirectUri)}`;
   return (
     <div className="my-5">
       <a
