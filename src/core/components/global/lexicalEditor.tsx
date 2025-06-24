@@ -29,8 +29,8 @@ function InitialContentPlugin({ content }: { content?: string }) {
         const editorState = editor.parseEditorState(content);
         editor.setEditorState(editorState);
         isInitialized.current = true;
-      } catch (error) {
-        console.warn("Failed to parse initial content:", error);
+      } catch {
+        // console.warn("Failed to parse initial content:", error);
       }
     }
   }, [editor, content]);
@@ -65,9 +65,7 @@ export default function LexicalEditor({
   const initialConfig = {
     namespace: "MyEditor",
     theme,
-    onError: (error: Error) => {
-      console.error(error);
-    },
+    onError: () => {},
     editable: true,
   };
 

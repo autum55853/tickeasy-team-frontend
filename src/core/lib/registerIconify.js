@@ -86,8 +86,8 @@ function registerAllIcons() {
     fs.writeFileSync(registerFilePath, registerCode);
 
     // console.log(`成功註冊 ${icons.length} 個圖標到 ${registerFilePath}`);
-  } catch (error) {
-    console.error("註冊圖標時發生錯誤:", error);
+  } catch {
+    // console.error("註冊圖標時發生錯誤:", error);
   }
 }
 

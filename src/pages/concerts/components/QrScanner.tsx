@@ -29,8 +29,8 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
     if (scannerRef.current) {
       try {
         scannerRef.current.clear();
-      } catch (error) {
-        console.warn("停止掃描器時發生錯誤:", error);
+      } catch {
+        // console.warn("停止掃描器時發生錯誤:", error);
       }
       scannerRef.current = null;
     }
@@ -82,7 +82,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
           // 掃描失敗（正常狀況），僅每 2 秒輸出一次 debug 訊息
           const now = Date.now();
           if (now - lastErrorLogRef.current > 2000) {
-            console.debug("掃描中...");
+            // console.debug("掃描中...");
             lastErrorLogRef.current = now;
           }
         }
@@ -97,7 +97,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, isActive 
           : domErr?.name === "NotFoundError"
             ? "未偵測到相機裝置"
             : "無法訪問相機，請檢查權限設置";
-      console.error("初始化掃描器失敗:", err);
+      // console.error("初始化掃描器失敗:", err);
       setHasCamera(false);
       setError(msg);
       onError?.(msg);

@@ -292,8 +292,8 @@ export default function CreateConSessionsAndTicketsPage() {
         description: isEditMode ? "變更儲存成功" : "草稿儲存成功",
         variant: "default",
       });
-    } catch (error) {
-      console.error("儲存草稿失敗:", error);
+    } catch {
+      // console.error("儲存草稿失敗:", error);
       toast({
         title: "錯誤",
         description: "儲存失敗，請重試",
@@ -557,7 +557,7 @@ export default function CreateConSessionsAndTicketsPage() {
         navigate(`/companyDetail?companyId=${orgId}&tab=concertList`);
       }
     } catch (error) {
-      console.error("送審失敗:", error);
+      // console.error("送審失敗:", error);
       toast({
         title: "錯誤",
         description: error instanceof Error ? error.message : "送審失敗",

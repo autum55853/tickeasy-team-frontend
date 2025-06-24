@@ -38,13 +38,13 @@ export function useSeattableUpload() {
         const url = await uploadImage(file, "CONCERT_SEATING_TABLE");
         updateSession({ sessionId, imgSeattable: url });
         toast({ title: "成功", description: "座位圖上傳成功" });
-      } catch (err) {
+      } catch {
         toast({
           title: "錯誤",
           description: "座位圖上傳失敗",
           variant: "destructive",
         });
-        console.error(err);
+        // console.error(err);
       }
     };
     input.click();

@@ -360,7 +360,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
 
       const token = useAuthStore.getState().getAuthToken();
       if (!token) {
-        console.error("[saveDraft] 未登入");
+        // console.error("[saveDraft] 未登入");
         return Promise.reject(new Error("未登入"));
       }
 
@@ -403,8 +403,8 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         if (info[key]) {
           try {
             payload[key] = typeof info[key] === "string" ? info[key] : JSON.stringify(info[key]);
-          } catch (e) {
-            console.error(`[saveDraft] ${key} 轉換失敗:`, e);
+          } catch {
+            // console.error(`[saveDraft] ${key} 轉換失敗:`, e);
             payload[key] = info[key];
           }
         }
@@ -415,49 +415,37 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         if (info[key]) {
           try {
             payload[key] = info[key];
-          } catch (e) {
-            console.error(`[saveDraft] ${key} 處理失敗:`, e);
+          } catch {
+            // console.error(`[saveDraft] ${key} 處理失敗:`, e);
           }
         }
       });
 
       // sessions 處理
-      try {
-        payload.sessions = sessions.map((s) => {
-          // 確保 sessionDate 只有日期部分
-          const sessionDate = s.sessionDate ? s.sessionDate.split("T")[0] : "";
+      payload.sessions = sessions.map((s) => {
+        // 確保 sessionDate 只有日期部分
+        const sessionDate = s.sessionDate ? s.sessionDate.split("T")[0] : "";
 
-          const sessionData = {
-            sessionTitle: s.sessionTitle || "",
-            sessionDate: sessionDate || "",
-            sessionStart: s.sessionStart || "",
-            sessionEnd: s.sessionEnd || "",
-            imgSeattable: s.imgSeattable || "",
-            ticketTypes: s.ticketTypes.map((t) => {
-              try {
-                return {
-                  ticketTypeName: t.ticketTypeName || "",
-                  entranceType: t.entranceType || "",
-                  ticketBenefits: t.ticketBenefits || "",
-                  ticketRefundPolicy: t.ticketRefundPolicy || "",
-                  ticketTypePrice: t.ticketTypePrice ? Number(t.ticketTypePrice) : 0,
-                  totalQuantity: t.totalQuantity || 0,
-                  sellBeginDate: t.sellBeginDate || "",
-                  sellEndDate: t.sellEndDate || "",
-                };
-              } catch (e) {
-                console.error("[saveDraft] ticketType 處理失敗:", t, e);
-                throw e;
-              }
-            }),
-          };
-          // console.log("[saveDraft] 處理後的 session 資料:", sessionData);
-          return sessionData;
-        });
-      } catch (e) {
-        console.error("[saveDraft] sessions 處理失敗:", e);
-        throw e;
-      }
+        const sessionData = {
+          sessionTitle: s.sessionTitle || "",
+          sessionDate: sessionDate || "",
+          sessionStart: s.sessionStart || "",
+          sessionEnd: s.sessionEnd || "",
+          imgSeattable: s.imgSeattable || "",
+          ticketTypes: s.ticketTypes.map((t) => ({
+            ticketTypeName: t.ticketTypeName || "",
+            entranceType: t.entranceType || "",
+            ticketBenefits: t.ticketBenefits || "",
+            ticketRefundPolicy: t.ticketRefundPolicy || "",
+            ticketTypePrice: t.ticketTypePrice ? Number(t.ticketTypePrice) : 0,
+            totalQuantity: t.totalQuantity || 0,
+            sellBeginDate: t.sellBeginDate || "",
+            sellEndDate: t.sellEndDate || "",
+          })),
+        };
+        // console.log("[saveDraft] 處理後的 session 資料:", sessionData);
+        return sessionData;
+      });
 
       // console.log("[saveDraft] 準備發送的 payload:", JSON.stringify(payload, null, 2));
 
@@ -480,13 +468,13 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         }
       } catch (e) {
         if (axios.isAxiosError(e)) {
-          console.error("[saveDraft] API 錯誤:", {
-            status: e.response?.status,
-            data: e.response?.data,
-            message: e.message,
-          });
+          // console.error("[saveDraft] API 錯誤:", {
+          //   status: e.response?.status,
+          //   data: e.response?.data,
+          //   message: e.message,
+          // });
         } else {
-          console.error("[saveDraft] 未知錯誤:", e);
+          // console.error("[saveDraft] 未知錯誤:", e);
         }
         throw e;
       }
@@ -519,7 +507,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       }
       return undefined;
     } catch (error) {
-      console.error("[saveDraft] 完整錯誤:", error);
+      // console.error("[saveDraft] 完整錯誤:", error);
       return Promise.reject(error);
     }
   },
@@ -599,7 +587,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得演唱會資料失敗"));
       }
     } catch (error) {
-      console.error("getConcert error", error);
+      // console.error("getConcert error", error);
       return Promise.reject(error);
     }
   },
@@ -614,7 +602,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得場館列表失敗"));
       }
     } catch (error) {
-      console.error("getVenues error", error);
+      // console.error("getVenues error", error);
       return Promise.reject(error);
     }
   },
@@ -643,7 +631,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得組織演唱會列表失敗"));
       }
     } catch (error) {
-      console.error("getOrganizationConcerts error", error);
+      // console.error("getOrganizationConcerts error", error);
       return Promise.reject(error);
     }
   },
@@ -696,7 +684,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
 
       return allConcerts;
     } catch (error) {
-      console.error("getAllOrganizationConcerts error", error);
+      // console.error("getAllOrganizationConcerts error", error);
       return Promise.reject(error);
     }
   },
@@ -724,7 +712,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         await get().getOrganizationConcerts(info.organizationId);
       }
     } catch (error) {
-      console.error("cancelConcert error", error);
+      // console.error("cancelConcert error", error);
       return Promise.reject(error);
     }
   },
@@ -752,7 +740,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         await get().getOrganizationConcerts(info.organizationId);
       }
     } catch (error) {
-      console.error("deleteConcert error", error);
+      // console.error("deleteConcert error", error);
       return Promise.reject(error);
     }
   },
@@ -791,7 +779,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得地點標籤失敗"));
       }
     } catch (error) {
-      console.error("getLocationTags error", error);
+      // console.error("getLocationTags error", error);
       return Promise.reject(error);
     }
   },
@@ -805,7 +793,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得音樂標籤失敗"));
       }
     } catch (error) {
-      console.error("getMusicTags error", error);
+      // console.error("getMusicTags error", error);
       return Promise.reject(error);
     }
   },
@@ -833,7 +821,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         await get().getOrganizationConcerts(info.organizationId);
       }
     } catch (error) {
-      console.error("submitConcert error", error);
+      // console.error("submitConcert error", error);
       return Promise.reject(error);
     }
   },
@@ -859,17 +847,18 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         await get().getOrganizationConcerts(info.organizationId);
       }
     } catch (error) {
-      console.error("cloneConcert error", error);
+      // console.error("cloneConcert error", error);
       return Promise.reject(error);
     }
   },
   // 增加瀏覽次數
   incrementVisitCount: async (concertId: string) => {
-    try {
-      await axios.patch(`${API_BASE_URL}/api/v1/concerts/${concertId}/visit`);
-    } catch (error) {
-      console.error("incrementVisitCount error", error);
-    }
+    await axios.patch(`${API_BASE_URL}/api/v1/concerts/${concertId}/visit`);
+    // try {
+    //   await axios.patch(`${API_BASE_URL}/api/v1/concerts/${concertId}/visit`);
+    // } catch (error) {
+    //   console.error("incrementVisitCount error", error);
+    // }
   },
   getConcertReviews: async (concertId: string) => {
     try {
@@ -886,39 +875,29 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         return Promise.reject(new Error("取得演唱會審核記錄失敗"));
       }
     } catch (error) {
-      console.error("getConcertReviews error", error);
+      // console.error("getConcertReviews error", error);
       return Promise.reject(error);
     }
   },
   getConcertSessions: async (concertId: string) => {
     const token = useAuthStore.getState().getAuthToken();
     if (!token) throw new Error("未登入");
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/concerts/${concertId}/sessions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.status === "success") {
-        set({ concertStatsData: response.data.data });
-      }
-    } catch (error) {
-      console.error("getConcertSessions error", error);
-      throw error;
+    const response = await axios.get(`${API_BASE_URL}/api/v1/concerts/${concertId}/sessions`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.data.status === "success") {
+      set({ concertStatsData: response.data.data });
     }
   },
 
   getSessionCheckIns: async (sessionId: string, page: number) => {
     const token = useAuthStore.getState().getAuthToken();
     if (!token) throw new Error("未登入");
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/v1/sessions/${sessionId}/check-inused?page=${page}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data.status === "success") {
-        set({ checkInData: response.data.data });
-      }
-    } catch (error) {
-      console.error("getSessionCheckIns error", error);
-      throw error;
+    const response = await axios.get(`${API_BASE_URL}/api/v1/sessions/${sessionId}/check-inused?page=${page}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.data.status === "success") {
+      set({ checkInData: response.data.data });
     }
   },
 }));
