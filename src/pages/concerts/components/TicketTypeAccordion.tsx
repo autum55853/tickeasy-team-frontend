@@ -3,7 +3,7 @@ import { ticketTypeItem } from "../types/ConcertData";
 import { formatNumberToPrice } from "@/utils/formatToPrice";
 import { TicketStepper } from "./TicketStepper";
 import { formatLocalTime } from "@/utils/formatTime";
-export default function TicketTypeAccordion({ ticketTypes, refundPolicy }: { ticketTypes: ticketTypeItem[]; refundPolicy: string }) {
+export default function TicketTypeAccordion({ ticketTypes }: { ticketTypes: ticketTypeItem[] }) {
   return (
     <Accordion type="single" collapsible className="w-full">
       {ticketTypes.map((ticketType) => (
@@ -42,7 +42,7 @@ export default function TicketTypeAccordion({ ticketTypes, refundPolicy }: { tic
                   <ul className="list-disc pl-6">
                     <li className="font-semibold">入場方式: {ticketType.entranceType}</li>
                     <li className="font-semibold">票券權益: {ticketType.ticketBenefits}</li>
-                    <li className="font-semibold">退換票政策: {refundPolicy}</li>
+                    <li className="font-semibold">退換票政策: {ticketType.ticketRefundPolicy}</li>
                   </ul>
                 </div>
               </div>

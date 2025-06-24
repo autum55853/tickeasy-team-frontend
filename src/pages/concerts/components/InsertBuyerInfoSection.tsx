@@ -36,20 +36,19 @@ export default function InsertCreditCardSection() {
   }).useGet(undefined, buyerSameAsMember);
 
   useEffect(() => {
-    if (!buyerSameAsMember) {
-      setBuyerInfo(defaultBuyerInfo);
-    }
-  }, [buyerSameAsMember]);
-  useEffect(() => {
-    if (data && "user" in data) {
+    if (buyerSameAsMember && data && "user" in data) {
       setBuyerInfo({
-        ...buyerInfo,
         name: data.user.name || "",
         email: data.user.email || "",
         mobilePhone: data.user.phone || "",
+        paymentMethod: buyerInfo.paymentMethod || "",
       });
     }
-  }, [data]);
+    if (!buyerSameAsMember) {
+      setBuyerInfo(defaultBuyerInfo);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyerSameAsMember, data]);
 
   // 處理錯誤
   useEffect(() => {

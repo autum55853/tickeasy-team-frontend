@@ -2,22 +2,39 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/core/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
+import { axiosInstance } from "@/core/lib/axios";
+
 export default function GoogleAuthCallbackPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const setAuth = useAuthStore((state) => state.setAuth);
   const setCookie = useAuthStore((state) => state.setCookie);
   const handledRef = useRef(false);
+
+  const fetchUserProfile = async (token: string) => {
+    try {
+      // 先設置 token 到 cookie，這樣 axios 攔截器會自動添加認證標頭
+      setCookie(token);
+      
+      // 使用 token 呼叫用戶資料 API
+      const userData = await axiosInstance.get('/api/v1/users/profile');
+      return userData;
+    } catch (error) {
+      console.error('Failed to fetch user profile:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     if (handledRef.current) return;
     handledRef.current = true;
+    
     // 從 URL 中獲取授權碼
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     const error = urlParams.get("error");
 
     if (error) {
-      console.error("OAuth error:", error);
       toast({
         variant: "destructive",
         title: "發生錯誤",
@@ -28,14 +45,27 @@ export default function GoogleAuthCallbackPage() {
     }
 
     if (token) {
-      setCookie(token);
-      setAuth("", "");
-      // 重定向到首頁或其他適當的頁面
-      toast({
-        title: "登入成功",
-        description: "導向首頁",
-      });
-      navigate("/");
+      // 使用 token 獲取用戶資料
+      fetchUserProfile(token)
+        .then((userData) => {
+          // 設置用戶資訊，與一般登入保持一致
+          setAuth(userData.data?.user?.email || "", userData.data?.user?.role || "");
+          
+          toast({
+            title: "登入成功",
+            description: "導向首頁",
+          });
+          navigate("/");
+        })
+        .catch((error) => {
+          console.error("Failed to get user profile:", error);
+          toast({
+            variant: "destructive",
+            title: "登入失敗",
+            description: "無法獲取用戶資訊，請重新嘗試登入",
+          });
+          navigate("/login");
+        });
     } else {
       toast({
         variant: "destructive",
@@ -43,7 +73,7 @@ export default function GoogleAuthCallbackPage() {
         description: "請重新嘗試登入",
       });
     }
-  }, [navigate, setCookie, toast]);
+  }, [navigate, setCookie, setAuth, toast]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

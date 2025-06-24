@@ -25,7 +25,10 @@ export default function TicketHistorySection() {
   const { data, error, isLoading, refetch } = useGet();
   useEffect(() => {
     if (data && Array.isArray(data) && data[0].length > 0) {
-      setTicketHistory(data[0]);
+      const sortedData = data[0].sort((a: ticketHistoryItem, b: ticketHistoryItem) => {
+        return new Date(b.orderCreatedAt).getTime() - new Date(a.orderCreatedAt).getTime();
+      });
+      setTicketHistory(sortedData);
     }
   }, [data]);
   // 處理錯誤

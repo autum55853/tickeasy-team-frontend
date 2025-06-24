@@ -4,24 +4,25 @@ Tickeasy 是一個現代化的演唱會購票系統，旨在為用戶提供流�
 
 ## 專案概述
 
+### 測試帳號
+- (舉辦者) admin@gmail.com / admin1234
+- (參與者) user@gmail.com / user1234
+- (網站管理者) admin@gmail.com / admin1234
+
+
 本系統提供以下核心功能：
 
 ### 用戶功能
 
 - 🎫 票務查詢與購買
   - 多元支付方式 (信用卡)
-  - 購票倒數計時器
 - 🎭 演唱會活動資訊
   - 進階搜尋與篩選 (依名稱、日期、地點)
-  - 活動收藏功能
 - 👤 會員系統
   - OAuth 社群登入 (Google)
   - 個人資料管理
   - 購買記錄查詢
   - 退票申請功能
-- 🔔 通知系統
-  - 開賣提醒
-  - Email 推播通知
 - 📱 跨平台支援
   - 響應式網頁設計
 
@@ -42,29 +43,33 @@ Tickeasy 是一個現代化的演唱會購票系統，旨在為用戶提供流�
 
 ## 技術棧
 
-- **核心框架**: React 19
-- **建構工具**: Vite 6
-- **開發語言**: TypeScript 5.7
+- **核心框架**: React 19.1.0
+- **建構工具**: Vite 5.1.4
+- **開發語言**: TypeScript 5.7.2
 - **UI框架**:
   - shadcn/ui (基於 Radix UI 的組件庫)
   - Radix UI (無樣式、可訪問性組件)
+  - Lucide React (圖示庫)
 - **樣式解決方案**:
-  - TailwindCSS 4
-  - Styled-components 6
+  - TailwindCSS 4.1.3
+  - Styled-components 6.1.15
   - SASS
-- **狀態管理**: TanStack Query (React Query) 5
-- **表單處理**: React Hook Form 7
-- **路由管理**: React Router 7.5
-- **資料驗證**: Zod
-- **HTTP 客戶端**: Axios
+- **狀態管理**: 
+  - TanStack Query (React Query) 5.74.3
+  - Zustand 5.0.4
+- **表單處理**: React Hook Form 7.55.0
+- **路由管理**: React Router 7.5.2
+- **資料驗證**: Zod 3.24.2
+- **HTTP 客戶端**: Axios 1.8.4
 - **工具庫**:
   - dayjs (日期處理)
   - clsx & tailwind-merge (類名合併)
+  - date-fns (日期處理)
 
 ## 程式碼品質工具
 
-- ESLint 9 (程式碼檢查)
-- Stylelint 16 (樣式檢查)
+- ESLint 9.21.0 (程式碼檢查)
+- Stylelint 16.2.1 (樣式檢查)
 - Prettier (程式碼格式化)
 
 ## 開發指令
@@ -108,33 +113,31 @@ npm run format
 
 ```
 src/
-├── assets/           # 應用程式資源
-│   ├── icons/       # 圖示資源
-│   └── images/      # 圖片資源
-├── public/          # 靜態資源文件
-│   ├── favicon/     # 網站圖示
-│   └── images/      # 靜態圖片
-├── core/            # 核心功能模組
-│   ├── boot/       # 應用程式啟動相關
-│   ├── components/ # 全域共用元件
-│   │   ├── global/ # 一般共用元件
-│   │   └── ui/     # UI 基礎元件
-│   ├── hooks/      # 全域共用 Hooks
-│   ├── lib/        # 工具函式庫
-│   ├── routers/    # 路由配置
-│   ├── styles/     # 全域樣式
-│   └── types/      # TypeScript 類型定義
-├── schema/         # Zod 資料驗證結構定義
-│   └── example.ts # 資料驗證範本
-└── pages/          # 頁面模組
-    ├── comm/       # 共用頁面 (登入、404等)
-    │   ├── types/  # 模組類型定義
-    │   └── views/  # 頁面視圖
-    └── home/       # 首頁模組
-        ├── components/ # 模組專用元件
-        ├── hooks/     # 模組專用 Hooks
-        ├── types/     # 模組類型定義
-        └── views/     # 頁面視圖
+├── assets/ # 應用程式資源
+│ ├── icons/ # 圖示資源
+│ └── images/ # 圖片資源
+├── context/ # React Context 狀態管理
+├── core/ # 核心功能模組
+│ ├── boot/ # 應用程式啟動相關
+│ ├── components/ # 全域共用元件
+│ │ ├── customer-service/ # 客服相關元件
+│ │ ├── global/ # 一般共用元件
+│ │ └── ui/ # UI 基礎元件
+│ ├── hooks/ # 全域共用 Hooks
+│ ├── icons/ # 圖示註冊
+│ ├── lib/ # 工具函式庫
+│ ├── routers/ # 路由配置
+│ ├── styles/ # 全域樣式
+│ └── types/ # TypeScript 類型定義
+├── pages/ # 頁面模組
+│ ├── comm/ # 共用頁面 (登入、404等)
+│ ├── company/ # 公司/主辦方頁面
+│ ├── concerts/ # 演唱會相關頁面
+│ ├── home/ # 首頁模組
+│ └── user/ # 用戶相關頁面
+├── schema/ # Zod 資料驗證結構定義
+├── store/ # 全域狀態管理
+└── utils/ # 工具函式
 ```
 
 ### 目錄說明
@@ -142,26 +145,32 @@ src/
 - **assets**: 應用程式內部使用的資源
   - **icons**: SVG 圖示等向量圖形
   - **images**: 應用程式內使用的圖片
-- **public**: 靜態資源文件
-  - **favicon**: 網站圖示相關檔案
-  - **images**: 不需要經過打包的靜態圖片
+- **context**: React Context 用於跨組件狀態管理
 - **core**: 核心功能模組
   - **boot**: 應用程式啟動與初始化相關
   - **components**: 全域共用元件
+    - **customer-service**: 客服相關元件
+    - **global**: 一般共用元件
+    - **ui**: UI 基礎元件
   - **hooks**: 全域共用的自定義 Hooks
+  - **icons**: 圖示註冊與管理
   - **lib**: 工具函式與共用邏輯
   - **routers**: 路由配置與管理
   - **styles**: 全域樣式設定
   - **types**: TypeScript 類型定義
+- **pages**: 頁面模組，每個子目錄代表一個功能模組
+  - **comm**: 共用頁面模組 (如登入、404等)
+  - **company**: 公司/主辦方相關頁面
+  - **concerts**: 演唱會相關頁面
+  - **home**: 首頁模組
+  - **user**: 用戶相關頁面
 - **schema**: 使用 Zod 進行資料驗證的結構定義
   - 定義表單、API 請求/響應等資料的驗證規則
   - 自動生成 TypeScript 類型定義
   - 提供運行時的資料驗證
   - 集中管理所有資料結構的驗證邏輯
-- **pages**: 頁面模組，每個子目錄代表一個功能模組
-  - **comm**: 共用頁面模組 (如登入、404等)
-  - **home**: 首頁模組
-    - 每個模組可包含自己的 components、hooks、types 等
+- **store**: 全域狀態管理 (Zustand stores)
+- **utils**: 工具函式
 
 ### 模組結構規範
 
@@ -172,6 +181,7 @@ src/
 - `hooks/`: 模組專用的自定義 Hooks
 - `types/`: 模組相關的類型定義
 - `views/`: 實際的頁面元件
+- `schemas/`: 模組相關的資料驗證結構 (如適用)
 
 ### 資料驗證規範
 
@@ -181,18 +191,3 @@ src/
 - 必要的驗證規則（如長度限制、格式要求等）
 - 對應的 TypeScript 類型導出
 - 適當的錯誤提示信息
-
-例如 `example.ts` 的結構：
-
-```typescript
-// 定義基本結構和驗證規則
-const Schema = z.object({
-  field: z.string().min(1, "錯誤提示"),
-});
-
-// 導出用於特定用途的變體
-export const CreateSchema = Schema.omit({ id: true });
-
-// 導出 TypeScript 類型
-export type T_Schema = z.infer<typeof Schema>;
-```

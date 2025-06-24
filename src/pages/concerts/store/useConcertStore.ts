@@ -283,7 +283,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
   setSessions: (sessions) => set({ sessions }),
 
   updateSession: (session) => {
-    console.log("updateSession called with", session);
+    // console.log("updateSession called with", session);
     set((state) => {
       const newSessions = state.sessions.map((s) => (s.sessionId === session.sessionId ? { ...s, ...session } : s));
       return {
@@ -365,11 +365,11 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       }
 
       const { info, sessions } = get();
-      console.log("[saveDraft] 當前 store 狀態:", { info, sessions });
+      // console.log("[saveDraft] 當前 store 狀態:", { info, sessions });
 
       // 只檢查 conTitle
       if (!info.conTitle?.trim()) {
-        console.error("[saveDraft] 演唱會名稱為空");
+        // console.error("[saveDraft] 演唱會名稱為空");
         return Promise.reject(new Error("演唱會名稱為必填"));
       }
 
@@ -386,7 +386,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
       }
 
       if (!organizationId) {
-        console.error("[saveDraft] 無法取得組織ID");
+        // console.error("[saveDraft] 無法取得組織ID");
         return Promise.reject(new Error("無法取得組織ID"));
       }
 
@@ -428,22 +428,22 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
           const sessionDate = s.sessionDate ? s.sessionDate.split("T")[0] : "";
 
           const sessionData = {
-            ...(s.sessionTitle && { sessionTitle: s.sessionTitle }),
-            ...(sessionDate && { sessionDate }),
-            ...(s.sessionStart && { sessionStart: s.sessionStart }),
-            ...(s.sessionEnd && { sessionEnd: s.sessionEnd }),
-            ...(s.imgSeattable && { imgSeattable: s.imgSeattable }),
+            sessionTitle: s.sessionTitle || "",
+            sessionDate: sessionDate || "",
+            sessionStart: s.sessionStart || "",
+            sessionEnd: s.sessionEnd || "",
+            imgSeattable: s.imgSeattable || "",
             ticketTypes: s.ticketTypes.map((t) => {
               try {
                 return {
-                  ...(t.ticketTypeName && { ticketTypeName: t.ticketTypeName }),
-                  ...(t.entranceType && { entranceType: t.entranceType }),
-                  ...(t.ticketBenefits && { ticketBenefits: t.ticketBenefits }),
-                  ...(t.ticketRefundPolicy && { ticketRefundPolicy: t.ticketRefundPolicy }),
-                  ...(t.ticketTypePrice && { ticketTypePrice: Number(t.ticketTypePrice) }),
-                  ...(t.totalQuantity && { totalQuantity: t.totalQuantity }),
-                  ...(t.sellBeginDate && { sellBeginDate: t.sellBeginDate }),
-                  ...(t.sellEndDate && { sellEndDate: t.sellEndDate }),
+                  ticketTypeName: t.ticketTypeName || "",
+                  entranceType: t.entranceType || "",
+                  ticketBenefits: t.ticketBenefits || "",
+                  ticketRefundPolicy: t.ticketRefundPolicy || "",
+                  ticketTypePrice: t.ticketTypePrice ? Number(t.ticketTypePrice) : 0,
+                  totalQuantity: t.totalQuantity || 0,
+                  sellBeginDate: t.sellBeginDate || "",
+                  sellEndDate: t.sellEndDate || "",
                 };
               } catch (e) {
                 console.error("[saveDraft] ticketType 處理失敗:", t, e);
@@ -451,7 +451,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
               }
             }),
           };
-          console.log("[saveDraft] 處理後的 session 資料:", sessionData);
+          // console.log("[saveDraft] 處理後的 session 資料:", sessionData);
           return sessionData;
         });
       } catch (e) {
@@ -459,7 +459,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         throw e;
       }
 
-      console.log("[saveDraft] 準備發送的 payload:", JSON.stringify(payload, null, 2));
+      // console.log("[saveDraft] 準備發送的 payload:", JSON.stringify(payload, null, 2));
 
       let response: AxiosResponse<ConcertCreateResponse>;
       try {
@@ -491,7 +491,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
         throw e;
       }
 
-      console.log("[saveDraft] API 回傳資料:", response.data);
+      // console.log("[saveDraft] API 回傳資料:", response.data);
 
       const concertData = response.data.data.concert;
       if (concertData.concertId) {
@@ -501,8 +501,8 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
           imgBanner: concertData.imgBanner || "",
         };
 
-        console.log("[saveDraft] 更新前的 store info:", get().info);
-        console.log("[saveDraft] 準備更新的 info:", updatedInfo);
+        // console.log("[saveDraft] 更新前的 store info:", get().info);
+        // console.log("[saveDraft] 準備更新的 info:", updatedInfo);
 
         set((state) => ({
           info: {
@@ -513,7 +513,7 @@ export const useConcertStore = create<ConcertState>((set, get) => ({
           venue: concertData.venue,
         }));
 
-        console.log("[saveDraft] 更新後的 store info:", get().info);
+        // console.log("[saveDraft] 更新後的 store info:", get().info);
         localStorage.setItem("concertId", concertData.concertId);
         return { concertId: concertData.concertId };
       }

@@ -33,32 +33,44 @@ export default function CreateConInfoPage() {
   }, [isEditMode, concertId, getConcert, info.concertId]);
 
   const handleSaveAndNext = async () => {
-    let concertId: string | undefined = info.concertId;
-    if (!concertId) {
+    try {
+      // 無論是否有 concertId，都先儲存草稿確保資料同步
       const result = await saveDraft();
-      concertId = result?.concertId;
+      const concertId = result?.concertId;
+
       if (!concertId) {
         toast({
           title: "錯誤",
-          description: "請先儲存草稿，才能進行下一步。",
+          description: "儲存草稿失敗，請重試。",
           variant: "destructive",
         });
         return;
       }
-      setInfo({ concertId });
-    }
 
-    // 構建查詢參數
-    const queryParams = new URLSearchParams();
-    queryParams.set("concertId", concertId);
-    if (companyId) {
-      queryParams.set("companyId", companyId);
-    }
+      // 確保 store 中有最新的 concertId
+      if (concertId !== info.concertId) {
+        setInfo({ concertId });
+      }
 
-    const nextPath = isEditMode
-      ? `/concert/edit/${concertId}/sessions-and-tickets`
-      : `/concert/create/sessions-and-tickets?${queryParams.toString()}`;
-    window.location.href = nextPath;
+      // 構建查詢參數
+      const queryParams = new URLSearchParams();
+      queryParams.set("concertId", concertId);
+      if (companyId) {
+        queryParams.set("companyId", companyId);
+      }
+
+      const nextPath = isEditMode
+        ? `/concert/edit/${concertId}/sessions-and-tickets`
+        : `/concert/create/sessions-and-tickets?${queryParams.toString()}`;
+      window.location.href = nextPath;
+    } catch (error) {
+      console.error("下一步操作失敗:", error);
+      toast({
+        title: "錯誤",
+        description: "操作失敗，請重試",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -99,7 +111,8 @@ export default function CreateConInfoPage() {
               {/* 簡介 */}
               <div className="mt-4">
                 <label className="mb-1 block font-medium text-gray-700">
-                  簡介 <span className="text-sm text-gray-400">上限3,000字</span>
+                  簡介<span className="ml-1 text-lg text-red-500">*</span>
+                  <span className="text-sm text-gray-400">上限3,000字</span>
                 </label>
                 <textarea
                   className="w-full rounded border border-gray-300 p-3"

@@ -58,14 +58,12 @@ export default function Password() {
     } catch (error: unknown) {
       // 處理 Zod 驗證錯誤
       if (error instanceof ZodError) {
-        console.log("error", error.errors);
         // setErrors(error.errors);
         return;
       }
 
       // 處理其他類型錯誤
       if (error instanceof Error) {
-        console.log("error", error);
         // setErrors([
         //   {
         //     code: "custom",

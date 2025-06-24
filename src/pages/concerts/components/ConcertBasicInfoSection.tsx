@@ -36,7 +36,9 @@ export function ConcertBasicInfoSection({
         {/* 演唱會時間 */}
         <div className="flex flex-1 items-center">
           <div className="w-full">
-            <label className="mb-4 block font-medium text-gray-700">演唱會時間</label>
+            <label className="mb-4 block font-medium text-gray-700">
+              演唱會時間<span className="ml-1 text-lg text-red-500">*</span>
+            </label>
             <div className="flex flex-col gap-2 md:flex-row md:items-center">
               <SingleDatePicker
                 date={eventStartDate ? new Date(eventStartDate) : null}

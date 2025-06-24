@@ -38,7 +38,7 @@ export function DateTimePicker({
           {date ? dayjs(date).format(format) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className="z-[9999] w-auto p-0" align="start" side="bottom">
         <div className="p-3">
           <Calendar
             mode="single"
@@ -64,7 +64,7 @@ export function DateTimePicker({
               <SelectTrigger className="w-[70px]">
                 <SelectValue placeholder="時" />
               </SelectTrigger>
-              <SelectContent className="max-h-[200px] overflow-y-auto">
+              <SelectContent className="z-[9999] max-h-[200px] overflow-y-auto" position="popper" side="top" sideOffset={5}>
                 {hours.map((hour) => (
                   <SelectItem key={hour} value={hour}>
                     {hour}
@@ -83,7 +83,7 @@ export function DateTimePicker({
               <SelectTrigger className="w-[70px]">
                 <SelectValue placeholder="分" />
               </SelectTrigger>
-              <SelectContent className="max-h-[200px] overflow-y-auto">
+              <SelectContent className="z-[9999] max-h-[200px] overflow-y-auto" position="popper" side="top" sideOffset={5}>
                 {minutes.map((minute) => (
                   <SelectItem key={minute} value={minute}>
                     {minute}

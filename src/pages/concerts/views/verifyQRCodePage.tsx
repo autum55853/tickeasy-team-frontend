@@ -20,7 +20,7 @@ export default function Page() {
   // 真實驗票 API
   const verifyQrCode = async (qrCode: string): Promise<VerifyApiResponse> => {
     const data = (await axiosInstance.post("/api/v1/ticket/verify", { qrCode })) as VerifyApiResponse;
-    console.log("API result", data);
+    // console.log("API result", data);
     return data;
   };
 
@@ -45,7 +45,7 @@ export default function Page() {
     setLoading(true);
     verifyQrCode(qrCode)
       .then((res) => {
-        console.log("API result", res);
+        // console.log("API result", res);
         toast({
           title: res.status === "success" ? "驗證成功" : "驗證結果",
           description: res.message,
