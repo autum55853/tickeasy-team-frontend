@@ -382,7 +382,7 @@ export default function CreateConSessionsAndTicketsPage() {
     }
 
     if (basicInfoErrors.length > 0) {
-      console.log("basicInfoErrors:", basicInfoErrors);
+      // console.log("basicInfoErrors:", basicInfoErrors);
       toast({
         title: "基本資料未完整",
         description: `請填寫以下欄位：${basicInfoErrors.join("、")}`,
