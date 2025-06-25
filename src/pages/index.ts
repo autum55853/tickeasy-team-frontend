@@ -11,7 +11,7 @@ export const pagesConfig = Object.entries(modules).reduce(
 
     // 檢查 config.default 是否存在
     if (!config?.default) {
-      console.warn(`警告: ${path} 沒有默認導出`);
+      // console.warn(`警告: ${path} 沒有默認導出`);
       return acc;
     }
 
@@ -24,10 +24,10 @@ export const pagesConfig = Object.entries(modules).reduce(
 );
 
 // 合併後的路由配置 最後會導入到 @/core/routers
-export const routes = Object.values(pagesConfig).reduce<RouteView[]>((acc, config, index) => {
-  const moduleName = Object.keys(pagesConfig)[index];
+export const routes = Object.values(pagesConfig).reduce<RouteView[]>((acc, config) => {
+  // const moduleName = Object.keys(pagesConfig)[index];
   if (!config?.views) {
-    console.warn(`警告: ${moduleName} 模組的配置文件缺少 views 屬性`);
+    // console.warn(`警告: ${moduleName} 模組的配置文件缺少 views 屬性`);
     return acc;
   }
   return [...acc, ...config.views];

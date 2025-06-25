@@ -110,7 +110,7 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
           } else {
             setError("發生未知錯誤，請稍後再試");
           }
-          console.error("Concert fetch error:", err);
+          // console.error("Concert fetch error:", err);
         } finally {
           setLoading(false);
         }

@@ -15,8 +15,8 @@ const BannerUploadSectionComponent = ({ imgBanner, onBannerChange }: BannerUploa
     try {
       const url = await triggerFileInput("CONCERT_BANNER");
       if (url) onBannerChange(url);
-    } catch (error) {
-      console.error("上傳圖片失敗:", error);
+    } catch {
+      // console.error("上傳圖片失敗:", error);
     }
   };
 

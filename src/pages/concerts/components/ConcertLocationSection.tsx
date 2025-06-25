@@ -60,8 +60,8 @@ export function ConcertLocationSection({
   const fetchData = useCallback(async () => {
     try {
       await getVenues();
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
+    } catch {
+      // console.error("Failed to fetch data:", error);
     }
   }, [getVenues]);
 

@@ -63,8 +63,8 @@ export default function CreateConInfoPage() {
         ? `/concert/edit/${concertId}/sessions-and-tickets`
         : `/concert/create/sessions-and-tickets?${queryParams.toString()}`;
       window.location.href = nextPath;
-    } catch (error) {
-      console.error("下一步操作失敗:", error);
+    } catch {
+      // console.error("下一步操作失敗:", error);
       toast({
         title: "錯誤",
         description: "操作失敗，請重試",

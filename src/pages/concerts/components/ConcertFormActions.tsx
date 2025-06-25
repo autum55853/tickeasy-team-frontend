@@ -28,8 +28,8 @@ export function ConcertFormActions({ onSaveAndNext, isEditMode = false }: Concer
         description: "草稿儲存成功",
         variant: "default",
       });
-    } catch (e) {
-      console.error("草稿儲存失敗:", e);
+    } catch {
+      // console.error("草稿儲存失敗:", e);
       toast({
         title: "錯誤",
         description: "草稿儲存失敗",
@@ -46,8 +46,8 @@ export function ConcertFormActions({ onSaveAndNext, isEditMode = false }: Concer
     setIsLoading(true);
     try {
       await onSaveAndNext();
-    } catch (e) {
-      console.error("下一步操作失敗:", e);
+    } catch {
+      // console.error("下一步操作失敗:", e);
       toast({
         title: "錯誤",
         description: "操作失敗，請重試",

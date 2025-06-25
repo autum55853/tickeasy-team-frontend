@@ -16,17 +16,9 @@ export default function GoogleAuthCallbackPage() {
     handledRef.current = true;
 
     const fetchUserProfile = async (token: string) => {
-      try {
-        // 先設置 token 到 cookie，這樣 axios 攔截器會自動添加認證標頭
-        setCookie(token);
-
-        // 使用 token 呼叫用戶資料 API
-        const userData = await axiosInstance.get("/api/v1/users/profile");
-        return userData;
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
-        throw error;
-      }
+      setCookie(token);
+      const userData = await axiosInstance.get("/api/v1/users/profile");
+      return userData;
     };
 
     // 從 URL 中獲取授權碼
@@ -57,8 +49,8 @@ export default function GoogleAuthCallbackPage() {
           });
           navigate("/");
         })
-        .catch((error) => {
-          console.error("Failed to get user profile:", error);
+        .catch(() => {
+          // console.error("Failed to get user profile:", error);
           toast({
             variant: "destructive",
             title: "登入失敗",

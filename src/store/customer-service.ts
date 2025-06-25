@@ -1,33 +1,33 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { Message, Session, QuickReplyOption, CustomerServiceState } from '@/core/types/customer-service';
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+import { Message, Session, QuickReplyOption, CustomerServiceState } from "@/core/types/customer-service";
 
 interface CustomerServiceActions {
   // UI 控制
   toggleChat: () => void;
   openChat: () => void;
   closeChat: () => void;
-  
+
   // 訊息管理
   addMessage: (message: Partial<Message>) => void;
   updateMessage: (messageId: string, updates: Partial<Message>) => void;
   clearMessages: () => void;
   markAllAsRead: () => void;
-  
+
   // 會話管理
   setSession: (session: Session | null) => void;
   updateSession: (updates: Partial<Session>) => void;
-  
+
   // 狀態控制
   setLoading: (loading: boolean) => void;
   setConnected: (connected: boolean) => void;
   incrementUnreadCount: () => void;
   resetUnreadCount: () => void;
-  
+
   // 快速回覆
   setQuickReplies: (replies: QuickReplyOption[]) => void;
   addQuickReply: (reply: QuickReplyOption) => void;
-  
+
   // 重置所有狀態
   reset: () => void;
 }
@@ -36,11 +36,11 @@ interface CustomerServiceStore extends CustomerServiceState, CustomerServiceActi
 
 // 預設快速回覆選項
 const DEFAULT_QUICK_REPLIES: QuickReplyOption[] = [
-  { text: '如何購買門票？', category: '購票' },
-  { text: '退票政策說明', category: '退票' },
-  { text: '如何舉辦演唱會？', category: '演唱會' },
-  { text: '付款方式查詢', category: '付款' },
-  { text: '演唱會時間地點', category: '活動資訊' },
+  { text: "如何購買門票？", category: "購票" },
+  { text: "退票政策說明", category: "退票" },
+  { text: "如何舉辦演唱會？", category: "演唱會" },
+  { text: "付款方式查詢", category: "付款" },
+  { text: "演唱會時間地點", category: "活動資訊" },
 ];
 
 // 初始狀態
@@ -63,7 +63,7 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
       toggleChat: () => {
         const { isOpen } = get();
         set({ isOpen: !isOpen });
-        
+
         // 打開聊天時重置未讀計數
         if (!isOpen) {
           set({ unreadCount: 0 });
@@ -83,10 +83,10 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
         const newMessage: Message = {
           id: messageData.id || `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           sessionId: messageData.sessionId,
-          senderType: messageData.senderType || 'user',
+          senderType: messageData.senderType || "user",
           senderId: messageData.senderId,
-          messageText: messageData.messageText || '',
-          messageType: messageData.messageType || 'text',
+          messageText: messageData.messageText || "",
+          messageType: messageData.messageType || "text",
           metadata: messageData.metadata,
           isRead: messageData.isRead ?? false,
           createdAt: messageData.createdAt || new Date().toISOString(),
@@ -99,7 +99,7 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
 
         // 如果是機器人或客服的訊息且聊天視窗未開啟，增加未讀計數
         const { isOpen } = get();
-        if (!isOpen && newMessage.senderType !== 'user') {
+        if (!isOpen && newMessage.senderType !== "user") {
           set((state) => ({
             unreadCount: state.unreadCount + 1,
           }));
@@ -108,11 +108,7 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
 
       updateMessage: (messageId: string, updates: Partial<Message>) => {
         set((state) => ({
-          messages: state.messages.map((msg) =>
-            msg.id === messageId
-              ? { ...msg, ...updates, updatedAt: new Date().toISOString() }
-              : msg
-          ),
+          messages: state.messages.map((msg) => (msg.id === messageId ? { ...msg, ...updates, updatedAt: new Date().toISOString() } : msg)),
         }));
       },
 
@@ -134,9 +130,7 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
 
       updateSession: (updates: Partial<Session>) => {
         set((state) => ({
-          session: state.session
-            ? { ...state.session, ...updates }
-            : null,
+          session: state.session ? { ...state.session, ...updates } : null,
         }));
       },
 
@@ -146,13 +140,13 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
       },
 
       setConnected: (connected: boolean) => {
-        const prevConnected = get().isConnected;
-        console.log('🔌 [Store] setConnected 呼叫:', {
-          from: prevConnected,
-          to: connected,
-          timestamp: new Date().toISOString(),
-          stack: new Error().stack?.split('\n').slice(1, 4).join('\n') // 只顯示前几層呼叫堆栈
-        });
+        // const prevConnected = get().isConnected;
+        // console.log('🔌 [Store] setConnected 呼叫:', {
+        //   from: prevConnected,
+        //   to: connected,
+        //   timestamp: new Date().toISOString(),
+        //   stack: new Error().stack?.split('\n').slice(1, 4).join('\n') // 只顯示前几層呼叫堆栈
+        // });
         set({ isConnected: connected });
       },
 
@@ -183,7 +177,7 @@ export const useCustomerServiceStore = create<CustomerServiceStore>()(
       },
     }),
     {
-      name: 'customer-service-store',
+      name: "customer-service-store",
       // 只在開發環境啟用 devtools
       enabled: import.meta.env.DEV,
     }
