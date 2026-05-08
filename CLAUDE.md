@@ -125,3 +125,20 @@ export type T_FooSchema = z.infer<typeof FooSchema>;
 ## Git 分支命名
 
 `feat/#<issue編號>/<功能名稱>` 或 `fix/#<issue編號>/<修正內容>`，PR 目標分支為 `dev`。
+
+## 詳細文件
+
+- [docs/README.md](./docs/README.md) — 項目介紹與快速開始
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — 架構、目錄結構、路由總覽、API 端點
+- [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) — 開發規範、命名規則、計畫歸檔流程
+- [docs/FEATURES.md](./docs/FEATURES.md) — 功能清單與完成狀態
+- [docs/TESTING.md](./docs/TESTING.md) — 測試規範與指南
+- [docs/CHANGELOG.md](./docs/CHANGELOG.md) — 更新日誌
+
+## 必要遵守項目
+
+- 新增 API 呼叫請使用 `axiosInstance`（`src/core/lib/axios.ts`），不要使用原生 `axios`
+- 合併 Tailwind class 請使用 `cn()`（`src/core/lib/utils.ts`）
+- Zod schema 命名：`FooSchema` / `T_FooSchema`（推導型別）
+- 功能開發計畫記錄於 `docs/plans/`；完成後移至 `docs/plans/archive/`
+- 新增頁面模組只需在 `src/pages/` 建立資料夾並加入 `config.ts`，勿手動修改路由聚合檔案

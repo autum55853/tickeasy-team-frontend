@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(~/.npm/**)",
+      "Read(~/.npm/**)",
+      "Write(~/Library/pnpm/**)",
+      "Edit(~/Library/pnpm/**)",
+      "Read(~/Library/pnpm/**)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(git push *)",
+      "Bash(git reset --hard *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/amber/projects/tickeasy/tickeasy-team-frontend/.claude/hooks/protect-files.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/amber/projects/tickeasy/tickeasy-team-frontend/.claude/hooks/auto-format.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
