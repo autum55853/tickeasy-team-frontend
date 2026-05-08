@@ -1,21 +1,27 @@
-# 使用 Node.js 20-alpine 作為基礎映像
-FROM node:20-alpine
-
-# 設定工作目錄
+# Stage 1: Build
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# 複製 package.json 與 package-lock.json 至容器
 COPY package*.json ./
-
-# 安裝所有依賴
 RUN npm ci
 
-# 複製專案所有檔案到容器內
 COPY . .
 
-# 暴露端口（使用環境變數或默認 3000）
-ENV PORT=3000
-EXPOSE $PORT
+ARG VITE_API_BASE_URL
+ARG VITE_GOOGLE_CALLBACK
 
-# 啟動開發伺服器
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+# Stage 2: Production
+FROM node:20-alpine
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+
+ENV PORT=3000
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
