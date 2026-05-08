@@ -7,7 +7,8 @@ describe("cn()", () => {
   });
 
   it("條件 class：false 不加入", () => {
-    expect(cn("foo", false && "bar")).toBe("foo");
+    const include = false;
+    expect(cn("foo", include && "bar")).toBe("foo");
   });
 
   it("Tailwind merge：後面的 class 覆蓋前面的衝突 class", () => {

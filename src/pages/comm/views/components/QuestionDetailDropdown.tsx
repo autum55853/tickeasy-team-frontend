@@ -21,6 +21,7 @@ export default function QuestionDetailDropdown({ faqType }: { faqType: QuestionT
     if (!activeQuestion) {
       setActiveQuestion(faqDetails[faqType][0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [faqType]);
 
   return (

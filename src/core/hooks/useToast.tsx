@@ -148,6 +148,7 @@ interface State {
   toasts: ToasterToast[];
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case actionTypes.ADD_TOAST:
@@ -254,4 +255,5 @@ function useToast() {
   };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { useToast, toast };

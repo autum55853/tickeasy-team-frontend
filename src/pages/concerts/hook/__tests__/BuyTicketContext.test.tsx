@@ -1,16 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import { useContext } from "react";
 import { BuyTicketProvider } from "@/pages/concerts/hook/BuyTicketContext";
 import { BuyTicketContext } from "@/context/buyTicketContext";
 import type { sessionItem } from "@/pages/concerts/types/ConcertData";
 
 // 輔助元件：存取 context 並透過 data-testid 輸出結果
-function TestConsumer({
-  onResult,
-}: {
-  onResult: (ctx: ReturnType<typeof useContext<typeof BuyTicketContext>>) => void;
-}) {
+function TestConsumer({ onResult }: { onResult: (ctx: ReturnType<typeof useContext<typeof BuyTicketContext>>) => void }) {
   const ctx = useContext(BuyTicketContext);
   onResult(ctx);
   return <div data-testid="consumer" />;
@@ -20,7 +16,11 @@ function renderProvider() {
   let ctx: ReturnType<typeof useContext<typeof BuyTicketContext>> | null = null;
   render(
     <BuyTicketProvider>
-      <TestConsumer onResult={(c) => { ctx = c; }} />
+      <TestConsumer
+        onResult={(c) => {
+          ctx = c;
+        }}
+      />
     </BuyTicketProvider>
   );
   return () => ctx!;

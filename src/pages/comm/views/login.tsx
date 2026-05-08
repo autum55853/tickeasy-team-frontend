@@ -27,7 +27,7 @@ export default function Login() {
       });
       navigate("/");
     }
-  }, []);
+  }, [isLogin, navigate]);
 
   return (
     <Layout>

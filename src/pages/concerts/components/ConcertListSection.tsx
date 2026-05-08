@@ -60,7 +60,7 @@ export default function ConcertListSection() {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   // 篩選邏輯
   const filteredCards = () => {
@@ -109,17 +109,18 @@ export default function ConcertListSection() {
     if (clearFilter) {
       setClearFilter(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterType, clearFilter, rawConcertList]);
   // 分頁邏輯
   const totalPages = useMemo(() => {
     return Math.ceil(previousData.length / 9);
-  }, [filteredCards]);
+  }, [previousData.length]);
 
   const currentPageCards = useMemo(() => {
     const startIndex = (currentPage - 1) * 9;
     const endIndex = startIndex + 9;
     return previousData.slice(startIndex, endIndex);
-  }, [currentPage, filteredCards]);
+  }, [currentPage, previousData]);
 
   useEffect(() => {
     setCurrentPage(1);

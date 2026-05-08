@@ -27,6 +27,7 @@ interface ModalStatusContextType {
   resetLoginData: () => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ModalStatusContext = createContext<ModalStatusContextType | null>(null);
 
 export function ModalStatusProvider({ children }: { children: ReactNode }) {
