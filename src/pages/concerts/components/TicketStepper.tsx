@@ -34,6 +34,7 @@ export function TicketStepper({
         setSelectedTickets([...selectedTickets, { ticketTypeId, quantity: count, ticketPrice, ticketTypeName }]);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count]);
   return (
     <div className="flex flex-col items-center">

@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Test artifacts
+/src/test/e2e/.auth/
+/playwright-report/
+/coverage/

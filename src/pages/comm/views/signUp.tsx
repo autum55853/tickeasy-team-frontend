@@ -17,7 +17,7 @@ export default function Signup() {
       });
       navigate("/");
     }
-  }, []);
+  }, [isLogin, navigate]);
   return (
     <Layout>
       <div className="flex grid w-full grid-cols-1 items-center md:h-[calc(100vh-2rem)] md:grid-cols-2">
