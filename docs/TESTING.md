@@ -1,42 +1,86 @@
 # 測試規範
 
-## 現況
+## 技術棧
 
-本專案目前**無測試框架**，無單元測試指令。
+- **單元/整合測試**：Vitest 3 + React Testing Library 16 + MSW 2
+- **E2E 測試**：Playwright 1.52
 
-## 手動測試指南
+## 測試指令
 
-### 購票流程測試
+```bash
+npm run test               # 執行所有單元/整合測試（vitest run）
+npm run test:watch         # 監聽模式（vitest）
+npm run test:ui            # Vitest UI 介面
+npm run test:coverage      # 覆蓋率報告（thresholds: 40%）
+npm run test:e2e           # Playwright E2E（需先啟動 dev server）
+npm run test:e2e:ui        # Playwright UI 模式
+npm run test:e2e:report    # 查看 HTML 測試報告
+```
 
-1. 登入一般帳號
-2. 至 `/concerts` 搜尋演唱會
-3. 點入演唱會詳情
-4. 進行購票：選擇場次 → 選擇票種 → 填寫購買人資訊 → 付款
-5. 確認付款結果頁顯示正確
+## 目前覆蓋狀況
 
-### 演唱會建立流程測試
+| 範圍 | 測試檔 | 測試數 |
+|------|--------|--------|
+| 工具函式 | `src/utils/__tests__/` | 19 |
+| lib 工具 | `src/core/lib/__tests__/` | 15 |
+| Hooks | `src/core/hooks/__tests__/` | 26 |
+| Store | `src/store/__tests__/` | 5 |
+| Concerts Store | `src/pages/concerts/store/__tests__/` | 9 |
+| BuyTicket Context | `src/pages/concerts/hook/__tests__/` | 7 |
+| **合計** | 11 個測試檔 | **81 個測試** |
 
-1. 登入主辦方帳號
-2. 進入 `/concert/create/info` 填寫基本資料
-3. 進入 `/concert/create/sessions-and-tickets` 建立場次和票種
-4. 預覽演唱會
-5. 送審，確認狀態變為 `reviewing`
+## 架構設計
 
-### 路由守衛測試
+### vitest.config.ts 關鍵設定
 
-- 未登入時訪問 `needLogin: true` 的路由 → 應導向 `/login`
-- 訪問不存在的路徑 → 應導向 `/404`
-- 401 回應 → 應清除登入狀態並導向 `/login`
+- `pool: "forks"`：每個測試檔獨立 child process，防止 Zustand store 狀態洩漏
+- `environment: "jsdom"` + `url: "https://localhost:3000"`：支援 `secure` cookie 測試
+- `env.TZ: "UTC"`：確保 `formatTime` 時間格式確定性
 
-## 未來測試計畫
+### src/test/setup.ts
 
-若要引入測試框架，建議：
+- 啟動/重設/關閉 MSW server
+- 每個測試後清除 localStorage 與 cookie
 
-- **單元/整合測試**：Vitest + React Testing Library
-- **E2E 測試**：Playwright
+### src/test/utils.tsx
 
-測試優先順序：
-1. 購票流程（最核心業務邏輯）
-2. 演唱會建立流程（主辦方核心流程）
-3. 認證/授權（路由守衛）
-4. API 請求 hook（useRequest）
+提供 `renderWithProviders` 與 `renderHookWithProviders`，包含：
+- `QueryClientProvider`（retry: false）
+- `ModalStatusProvider`
+- `MemoryRouter`
+
+### src/test/mocks/
+
+- `handlers.ts`：MSW handler（Auth、User、Concerts、Orders、Organizations、Location/Music Tags）
+- `server.ts`：`setupServer(handlers)`
+
+## 已修正的 Bug
+
+`src/utils/formatTime.ts:5` — regex `/Z$|\\+00:00$/` 中 `\\+` 是「一個以上反斜線」，導致 `+00:00` 結尾的 UTC 時間無法識別，會被錯誤加 8 小時。已修正為 `/Z$|\+00:00$/`。
+
+## E2E 測試
+
+E2E 測試位於 `src/test/e2e/`，需要：
+
+```bash
+# 設定環境變數
+E2E_USER_EMAIL=xxx@example.com
+E2E_USER_PASSWORD=yourpassword
+
+# 啟動 dev server 後執行
+npm run test:e2e
+```
+
+| 測試檔 | 覆蓋場景 |
+|--------|---------|
+| `auth.setup.ts` | 全局登入，儲存 cookie 至 `.auth/user.json` |
+| `routerGuard.spec.ts` | 未登入訪問受保護頁面 → `/login`；未知路徑 → `/404` |
+| `login.spec.ts` | 登入成功 + cookie 驗證；錯誤密碼顯示錯誤訊息 |
+
+## 覆蓋率門檻（逐步提升目標）
+
+| 階段 | statements | branches | functions | lines |
+|------|-----------|---------|-----------|-------|
+| 初始（已達成） | 40% | 35% | 40% | 40% |
+| 階段二 | 60% | 55% | 60% | 60% |
+| 目標 | 80% | 75% | 80% | 80% |

@@ -2,7 +2,7 @@ export const formatLocalTime = (dateString: string) => {
   if (!dateString) return "";
 
   // 判斷是否為 UTC 格式（有 Z 或 +00:00 結尾）
-  const isUTC = /Z$|\\+00:00$/.test(dateString);
+  const isUTC = /Z$|\+00:00$/.test(dateString);
 
   let date = new Date(dateString);
   if (!isUTC) {
