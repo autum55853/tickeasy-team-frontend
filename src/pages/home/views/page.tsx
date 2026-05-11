@@ -1,7 +1,7 @@
 import Header from "@/core/components/global/header";
 import BannerSection from "../components/bannerSection";
 import TrendSection from "../components/TrendSection";
-import LastestSection from "../components/LastestSection";
+import LatestSection from "../components/LatestSection";
 import CategorySection from "../components/CategorySection";
 import VenueSection from "../components/VenueSection";
 import Footer from "@/core/components/global/footer";
@@ -46,7 +46,7 @@ export default function Page() {
       <main>
         <BannerSection />
         <TrendSection />
-        <LastestSection rawConcertList={rawConcertList} />
+        <LatestSection rawConcertList={rawConcertList} />
         <CategorySection rawConcertList={rawConcertList} />
         <VenueSection />
         <Footer />

@@ -1,7 +1,7 @@
-import { LastestCardProps } from "../types/LastestCard";
+import { LatestCardProps } from "../types/LatestCard";
 import { Icon } from "@iconify-icon/react";
 import { useNavigate } from "react-router-dom";
-export default function LastestCard(data: LastestCardProps) {
+export default function LastestCard(data: LatestCardProps) {
   const navigate = useNavigate();
   return (
     <div className="mx-auto">

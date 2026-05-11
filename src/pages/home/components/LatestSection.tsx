@@ -1,6 +1,6 @@
 import MobileTitle from "./mobileTitle";
-import LastestCard from "./LastestCard";
-import LastestCarousel from "./LastestCarousel";
+import LastestCard from "./LatestCard";
+import LastestCarousel from "./LatestCarousel";
 import bgBlock from "@/assets/images/lastestBlock.jpg";
 import { RawConertData } from "../types/RawConertData";
 import { useMemo } from "react";
