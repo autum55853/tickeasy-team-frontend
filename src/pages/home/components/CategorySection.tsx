@@ -93,7 +93,7 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
   }, [selectedCategory, cardList]);
 
   return (
-    <section className="mt-12 min-h-[80vh] lg:mt-20">
+    <section className="mt-12 min-h-[30vh] lg:mt-20">
       <div className="mx-auto h-full lg:w-[96%]">
         <MobileTitle title="活動分類" subtitle="Event Categories" deskTopShow={true} />
         {/* 手機 select */}

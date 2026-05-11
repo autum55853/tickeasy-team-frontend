@@ -84,7 +84,7 @@ export default function TrendSection() {
         ) : (
           <EmptyState message="目前沒有熱門活動" className="mt-20" />
         )}
-        <div className="absolute top-20 left-[20%] -z-10 hidden h-[1350px] w-[90%] rounded-2xl border-4 2xl:block"></div>
+        <div className="absolute top-20 left-[20%] -z-10 hidden min-h-[50vh] w-[90%] rounded-2xl border-4 2xl:block"></div>
       </div>
     </section>
   );

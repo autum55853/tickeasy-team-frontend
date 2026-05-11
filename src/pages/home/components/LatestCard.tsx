@@ -1,15 +1,13 @@
 import { LatestCardProps } from "../types/LatestCard";
 import { Icon } from "@iconify-icon/react";
-import { useNavigate } from "react-router-dom";
 export default function LastestCard(data: LatestCardProps) {
-  const navigate = useNavigate();
   return (
     <div className="mx-auto">
-      <div className="relative flex h-[280px] w-[416px] flex-col overflow-hidden rounded-2xl border-2 border-neutral-200 bg-white shadow-md">
-        <div className="relative h-[60%] w-full">
+      <div className="relative flex w-[416px] flex-col overflow-hidden rounded-2xl border-2 border-neutral-200 bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.05)]">
+        <div className="h-[240px] w-full">
           <img src={data.image} alt={data.title} className="h-full w-full object-cover" />
         </div>
-        <div className="flex h-[40%] w-full items-end justify-between px-4 py-2">
+        <div className="flex w-full items-end justify-between px-4 py-3">
           <div>
             <p className="text-base text-neutral-600">{data.date}</p>
             <p className="text-lg font-bold">{data.title}</p>
@@ -25,11 +23,8 @@ export default function LastestCard(data: LatestCardProps) {
               </a>
             </p>
           </div>
-          <div
-            onClick={() => navigate(`/concert/${data.id}`)}
-            className="border-primary flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1"
-          >
-            <Icon icon="my-arrow-right" className="text-primary text-xl" />
+          <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1 border-neutral-400">
+            <Icon icon="mdi:heart-outline" className="text-xl text-neutral-400" />
           </div>
         </div>
       </div>
