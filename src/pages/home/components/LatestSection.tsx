@@ -5,8 +5,9 @@ import bgBlock from "@/assets/images/lastestBlock.jpg";
 import { RawConertData } from "../types/RawConertData";
 import { useMemo } from "react";
 import EmptyState from "@/core/components/ui/emptyState";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 
-export default function LastestSection({ rawConcertList }: { rawConcertList: RawConertData[] }) {
+export default function LastestSection({ rawConcertList, isLoading }: { rawConcertList: RawConertData[]; isLoading: boolean }) {
   const data = useMemo(() => {
     const rawData = rawConcertList
       .sort((a, b) => {
@@ -28,22 +29,22 @@ export default function LastestSection({ rawConcertList }: { rawConcertList: Raw
     });
   }, [rawConcertList]);
 
-  if (data.length === 0) {
-    return (
-      <section className="mt-24 min-h-[100px] bg-neutral-100 lg:bg-white">
-        <EmptyState message="目前沒有最新活動" className="py-20" />
-      </section>
-    );
-  }
-
   return (
     <section className="mt-24 min-h-[100px] bg-neutral-100 lg:bg-white">
       {/* 手機板 */}
       <div className="lg:hidden">
         <MobileTitle title="最新活動" subtitle="Latest Events" subClass="text-neutral-200" />
-        <div className="mt-10 flex flex-col gap-4">
-          <LastestCarousel cardList={data} />
-        </div>
+        {isLoading ? (
+          <div className="mt-10">
+            <LoadingSpin />
+          </div>
+        ) : data.length === 0 ? (
+          <EmptyState message="目前沒有最新活動" className="py-20" />
+        ) : (
+          <div className="mt-10 flex flex-col gap-4">
+            <LastestCarousel cardList={data} />
+          </div>
+        )}
       </div>
       {/* 電腦板 */}
       <div className="relative hidden h-[100vh] h-full lg:block">
@@ -59,12 +60,19 @@ export default function LastestSection({ rawConcertList }: { rawConcertList: Raw
           alt="bgBlock"
           className="absolute top-0 left-1/2 z-0 h-full min-w-[1200px] -translate-x-1/2 scale-x-[1.2] scale-y-[1.1] object-cover lg:min-h-[1050px]"
         />
-        {/* cardContainer */}
-        <div className="mx-auto mt-20 grid w-[96%] max-w-[1300px] grid-cols-1 gap-4 lg:grid-cols-3">
-          {data.map((item) => (
-            <LastestCard key={item.id} {...item} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="relative z-10 mt-20">
+            <LoadingSpin />
+          </div>
+        ) : data.length === 0 ? (
+          <EmptyState message="目前沒有最新活動" className="relative z-10 py-20" />
+        ) : (
+          <div className="mx-auto mt-20 grid w-[96%] max-w-[1300px] grid-cols-1 gap-4 lg:grid-cols-3">
+            {data.map((item) => (
+              <LastestCard key={item.id} {...item} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

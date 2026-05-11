@@ -15,7 +15,7 @@ export default function Page() {
   const [rawConcertList, setRawConcertList] = useState<RawConertData[]>([]);
 
   // 取得 原始Convert 列表
-  const { data, error, refetch } = useRequest<RawConertData[]>({
+  const { data, error, refetch, isLoading } = useRequest<RawConertData[]>({
     queryKey: [],
     url: "/api/v1/concerts/search",
   }).useGet();
@@ -46,7 +46,7 @@ export default function Page() {
       <main>
         <BannerSection />
         <TrendSection />
-        <LatestSection rawConcertList={rawConcertList} />
+        <LatestSection rawConcertList={rawConcertList} isLoading={isLoading} />
         <CategorySection rawConcertList={rawConcertList} />
         <VenueSection />
         <Footer />
