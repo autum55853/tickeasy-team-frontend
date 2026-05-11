@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useConcertStore, ConInfoStatus } from "@/pages/concerts/store/useConcertStore";
 import { useToast } from "@/core/hooks/useToast";
 import { Pagination } from "@/core/components/ui/pagination";
+import EmptyState from "@/core/components/ui/emptyState";
 
 export default function CompanyConcertSection({ companyInfoData }: { companyInfoData: CompanyDetailData }) {
   const [activeTab, setActiveTab] = useState<ConInfoStatus>("draft");
@@ -117,23 +118,28 @@ export default function CompanyConcertSection({ companyInfoData }: { companyInfo
           </TabsList>
 
           {/* 使用分頁後的資料來顯示當前 tab 的演唱會列表 */}
-          {paginatedConcerts.map((concert) => (
-            <CompanyConcertCard
-              key={concert.concertId}
-              concertId={concert.concertId}
-              conTitle={concert.conTitle}
-              eventStartDate={concert.createdAt}
-              eventEndDate={concert.updatedAt}
-              imgBanner={concert.imgBanner}
-              companyId={companyInfoData.organizationId}
-            />
-          ))}
-
-          {/* 分頁控制 */}
-          {totalPages > 0 && (
-            <div className="mt-4">
-              <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-            </div>
+          {currentTabConcerts.length === 0 ? (
+            <EmptyState message="此分類尚無演唱會" />
+          ) : (
+            <>
+              {paginatedConcerts.map((concert) => (
+                <CompanyConcertCard
+                  key={concert.concertId}
+                  concertId={concert.concertId}
+                  conTitle={concert.conTitle}
+                  eventStartDate={concert.createdAt}
+                  eventEndDate={concert.updatedAt}
+                  imgBanner={concert.imgBanner}
+                  companyId={companyInfoData.organizationId}
+                />
+              ))}
+              {/* 分頁控制 */}
+              {totalPages > 1 && (
+                <div className="mt-4">
+                  <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                </div>
+              )}
+            </>
           )}
         </Tabs>
       </div>

@@ -6,12 +6,13 @@ import { useState, useEffect } from "react";
 import { TrendData } from "../types/TrendCard";
 import TrendCard from "./TrendCard";
 import LoadingSpin from "@/core/components/global/loadingSpin";
+import EmptyState from "@/core/components/ui/emptyState";
 
 export default function TrendSection() {
   const { toast } = useToast();
   const [trendCardData, setTrendCardData] = useState<TrendCardProps[]>([]);
   // 取得 Trend 列表
-  const { data, error, refetch } = useRequest<TrendData[]>({
+  const { data, error, refetch, isLoading } = useRequest<TrendData[]>({
     queryKey: ["take=3"],
     url: "/api/v1/concerts/popular",
   }).useGet();
@@ -50,16 +51,18 @@ export default function TrendSection() {
       {/* 手機板 */}
       <div className="lg:hidden">
         <MobileTitle title="熱門活動" subtitle="Trending Now" />
-        {trendCardData.length > 0 ? (
+        {isLoading ? (
+          <div className="mt-5">
+            <LoadingSpin />
+          </div>
+        ) : trendCardData.length > 0 ? (
           <div className="mt-5 space-y-4">
             {trendCardData.map((card) => (
               <TrendCard key={card.title} {...card} />
             ))}
           </div>
         ) : (
-          <div className="mt-5">
-            <LoadingSpin />
-          </div>
+          <EmptyState message="目前沒有熱門活動" className="mt-5" />
         )}
       </div>
       {/* 電腦板 */}
@@ -68,16 +71,18 @@ export default function TrendSection() {
           <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">熱門活動</h2>
           <span className={`absolute top-[20%] left-[calc(100%+2rem)] text-[40px] text-nowrap text-neutral-200`}>Trending Now</span>
         </div>
-        {trendCardData.length > 0 ? (
+        {isLoading ? (
+          <div className="mt-20">
+            <LoadingSpin />
+          </div>
+        ) : trendCardData.length > 0 ? (
           <div className="mt-20 space-y-6">
             {trendCardData.map((card) => (
               <TrendCard key={card.title} {...card} />
             ))}
           </div>
         ) : (
-          <div className="mt-20">
-            <LoadingSpin />
-          </div>
+          <EmptyState message="目前沒有熱門活動" className="mt-20" />
         )}
         <div className="absolute top-20 left-[20%] -z-10 hidden h-[1350px] w-[90%] rounded-2xl border-4 2xl:block"></div>
       </div>

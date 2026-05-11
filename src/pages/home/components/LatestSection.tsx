@@ -4,6 +4,7 @@ import LastestCarousel from "./LatestCarousel";
 import bgBlock from "@/assets/images/lastestBlock.jpg";
 import { RawConertData } from "../types/RawConertData";
 import { useMemo } from "react";
+import EmptyState from "@/core/components/ui/emptyState";
 
 export default function LastestSection({ rawConcertList }: { rawConcertList: RawConertData[] }) {
   const data = useMemo(() => {
@@ -26,6 +27,14 @@ export default function LastestSection({ rawConcertList }: { rawConcertList: Raw
       };
     });
   }, [rawConcertList]);
+
+  if (data.length === 0) {
+    return (
+      <section className="mt-24 min-h-[100px] bg-neutral-100 lg:bg-white">
+        <EmptyState message="目前沒有最新活動" className="py-20" />
+      </section>
+    );
+  }
 
   return (
     <section className="mt-24 min-h-[100px] bg-neutral-100 lg:bg-white">
