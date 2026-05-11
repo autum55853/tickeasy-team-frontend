@@ -1,7 +1,7 @@
 import Header from "@/core/components/global/header";
 import BannerSection from "../components/bannerSection";
 import TrendSection from "../components/TrendSection";
-import LastestSection from "../components/LastestSection";
+import LatestSection from "../components/LatestSection";
 import CategorySection from "../components/CategorySection";
 import VenueSection from "../components/VenueSection";
 import Footer from "@/core/components/global/footer";
@@ -15,7 +15,7 @@ export default function Page() {
   const [rawConcertList, setRawConcertList] = useState<RawConertData[]>([]);
 
   // 取得 原始Convert 列表
-  const { data, error, refetch } = useRequest<RawConertData[]>({
+  const { data, error, refetch, isLoading } = useRequest<RawConertData[]>({
     queryKey: [],
     url: "/api/v1/concerts/search",
   }).useGet();
@@ -41,12 +41,12 @@ export default function Page() {
     refetch();
   }, [refetch]);
   return (
-    <div className="mt-24 flex flex-col overflow-x-hidden overflow-y-scroll pb-[400px]">
+    <div className="mt-24 flex flex-col overflow-x-hidden overflow-y-scroll pb-[50px]">
       <Header />
       <main>
         <BannerSection />
         <TrendSection />
-        <LastestSection rawConcertList={rawConcertList} />
+        <LatestSection rawConcertList={rawConcertList} isLoading={isLoading} />
         <CategorySection rawConcertList={rawConcertList} />
         <VenueSection />
         <Footer />

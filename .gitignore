@@ -31,3 +31,4 @@ dist-ssr
 /src/test/e2e/.auth/
 /playwright-report/
 /coverage/
+docs/figma-design/*

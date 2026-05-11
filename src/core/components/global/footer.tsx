@@ -1,5 +1,5 @@
 import footerBlock from "@/assets/images/footerBlock.jpg";
-import DeaktopLogo from "@/assets/images/logo-bg.png";
+import DesktopLogo from "@/assets/images/logo-bg.png";
 import MobileLogo from "@/assets/images/logo.png";
 import { Icon } from "@iconify-icon/react";
 import { useNavigate } from "react-router-dom";
@@ -14,13 +14,13 @@ export default function Footer() {
         style={{
           backgroundImage: `url(${footerBlock})`,
         }}
-        className="mx-auto mt-20 hidden min-h-[570px] bg-cover bg-bottom bg-no-repeat pt-[170px] lg:block"
+        className="mx-auto mt-20 hidden min-h-[570px] bg-contain bg-center bg-no-repeat lg:flex lg:items-center"
       >
-        <div className="container mx-auto flex h-[240px]">
+        <div className="container mx-auto flex">
           {/* 左半區 */}
           <div className="w-[50%]">
             <div className="ml-auto grid h-full w-[70%] grid-cols-2 grid-rows-3 gap-y-3">
-              <img className="col-span-2 ml-8 max-w-[320px]" src={DeaktopLogo} alt="Logo" />
+              <img className="col-span-2 ml-8 max-w-[320px]" src={DesktopLogo} alt="Logo" />
               <p className="mt-4">tickeasy@email.com</p>
               <p className="mt-4">週一至週五 10:00~17:00</p>
               <div className="col-span-2 mx-4 border-t border-neutral-200 pt-4">樂票網股份有限公司 © Tickeasy. All Rights Reserved.</div>

@@ -1,4 +1,4 @@
-export interface LastestCardProps {
+export interface LatestCardProps {
   idx: number;
   id: string;
   date: string;
