@@ -39,6 +39,19 @@
 5. **付款** → 外部金流（`method` + `provider`）
 6. **付款結果** → `/concert/paymentResult` 查詢結果
 
+### 售票按鈕自動解鎖機制（ConcertDetailPage）
+
+演唱會詳情頁的場次卡片按鈕依 `sellBeginDate` 顯示：
+
+- **未到售票時間**：按鈕顯示「敬請期待」（disabled）
+- **已到售票時間**：按鈕顯示「下一步」（可點擊）
+
+判斷邏輯取該場次所有 ticketType 中**最早**的 `sellBeginDate` 與目前時間比較。
+
+**自動解鎖**：使用者停留在頁面時，若最早 `sellBeginDate` 在 **1 小時內**，系統透過 `setTimeout` 精準排程在 `sellBeginDate` 當下更新 `now` state，觸發 re-render 自動解鎖按鈕，無須手動刷新。超過 1 小時則不排程（使用者自行重整即可）。
+
+實作位置：`src/pages/concerts/components/ConcertDetailPage.tsx`（`isTicketSaleNotStarted` + `useEffect` timeout 機制）。
+
 ### 演唱會搜尋篩選
 
 `ConcertFilterContext` 管理搜尋條件，包含：地點標籤、音樂標籤、日期範圍、關鍵字。

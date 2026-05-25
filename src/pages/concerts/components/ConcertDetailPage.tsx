@@ -58,6 +58,7 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
   const [concert, setConcert] = useState<OrganizationConcert | ConcertResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date());
 
   const sessionsRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -135,10 +136,23 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
     tabOptions[idx].ref.current?.scrollIntoView({ behavior: "smooth" });
   }
 
-  function isSessionInFuture(sessionDate: string, sessionStart: string | null | undefined): boolean {
-    const datePart = sessionDate.split("T")[0];
-    const timePart = sessionStart ? sessionStart.split(":").slice(0, 2).join(":") : "00:00";
-    return new Date(`${datePart}T${timePart}:00`) > new Date();
+  useEffect(() => {
+    if (!concert?.sessions) return;
+    const futureDates = concert.sessions
+      .flatMap((s) => (s.ticketTypes || []).map((t) => new Date(t.sellBeginDate)))
+      .filter((d) => d > now)
+      .sort((a, b) => a.getTime() - b.getTime());
+    if (futureDates.length === 0) return;
+    const delay = futureDates[0].getTime() - now.getTime();
+    if (delay > 60 * 60 * 1000) return;
+    const timer = setTimeout(() => setNow(new Date()), delay);
+    return () => clearTimeout(timer);
+  }, [concert, now]);
+
+  function isTicketSaleNotStarted(ticketTypes: Array<{ sellBeginDate: string }>): boolean {
+    if (!ticketTypes || ticketTypes.length === 0) return true;
+    const earliest = ticketTypes.reduce((min, t) => (new Date(t.sellBeginDate) < new Date(min.sellBeginDate) ? t : min));
+    return new Date(earliest.sellBeginDate) > now;
   }
 
   function isLexicalJson(str: string) {
@@ -441,9 +455,9 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
                     size="lg"
                     className="flex items-center gap-2 rounded-full bg-[#2A7AC0] px-8 hover:bg-[#2563eb]"
                     onClick={handleBuyTicket}
-                    disabled={isPreview || isSessionInFuture(session.sessionDate, session.sessionStart)}
+                    disabled={isPreview || isTicketSaleNotStarted(session.ticketTypes || [])}
                   >
-                    {isPreview ? "預覽模式" : isSessionInFuture(session.sessionDate, session.sessionStart) ? "敬請期待" : "下一步"}
+                    {isPreview ? "預覽模式" : isTicketSaleNotStarted(session.ticketTypes || []) ? "敬請期待" : "下一步"}
                     <ArrowRight className="ml-1" size={20} />
                   </Button>
                 </div>
