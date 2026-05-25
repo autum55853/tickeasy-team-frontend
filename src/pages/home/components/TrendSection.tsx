@@ -21,7 +21,7 @@ export default function TrendSection() {
 
   useEffect(() => {
     if (Array.isArray(data)) {
-      let covertData = data.map((item) => {
+      const covertData = data.map((item) => {
         return {
           title: item.conTitle,
           image: item.imgBanner ?? "",
@@ -30,38 +30,38 @@ export default function TrendSection() {
           link: item.concertId,
         };
       });
-      covertData = [
-        {
-          title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
-          image:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          bgImage:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          description:
-            "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
-          link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
-        },
-        {
-          title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
-          image:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          bgImage:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          description:
-            "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
-          link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
-        },
-        {
-          title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
-          image:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          bgImage:
-            "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
-          description:
-            "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
-          link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
-        },
-      ];
+      // covertData = [
+      //   {
+      //     title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
+      //     image:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     bgImage:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     description:
+      //       "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
+      //     link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
+      //   },
+      //   {
+      //     title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
+      //     image:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     bgImage:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     description:
+      //       "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
+      //     link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
+      //   },
+      //   {
+      //     title: "《復古潮浪 Retro Beats 2025》90’s 嘻哈音樂派對",
+      //     image:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     bgImage:
+      //       "https://xrsirihlrdtobbmgjcuv.supabase.co/storage/v1/object/public/concert/concerts/3a44ed48-8cef-4ecf-9e52-ae32650754ad/banner.webp",
+      //     description:
+      //       "準備好回到 90 年代的街頭了嗎？\nRetro Beats 2025 將經典老派嘻哈與現代潮流音樂融合，邀請台灣本土與亞洲人氣嘻哈歌手，打造專屬於潮流迷的懷舊派對。\n除了精彩演出，現場更有 塗鴉牆、復古遊戲機、街舞快閃表演與服飾市集，讓你從視覺、聽覺到整體氛圍都沉浸在濃濃的復古街頭感中。",
+      //     link: "3a44ed48-8cef-4ecf-9e52-ae32650754ad",
+      //   },
+      // ];
       setTrendCardData(covertData);
     }
   }, [data]);
@@ -110,15 +110,16 @@ export default function TrendSection() {
         )}
       </div>
       {/* 電腦板 */}
-      <div className="hidden lg:block" style={{ minHeight: borderHeight !== undefined ? `${Math.ceil(borderHeight / 0.9) + 50}px` : "100vh" }}>
+
+      <div className="relative w-fit text-4xl font-bold select-none 2xl:ml-[25%]">
+        <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">熱門活動</h2>
+        <span className={`absolute top-[20%] left-[calc(100%+1rem)] text-[40px] text-nowrap text-neutral-200`}>Trending Now</span>
+      </div>
+      <div className="hidden lg:block" style={{ height: borderHeight !== undefined ? `${Math.ceil(borderHeight / 1) + 20}px` : "100vh" }}>
         <div
-          className="absolute top-[10%] left-[25%] hidden w-[90%] rounded-2xl border-4 border-[#F0F0F0] 2xl:block"
+          className="absolute top-[5%] left-[25%] hidden w-[90%] rounded-2xl border-4 border-[#F0F0F0] 2xl:block"
           style={{ height: borderHeight !== undefined ? `${borderHeight}px` : "80%" }}
         >
-          <div className="absolute top-[-10%] w-fit text-4xl font-bold select-none">
-            <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">熱門活動</h2>
-            <span className={`absolute top-[20%] left-[calc(100%+1rem)] text-[40px] text-nowrap text-neutral-200`}>Trending Now</span>
-          </div>
           <div className="absolute left-[-30%]">
             {isLoading ? (
               <div className="mt-20">
