@@ -135,6 +135,12 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
     tabOptions[idx].ref.current?.scrollIntoView({ behavior: "smooth" });
   }
 
+  function isSessionInFuture(sessionDate: string, sessionStart: string | null | undefined): boolean {
+    const datePart = sessionDate.split("T")[0];
+    const timePart = sessionStart ? sessionStart.split(":").slice(0, 2).join(":") : "00:00";
+    return new Date(`${datePart}T${timePart}:00`) > new Date();
+  }
+
   function isLexicalJson(str: string) {
     try {
       const obj = JSON.parse(str);
@@ -382,7 +388,7 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
             <div className="space-y-6 text-base text-gray-800">
               <div>{renderContent(concert.precautions || "尚未設定注意事項")}</div>
               <div>
-                <div className="mb-2 text-lg font-bold text-blue-700">退票注意事項</div>
+                <div className="mb-2 text-lg font-bold text-red-600">退票注意事項</div>
                 <div>{renderContent(concert.refundPolicy || "尚未設定退票注意事項")}</div>
               </div>
             </div>
@@ -435,9 +441,10 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
                     size="lg"
                     className="flex items-center gap-2 rounded-full bg-[#2A7AC0] px-8 hover:bg-[#2563eb]"
                     onClick={handleBuyTicket}
-                    disabled={isPreview}
+                    disabled={isPreview || isSessionInFuture(session.sessionDate, session.sessionStart)}
                   >
-                    {isPreview ? "預覽模式" : "下一步"} <ArrowRight className="ml-1" size={20} />
+                    {isPreview ? "預覽模式" : isSessionInFuture(session.sessionDate, session.sessionStart) ? "敬請期待" : "下一步"}
+                    <ArrowRight className="ml-1" size={20} />
                   </Button>
                 </div>
               </div>
