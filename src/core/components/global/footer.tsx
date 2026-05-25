@@ -14,7 +14,7 @@ export default function Footer() {
         style={{
           backgroundImage: `url(${footerBlock})`,
         }}
-        className="mx-auto mt-20 hidden min-h-[570px] bg-contain bg-center bg-no-repeat lg:flex lg:items-center"
+        className="mx-auto mt-20 hidden bg-contain bg-center bg-no-repeat lg:flex lg:min-h-[450px] lg:items-center"
       >
         <div className="container mx-auto flex">
           {/* 左半區 */}

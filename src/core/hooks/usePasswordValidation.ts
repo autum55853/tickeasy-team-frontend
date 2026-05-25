@@ -23,12 +23,20 @@ export const usePasswordValidation = (): UsePasswordValidationReturn => {
       return { isValid: true, message: "" };
     }
 
-    // 檢查密碼是否包含英文字和數字
-    const hasLetter = /[a-zA-Z]/.test(pass);
-    const hasNumber = /[0-9]/.test(pass);
+    if (pass.length < 8) {
+      return { isValid: false, message: "密碼至少需要 8 個字元" };
+    }
 
-    if (!hasLetter || !hasNumber) {
-      return { isValid: false, message: "密碼必須包含英文字和數字" };
+    if (!/^[a-zA-Z\d]+$/.test(pass)) {
+      return { isValid: false, message: "密碼只允許英文字母與數字（不能含特殊符號）" };
+    }
+
+    if (!/[a-zA-Z]/.test(pass)) {
+      return { isValid: false, message: "密碼必須包含至少一個英文字母" };
+    }
+
+    if (!/\d/.test(pass)) {
+      return { isValid: false, message: "密碼必須包含至少一個數字" };
     }
 
     return { isValid: true, message: "" };

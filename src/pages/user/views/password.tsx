@@ -7,9 +7,19 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/core/hooks/useToast";
 import { useRequest } from "@/core/hooks/useRequest";
 import { useLogout } from "@/core/hooks/useLogout";
+import { UserResponse } from "../types/porfile";
+
 export default function Password() {
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const { data: profileData } = useRequest<UserResponse>({
+    url: "/api/v1/users/profile",
+    queryKey: ["userInfo"],
+  }).useGet();
+
+  const userData = profileData ? (Array.isArray(profileData) ? profileData[0] : profileData) : null;
+  const isOAuthUser = (userData?.user?.oauthProviders?.length ?? 0) > 0;
   const [data, setData] = useState<T_Password>({
     oldPassword: "",
     newPassword: "",
@@ -75,6 +85,17 @@ export default function Password() {
       }
     }
   };
+
+  if (isOAuthUser) {
+    return (
+      <div className="mx-auto h-[45vh] w-full lg:w-[70%]">
+        <div className="my-10 flex h-[50px] flex-col items-center gap-4 lg:mt-0 lg:flex-row">
+          <h4 className="text-2xl font-bold">修改密碼</h4>
+        </div>
+        <p className="text-center text-gray-500">使用第三方帳號（如 Google）登入的用戶無法修改密碼。</p>
+      </div>
+    );
+  }
 
   return (
     <>

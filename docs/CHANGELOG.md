@@ -8,6 +8,8 @@
 - 通用 `EmptyState` 元件（`src/core/components/ui/emptyState.tsx`）：Iconify 圖示 + 可自訂訊息，統一空資料視覺呈現
 
 ### Changed
+- `ConcertDetailPage`：場次按鈕改以 `sellBeginDate` 判斷是否可購票（原為場次日期）；售票時間 1 小時內自動排程 `setTimeout` 解鎖按鈕，免刷新頁面
+
 - `BannerSection`：API 回空陣列時改顯示靜態 Fallback 輪播（本地品牌圖片），載入中顯示 `LoadingSpin`；`bannerCarousel` 無 `concertId` 時隱藏報名按鈕
 - `TrendSection`：區分 loading（`LoadingSpin`）與 empty（`EmptyState`）狀態，修正空陣列時誤顯示 loading 的 bug
 - `VenueSection`：加入 loading/empty 狀態判斷，空陣列顯示 `EmptyState`

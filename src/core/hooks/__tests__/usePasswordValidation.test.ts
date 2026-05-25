@@ -33,23 +33,23 @@ describe("usePasswordValidation", () => {
 
   it("英數混合密碼：isValid=true", () => {
     const { result } = renderHook(() => usePasswordValidation());
-    act(() => result.current.setPassword("abc123"));
+    act(() => result.current.setPassword("abc12345"));
     expect(result.current.isValid).toBe(true);
     expect(result.current.passwordErrorMessage).toBe("");
   });
 
   it("確認密碼不符時顯示錯誤", () => {
     const { result } = renderHook(() => usePasswordValidation());
-    act(() => result.current.setPassword("abc123"));
-    act(() => result.current.setConfirmPassword("abc456"));
+    act(() => result.current.setPassword("abc12345"));
+    act(() => result.current.setConfirmPassword("xyz45678"));
     expect(result.current.confirmPasswordErrorMessage).not.toBe("");
     expect(result.current.isValid).toBe(false);
   });
 
   it("確認密碼相符時無錯誤", () => {
     const { result } = renderHook(() => usePasswordValidation());
-    act(() => result.current.setPassword("abc123"));
-    act(() => result.current.setConfirmPassword("abc123"));
+    act(() => result.current.setPassword("abc12345"));
+    act(() => result.current.setConfirmPassword("abc12345"));
     expect(result.current.confirmPasswordErrorMessage).toBe("");
     expect(result.current.isValid).toBe(true);
   });
@@ -57,7 +57,7 @@ describe("usePasswordValidation", () => {
   it("checkPasswordFormat 只驗證格式、不改變 password state", () => {
     const { result } = renderHook(() => usePasswordValidation());
     act(() => {
-      const isValid = result.current.checkPasswordFormat("abc123");
+      const isValid = result.current.checkPasswordFormat("abc12345");
       expect(isValid).toBe(true);
     });
     // password state 不應被 checkPasswordFormat 改變

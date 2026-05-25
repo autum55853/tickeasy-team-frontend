@@ -8,6 +8,7 @@ import { useFilterContext } from "../hook/useFilterContext";
 import { ConcertCardProps } from "../types/ConcertCard";
 import { RawConertData } from "../types/RawConertData";
 import { useSearchParams } from "react-router-dom";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 
 export default function ConcertListSection() {
   const { toast } = useToast();
@@ -24,7 +25,7 @@ export default function ConcertListSection() {
   // }).useGet();
   //處理搜尋
   const apiUrl = searchText ? `/api/v1/concerts/search?keyword=${encodeURIComponent(searchText)}` : "/api/v1/concerts/search";
-  const { data, error, refetch } = useRequest<RawConertData[]>({
+  const { data, error, refetch, isLoading } = useRequest<RawConertData[]>({
     queryKey: [searchText], // 讓 react-query 正確依 keyword 快取
     url: apiUrl,
   }).useGet();
@@ -128,21 +129,26 @@ export default function ConcertListSection() {
   return (
     <>
       <FilterSection />
-      <section className="min-h-[100px] lg:mt-15">
-        <div className="mx-auto lg:w-[96%]">
-          {/* card content */}
-          <div className="mb-8 grid max-w-[1300px] grid-cols-1 gap-8 lg:mt-4 lg:grid-cols-3 xl:mx-auto">
-            {currentPageCards.length > 0 ? (
-              currentPageCards.map((item) => <ConcertCard key={item.id} {...item} />)
-            ) : (
-              <div className="col-span-full text-center text-lg">目前沒有任何活動</div>
-            )}
-          </div>
 
-          {/* Pagination */}
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />
-        </div>
-      </section>
+      {isLoading ? (
+        <LoadingSpin />
+      ) : (
+        <section className="min-h-[100px] lg:mt-15">
+          <div className="mx-auto lg:w-[96%]">
+            {/* card content */}
+            <div className="mb-8 grid max-w-[1300px] grid-cols-1 gap-8 lg:mt-4 lg:grid-cols-3 xl:mx-auto">
+              {currentPageCards.length > 0 ? (
+                currentPageCards.map((item) => <ConcertCard key={item.id} {...item} />)
+              ) : (
+                <div className="col-span-full text-center text-lg">目前沒有任何活動</div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />
+          </div>
+        </section>
+      )}
     </>
   );
 }

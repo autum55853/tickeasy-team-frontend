@@ -46,7 +46,13 @@ export function ResetPassword({ passwordError }: ResetPasswordProps) {
             onBlur={handleValidatePassword}
             error={!!passwordErrorMessage}
           />
-          {passwordErrorMessage && <p className="absolute -bottom-5 left-0 text-sm text-red-500">{passwordErrorMessage}</p>}
+          <ul className="mb-1 mt-1 list-disc pl-5 text-xs text-gray-400">
+            <li>至少 8 字元</li>
+            <li>必須含至少一個英文字母（大小寫皆可）</li>
+            <li>必須含至少一個數字</li>
+            <li>只允許英文字母與數字（不能含特殊符號）</li>
+          </ul>
+          {passwordErrorMessage && <p className="text-sm text-red-500">{passwordErrorMessage}</p>}
         </div>
         <div className="relative">
           <Input

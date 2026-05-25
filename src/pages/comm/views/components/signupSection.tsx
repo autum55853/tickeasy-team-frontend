@@ -65,7 +65,7 @@ export function SignupSection() {
       return;
     }
     if (!isValidPassword(signupData.password)) {
-      setError((e) => ({ ...e, password: { error: true, errorMessage: "密碼必須包含至少一個英文字母和一個數字，且長度至少為8個字符" } }));
+      setError((e) => ({ ...e, password: { error: true, errorMessage: "密碼須至少 8 字元，包含英文字母與數字，且不可含特殊符號" } }));
       return;
     } else {
       setError((e) => ({ ...e, password: { error: false, errorMessage: "" } }));
@@ -192,6 +192,12 @@ export function SignupSection() {
           placeholder="請設定密碼"
           onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
         />
+        <ul className="mb-1 mt-1 list-disc pl-5 text-xs text-gray-400">
+          <li>至少 8 字元</li>
+          <li>必須含至少一個英文字母（大小寫皆可）</li>
+          <li>必須含至少一個數字</li>
+          <li>只允許英文字母與數字（不能含特殊符號）</li>
+        </ul>
         {error["password"].error && <p className="text-sm text-red-500">{error["password"].errorMessage}</p>}
         <Input
           type="password"
