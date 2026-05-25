@@ -39,10 +39,11 @@ export default function CategorySection({ rawConcertList }: { rawConcertList: Ra
         .filter(Boolean);
       setOptions(covertOptions);
       if (covertOptions.length > 0 && !selectedCategory) {
-        setSelectedCategory(covertOptions[0]);
+        const firstWithData = covertOptions.find((opt) => rawConcertList.some((concert) => concert.musicTagName === opt.value));
+        setSelectedCategory(firstWithData ?? covertOptions[0]);
       }
     }
-  }, [musicTagsData, selectedCategory]);
+  }, [musicTagsData, selectedCategory, rawConcertList]);
 
   // 處理錯誤
   useEffect(() => {
