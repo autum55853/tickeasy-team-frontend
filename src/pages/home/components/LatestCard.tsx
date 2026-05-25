@@ -1,8 +1,9 @@
 import { LatestCardProps } from "../types/LatestCard";
 import { Icon } from "@iconify-icon/react";
+import { Link } from "react-router-dom";
 export default function LastestCard(data: LatestCardProps) {
   return (
-    <div className="mx-auto">
+    <Link to={data.link} className="block h-full">
       <div className="relative flex w-[416px] flex-col overflow-hidden rounded-2xl border-2 border-neutral-200 bg-white shadow-[0px_4px_4px_0px_rgba(0,0,0,0.05)]">
         <div className="h-[240px] w-full">
           <img src={data.image} alt={data.title} className="h-full w-full object-cover" />
@@ -28,6 +29,6 @@ export default function LastestCard(data: LatestCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

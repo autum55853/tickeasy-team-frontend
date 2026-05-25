@@ -24,7 +24,7 @@ export default function LastestSection({ rawConcertList, isLoading }: { rawConce
         title: item.conTitle,
         image: item.imgBanner,
         location: item.conAddress,
-        link: `/concerts/${item.concertId}`,
+        link: `/concert/${item.concertId}`,
       };
     });
   }, [rawConcertList]);
@@ -50,7 +50,7 @@ export default function LastestSection({ rawConcertList, isLoading }: { rawConce
       <div className="relative mx-auto hidden h-full w-[90%] rounded-3xl lg:block lg:min-h-[400px] lg:overflow-hidden">
         <div className="relative text-center text-4xl font-bold select-none">
           <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">最新活動</h2>
-          <span className={`absolute top-[50%] left-1/2 z-10 w-[400px] -translate-x-1/2 text-center text-[40px] text-nowrap text-neutral-100`}>
+          <span className={`absolute top-[50%] left-1/2 z-10 w-[400px] -translate-x-1/2 text-center text-[40px] text-nowrap text-neutral-200`}>
             Latest Events
           </span>
         </div>
@@ -65,9 +65,9 @@ export default function LastestSection({ rawConcertList, isLoading }: { rawConce
             <LoadingSpin />
           </div>
         ) : data.length === 0 ? (
-          <EmptyState message="目前沒有最新活動" className="relative z-10 py-20" />
+          <EmptyState message="目前沒有最新活動" className="relative z-10" />
         ) : (
-          <div className="mx-auto mt-20 grid w-[96%] max-w-[1300px] grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="mx-auto mt-10 grid w-[96%] max-w-[1300px] grid-cols-1 gap-4 py-10 lg:grid-cols-3">
             {data.map((item) => (
               <LastestCard key={item.id} {...item} />
             ))}
