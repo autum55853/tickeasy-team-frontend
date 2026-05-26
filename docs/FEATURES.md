@@ -9,6 +9,8 @@
 | Google OAuth 登入 | ✅ 完成 | `/callback` |
 | 忘記密碼（Modal 流程）| ✅ 完成 | Modal（在 `/login` 觸發）|
 | 自動登出（401 / 7 天到期）| ✅ 完成 | Axios 攔截器 |
+| 跨域登出同步（BroadcastChannel）| ✅ 完成 | `/auth/logout-broadcast` |
+| Google OAuth 用戶停用修改密碼 | ✅ 完成 | `Tabs.tsx` guard + `password.tsx` redirect |
 
 ### 忘記密碼流程
 
@@ -16,6 +18,14 @@
 1. 使用者在登入頁點擊「忘記密碼」→ 開啟 Modal（`isModalForgotPasswordActive: true`）
 2. 輸入 email → 後端寄送驗證碼
 3. 輸入驗證碼 + 新密碼（`isResetPassword: true`）→ 完成重設
+
+### 跨域登出同步（BroadcastChannel）
+
+後台 Dashboard 登出時載入前台隱藏 iframe（`/auth/logout-broadcast`），由前台自行清除 auth 狀態並廣播 `BroadcastChannel("tickeasy_auth") { type: "LOGOUT" }`，同域其他 tab 由 `AuthSyncProvider` 監聽後自動登出。舊版 Safari（不支援 BroadcastChannel）以 `StorageEvent` fallback。
+
+### 密碼欄位規則提示
+
+`usePasswordValidation` hook 回傳逐條規則驗證結果（長度 ≥ 8、含大寫、含數字），UI 即時顯示每條規則的通過狀態。適用於：註冊、重設密碼、修改密碼。
 
 ---
 
@@ -118,5 +128,14 @@
 | 常見問題（FAQ）| ✅ 完成 | `/question` |
 | 問題詳情 | ✅ 完成 | `/question/detail` |
 | AI 客服 Widget | ✅ 完成 | 全域浮動（右下角）|
+| 客服人工模式切換 + SSE 即時接收 | ✅ 完成 | `useCustomerService` + `useCustomerServiceSSE` |
 | 服務條款 / 隱私政策 | ✅ 完成 | Dialog 元件 |
 | Google Map 嵌入 | ✅ 完成 | `googleMap.tsx` |
+
+### 客服 Widget 人工模式
+
+AI bot 健康檢查失敗時提示切換人工客服：
+
+- header 背景改為黃色，圖示換為 Headphones（視覺區分）
+- `useCustomerServiceSSE` 訂閱 `GET /api/v1/smart-reply/session/{sessionId}/stream`（SSE），即時推送客服人員（Discord）回覆
+- 人工模式下不寫入 bot session 快取，不顯示 AI 快速回覆選項

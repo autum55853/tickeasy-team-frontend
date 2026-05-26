@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Added
+- 跨域登出同步：新增 `/auth/logout-broadcast` 頁面 + `AuthSyncProvider`，配合後台 iframe 方案實現前後台登出同步；不支援 BroadcastChannel 的 Safari 以 `StorageEvent` fallback
+- 客服人工模式：AI bot 不可用時可切換人工客服，header 樣式改為黃色 Headphones；新增 `useCustomerServiceSSE` 透過 SSE 即時接收客服人員（Discord）回覆
+- Google OAuth 用戶停用修改密碼：`Tabs.tsx` 隱藏密碼入口，`password.tsx` 加入 route guard 防誤操作
+- 密碼規則即時提示：`usePasswordValidation` 逐條驗證（長度/大寫/數字），適用於註冊、重設密碼、修改密碼頁面
 - 初始專案文件結構（ARCHITECTURE、DEVELOPMENT、FEATURES、TESTING）
 - `.claude/` 下的 AI 輔助開發設定（rules、hooks、agents）
 - 通用 `EmptyState` 元件（`src/core/components/ui/emptyState.tsx`）：Iconify 圖示 + 可自訂訊息，統一空資料視覺呈現
