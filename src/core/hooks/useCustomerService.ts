@@ -1,8 +1,10 @@
 import { useCallback, useRef, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customerServiceAPI } from "@/core/lib/customer-service-api";
 import { useCustomerServiceStore } from "@/store/customer-service";
 import { Session } from "@/core/types/customer-service";
+
+export const CUSTOMER_SERVICE_HEALTH_QUERY_KEY = ["customer-service-health"] as const;
 
 export const useCustomerService = () => {
   const {
@@ -17,6 +19,8 @@ export const useCustomerService = () => {
     updateSession,
     markAllAsRead,
   } = useCustomerServiceStore();
+
+  const queryClient = useQueryClient();
 
   const retryCount = useRef(0);
   const maxRetries = 3;
@@ -150,20 +154,26 @@ export const useCustomerService = () => {
     },
     onSuccess: (response, variables) => {
       if (response.success && response.data) {
-        addMessage({
-          senderType: "bot",
-          messageText: response.data.message,
-          sessionId: variables.sessionId,
-          metadata: {
-            confidence: response.data.confidence,
-            strategy: response.data.strategy,
-          },
-        });
+        // 人工模式下不再加 bot 回覆（回覆由 SSE 從 Discord 推送）
+        const currentSession = useCustomerServiceStore.getState().session;
+        if (currentSession?.sessionType !== "human" && response.data.message) {
+          addMessage({
+            senderType: "bot",
+            messageText: response.data.message,
+            sessionId: variables.sessionId,
+            metadata: {
+              confidence: response.data.confidence,
+              strategy: response.data.strategy,
+            },
+          });
+        }
 
-        // 更新會話狀態
-        updateSession({
-          status: response.data.sessionStatus as "active" | "waiting" | "closed",
-        });
+        // 更新會話狀態（避免人工模式被覆寫回 active）
+        if (currentSession?.sessionType !== "human") {
+          updateSession({
+            status: response.data.sessionStatus as "active" | "waiting" | "closed",
+          });
+        }
 
         resetRetryCount();
       } else {
@@ -227,7 +237,7 @@ export const useCustomerService = () => {
     isError: healthError,
     error: healthErrorDetail,
   } = useQuery({
-    queryKey: ["customer-service-health"],
+    queryKey: CUSTOMER_SERVICE_HEALTH_QUERY_KEY,
     queryFn: async () => {
       // console.log('🔍 [健康檢查] 開始檢查...', new Date().toLocaleTimeString());
       const result = await customerServiceAPI.healthCheck();
@@ -303,6 +313,54 @@ export const useCustomerService = () => {
     [session, closeSessionMutation]
   );
 
+  // 觸發健康檢查重新拉取（用於開窗瞬間檢查）
+  const refetchHealth = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: CUSTOMER_SERVICE_HEALTH_QUERY_KEY }),
+    [queryClient]
+  );
+
+  // 切換為人工客服模式
+  // 若無 session 先 startSession，再呼叫 transfer 將後端 sessionType 設為 human
+  const switchToHuman = useCallback(
+    async (userId?: string, category = "一般諮詢") => {
+      let sid = session?.sessionId;
+
+      if (!sid) {
+        setLoading(true);
+        const resp = await customerServiceAPI.startSession({ category, userId });
+        setLoading(false);
+
+        if (!resp.success || !resp.data) {
+          addMessage({
+            senderType: "bot",
+            messageText: "切換人工客服失敗，請稍後再試。",
+          });
+          return;
+        }
+
+        const newSession: Session = {
+          sessionId: resp.data.sessionId,
+          status: resp.data.status as Session["status"],
+          sessionType: "human",
+          category: resp.data.category,
+          priority: "high",
+          createdAt: new Date().toISOString(),
+          userId,
+        };
+        setSession(newSession);
+        sid = newSession.sessionId;
+      }
+
+      try {
+        await requestTransferMutation.mutateAsync({ sessionId: sid, reason: "AI 服務不可用，使用者主動切換" });
+        updateSession({ sessionType: "human", status: "transferred" });
+      } catch {
+        // requestTransferMutation 內部已 addMessage 錯誤提示
+      }
+    },
+    [session, requestTransferMutation, setSession, setLoading, addMessage, updateSession]
+  );
+
   // 標記所有訊息為已讀
   const markAsRead = useCallback(() => {
     markAllAsRead();
@@ -347,6 +405,8 @@ export const useCustomerService = () => {
     requestTransfer,
     closeSession,
     markAsRead,
+    switchToHuman,
+    refetchHealth,
 
     // mutation 狀態
     mutations: {

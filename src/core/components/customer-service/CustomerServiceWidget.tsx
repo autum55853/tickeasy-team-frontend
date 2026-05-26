@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { MessageCircle, X, Bot } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useCustomerServiceIsOpen,
   useCustomerServiceUnreadCount,
   useCustomerServiceToggleChat,
   useCustomerServiceCloseChat,
 } from "@/store/customer-service";
+import { CUSTOMER_SERVICE_HEALTH_QUERY_KEY } from "@/core/hooks/useCustomerService";
 import CustomerServiceChat from "./CustomerServiceChat";
 
 interface CustomerServiceWidgetProps {
@@ -27,7 +29,16 @@ const CustomerServiceWidget: React.FC<CustomerServiceWidgetProps> = ({
   const unreadCount = useCustomerServiceUnreadCount();
   const toggleChat = useCustomerServiceToggleChat();
   const closeChat = useCustomerServiceCloseChat();
+  const queryClient = useQueryClient();
   const [isHovered, setIsHovered] = useState(false);
+
+  // 開窗瞬間主動觸發健康檢查，避免使用 5 分鐘前的快取結果
+  const handleToggle = () => {
+    if (!isOpen) {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_SERVICE_HEALTH_QUERY_KEY });
+    }
+    toggleChat();
+  };
 
   const positionClasses = {
     "bottom-right": "bottom-6 right-6",
@@ -68,7 +79,7 @@ const CustomerServiceWidget: React.FC<CustomerServiceWidgetProps> = ({
         {!isOpen ? (
           // 客服按鈕
           <button
-            onClick={toggleChat}
+            onClick={handleToggle}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             className={`relative h-14 w-14 rounded-full ${currentTheme.bg} ${currentTheme.border} border ${currentTheme.shadow} group transition-all duration-300 ease-in-out hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none`}
