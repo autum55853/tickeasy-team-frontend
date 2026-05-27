@@ -1,8 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, act } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import LogoutBroadcastPage from "@/pages/comm/views/logoutBroadcastPage";
 import { useAuthStore } from "@/store/authStore";
+
+function LocationDisplay() {
+  const { pathname } = useLocation();
+  return <div data-testid="location">{pathname}</div>;
+}
 
 class MockBroadcastChannel {
   static instances: MockBroadcastChannel[] = [];
@@ -20,6 +25,7 @@ function renderPage() {
   return render(
     <MemoryRouter>
       <LogoutBroadcastPage />
+      <LocationDisplay />
     </MemoryRouter>
   );
 }
@@ -93,6 +99,11 @@ describe("LogoutBroadcastPage", () => {
     expect(MockBroadcastChannel.instances).toHaveLength(0);
     expect(localStorage.getItem("tickeasy_logout")).not.toBeNull();
     expect(useAuthStore.getState().isLogin).toBe(false);
+  });
+
+  it("廣播完成後導向 /login", () => {
+    const { getByTestId } = renderPage();
+    expect(getByTestId("location").textContent).toBe("/login");
   });
 
   it("handledRef guard：多次 render 只執行一次 logout 和廣播", () => {

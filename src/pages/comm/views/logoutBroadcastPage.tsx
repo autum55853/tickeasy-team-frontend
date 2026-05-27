@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 
 export default function LogoutBroadcastPage() {
   const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
   const handledRef = useRef(false);
 
   useEffect(() => {
@@ -21,11 +23,13 @@ export default function LogoutBroadcastPage() {
     localStorage.setItem("tickeasy_logout", Date.now().toString());
     setTimeout(() => localStorage.removeItem("tickeasy_logout"), 100);
 
-    // 通知後台 iframe parent 廣播已完成，讓它繼續清除並跳轉
+    // 向後相容：若仍被當作 iframe 使用，通知 parent
     if (window.parent !== window) {
       window.parent.postMessage({ type: "LOGOUT_BROADCAST_DONE" }, "*");
     }
-  }, [logout]);
+
+    navigate("/login", { replace: true });
+  }, [logout, navigate]);
 
   return <div />;
 }
