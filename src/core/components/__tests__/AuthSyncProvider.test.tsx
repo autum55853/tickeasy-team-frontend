@@ -120,7 +120,7 @@ describe("AuthSyncProvider - StorageEvent fallback（BroadcastChannel 不可用�
   });
 
   it("unmount → 移除 storage 監聽器（再次觸發無效）", () => {
-    const { getByTestId, unmount } = renderSyncProvider("/dashboard");
+    const { unmount } = renderSyncProvider("/dashboard");
     unmount();
     act(() => {
       window.dispatchEvent(new StorageEvent("storage", { key: "tickeasy_logout", newValue: "123456" }));
