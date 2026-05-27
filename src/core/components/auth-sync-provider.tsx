@@ -8,7 +8,6 @@ export function AuthSyncProvider() {
 
   useEffect(() => {
     const performLogout = () => {
-      if (window.location.pathname === "/login") return;
       logout();
       navigate("/login", { replace: true });
     };

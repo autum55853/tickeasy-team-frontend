@@ -21,6 +21,7 @@ export default defineConfig({
     env: {
       TZ: "UTC",
       VITE_API_BASE_URL: "http://localhost:3001",
+      VITE_DASHBOARD_URL: "https://tickeasy-team-dashboard.onrender.com",
     },
     coverage: {
       provider: "v8",

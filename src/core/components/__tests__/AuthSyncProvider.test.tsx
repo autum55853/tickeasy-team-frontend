@@ -67,6 +67,14 @@ describe("AuthSyncProvider - BroadcastChannel 模式", () => {
     expect(useAuthStore.getState().email).toBe("");
   });
 
+  it("在 /login 頁面收到 LOGOUT → 仍執行登出", () => {
+    renderSyncProvider("/login");
+    const channel = MockBroadcastChannel.instances[0];
+    act(() => channel.simulate({ type: "LOGOUT" }));
+    expect(useAuthStore.getState().isLogin).toBe(false);
+    expect(useAuthStore.getState().email).toBe("");
+  });
+
   it("收到非 LOGOUT 訊息 → 無動作", () => {
     const { getByTestId } = renderSyncProvider("/dashboard");
     const channel = MockBroadcastChannel.instances[0];
@@ -107,6 +115,14 @@ describe("AuthSyncProvider - StorageEvent fallback（BroadcastChannel 不可用�
       window.dispatchEvent(new StorageEvent("storage", { key: "tickeasy_logout", newValue: "123456" }));
     });
     expect(getByTestId("location").textContent).toBe("/login");
+    expect(useAuthStore.getState().isLogin).toBe(false);
+  });
+
+  it("在 /login 頁面收到 tickeasy_logout storage event → 仍執行登出", () => {
+    renderSyncProvider("/login");
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: "tickeasy_logout", newValue: "123456" }));
+    });
     expect(useAuthStore.getState().isLogin).toBe(false);
   });
 
