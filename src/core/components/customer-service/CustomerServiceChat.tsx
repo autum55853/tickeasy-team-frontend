@@ -3,12 +3,13 @@ import {
   Send,
   Bot,
   User,
+  Headphones,
   // Star,
-  // Phone, // 暫時不用，等人工功能完成再加回
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCustomerService } from "@/core/hooks/useCustomerService";
+import { useCustomerServiceSSE } from "@/core/hooks/useCustomerServiceSSE";
 import { useCustomerServiceQuickReplies, useCustomerServiceStore } from "@/store/customer-service";
 import { Message } from "@/core/types/customer-service";
 
@@ -22,9 +23,15 @@ interface CustomerServiceChatProps {
 }
 
 const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({ isOpen, onClose, userId, initialCategory = "一般諮詢" }) => {
-  const { messages, session, isLoading, isConnected, startSession, sendMessage, closeSession, markAsRead, mutations } = useCustomerService();
+  const { messages, session, isLoading, isConnected, startSession, sendMessage, closeSession, markAsRead, mutations, switchToHuman } =
+    useCustomerService();
   const navigate = useNavigate();
   const quickReplies = useCustomerServiceQuickReplies();
+
+  const isHumanMode = session?.sessionType === "human";
+
+  // 人工模式啟動 SSE 串流接收 Discord 回覆
+  useCustomerServiceSSE({ sessionId: session?.sessionId, enabled: isHumanMode });
 
   // 內部域名配置 - 可以根據環境變量或配置文件調整
   const INTERNAL_DOMAINS = [
@@ -254,14 +261,14 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({ isOpen, onClo
   return (
     <div className="flex h-[500px] w-80 flex-col rounded-lg border border-gray-200 bg-white shadow-2xl">
       {/* 標題欄 */}
-      <div className="flex items-center justify-between rounded-t-lg border-b border-gray-200 bg-blue-50 p-4">
+      <div className={`flex items-center justify-between rounded-t-lg border-b border-gray-200 p-4 ${isHumanMode ? "bg-yellow-50" : "bg-blue-50"}`}>
         <div className="flex items-center space-x-2">
-          <Bot className="h-5 w-5 text-blue-600" />
+          {isHumanMode ? <Headphones className="h-5 w-5 text-yellow-600" /> : <Bot className="h-5 w-5 text-blue-600" />}
           <div>
-            <h6 className="font-semibold text-gray-800">Tickeasy 客服</h6>
+            <h6 className="font-semibold text-gray-800">{isHumanMode ? "人工客服" : "Tickeasy 客服"}</h6>
             <p className="text-xs text-gray-600">
-              {isConnected ? "在線服務" : "連接中斷"}
-              {session && (
+              {isHumanMode ? "已轉接，等待客服回覆" : isConnected ? "在線服務" : "AI 服務暫不可用"}
+              {session && !isHumanMode && (
                 <span className="ml-2 rounded bg-green-100 px-2 py-1 text-xs text-green-600">
                   {session.status === "active"
                     ? "進行中"
@@ -286,25 +293,42 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({ isOpen, onClo
           {/* 訊息列表 */}
           <div className="flex-1 space-y-2 overflow-y-auto p-4">
             {messages.length === 0 ? (
-              <div className="py-8 text-center">
-                <Bot className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                <p className="mb-4 text-gray-600">您好！我是 Tickeasy 智能客服</p>
-                <p className="mb-6 text-sm text-gray-500">請選擇以下問題或直接輸入您的問題：</p>
-
-                {/* 快速回覆選項 */}
-                <div className="grid gap-2">
-                  {quickReplies.slice(0, 3).map((reply, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickReply(reply.text)}
-                      className="rounded-lg bg-gray-50 p-3 text-left text-sm transition-colors hover:bg-gray-100"
-                      disabled={isLoading}
-                    >
-                      {reply.text}
-                    </button>
-                  ))}
+              !isConnected && !isHumanMode ? (
+                // AI 服務不可用 → 提示切換人工客服
+                <div className="py-8 text-center">
+                  <Headphones className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
+                  <p className="mb-2 font-semibold text-gray-800">AI 智能客服暫時無法使用</p>
+                  <p className="mb-6 text-sm text-gray-500">您可以切換為人工客服，訊息將由真人客服於 Discord 回覆</p>
+                  <button
+                    onClick={() => switchToHuman(userId, initialCategory)}
+                    disabled={isLoading}
+                    className="inline-flex items-center space-x-2 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-yellow-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+                  >
+                    <Headphones className="h-4 w-4" />
+                    <span>切換為人工客服</span>
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <div className="py-8 text-center">
+                  <Bot className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                  <p className="mb-4 text-gray-600">您好！我是 Tickeasy 智能客服</p>
+                  <p className="mb-6 text-sm text-gray-500">請選擇以下問題或直接輸入您的問題：</p>
+
+                  {/* 快速回覆選項 */}
+                  <div className="grid gap-2">
+                    {quickReplies.slice(0, 3).map((reply, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleQuickReply(reply.text)}
+                        className="rounded-lg bg-gray-50 p-3 text-left text-sm transition-colors hover:bg-gray-100"
+                        disabled={isLoading}
+                      >
+                        {reply.text}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
             ) : (
               <>
                 {messages.map((message) => (
@@ -368,13 +392,13 @@ const CustomerServiceChat: React.FC<CustomerServiceChatProps> = ({ isOpen, onClo
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={isConnected ? "輸入您的問題..." : "連接中斷，請稍後再試"}
-                disabled={isLoading || !isConnected}
+                placeholder={isHumanMode ? "輸入訊息發送給人工客服..." : isConnected ? "輸入您的問題..." : "AI 服務暫不可用，請切換為人工客服"}
+                disabled={isLoading || (!isHumanMode && !isConnected)}
                 className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={isLoading || !inputValue.trim() || !isConnected}
+                disabled={isLoading || !inputValue.trim() || (!isHumanMode && !isConnected)}
                 className="rounded-lg bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
                 aria-label="發送訊息"
               >
