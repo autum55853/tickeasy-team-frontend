@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { supabase } from "@/lib/supabase";
 
 export default function LogoutBroadcastPage() {
   const logout = useAuthStore((state) => state.logout);
+  const email = useAuthStore((state) => state.email);
   const navigate = useNavigate();
   const handledRef = useRef(false);
 
@@ -28,8 +30,46 @@ export default function LogoutBroadcastPage() {
       window.parent.postMessage({ type: "LOGOUT_BROADCAST_DONE" }, "*");
     }
 
-    navigate("/login", { replace: true });
-  }, [logout, navigate]);
+    // Supabase Realtime 跨域廣播（best-effort，最多等 2 秒）
+    const broadcastAndNavigate = async () => {
+      if (email) {
+        try {
+          await new Promise<void>((resolve) => {
+            const ch = supabase.channel(`tickeasy-logout-${email}`);
+            const fallback = setTimeout(() => {
+              supabase.removeChannel(ch);
+              resolve();
+            }, 2000);
+            ch.subscribe((status) => {
+              if (status === "SUBSCRIBED") {
+                clearTimeout(fallback);
+                ch.send({
+                  type: "broadcast",
+                  event: "LOGOUT",
+                  payload: {
+                    timestamp: Date.now(),
+                    secret: import.meta.env.VITE_LOGOUT_BROADCAST_SECRET,
+                  },
+                }).finally(() => {
+                  supabase.removeChannel(ch);
+                  resolve();
+                });
+              } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                clearTimeout(fallback);
+                supabase.removeChannel(ch);
+                resolve();
+              }
+            });
+          });
+        } catch {
+          // best effort，忽略錯誤
+        }
+      }
+      navigate("/login", { replace: true });
+    };
+
+    broadcastAndNavigate();
+  }, [logout, email, navigate]);
 
   return <div />;
 }

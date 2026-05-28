@@ -21,6 +21,34 @@ class MockBroadcastChannel {
   }
 }
 
+// vi.hoisted 確保 mock 變數在 vi.mock 工廠執行前已初始化
+const mocks = vi.hoisted(() => {
+  const subscribeCallbackRef: { current: ((status: string) => void) | null } = { current: null };
+  const mockSend = vi.fn().mockResolvedValue("ok");
+  const mockRemoveChannel = vi.fn();
+  const mockChannel = {
+    subscribe: vi.fn((cb: (status: string) => void) => {
+      subscribeCallbackRef.current = cb;
+      return mockChannel;
+    }),
+    send: mockSend,
+  };
+  return {
+    subscribeCallbackRef,
+    mockSend,
+    mockRemoveChannel,
+    mockChannel,
+    supabase: {
+      channel: vi.fn(() => mockChannel),
+      removeChannel: mockRemoveChannel,
+    },
+  };
+});
+
+vi.mock("@/lib/supabase", () => ({
+  supabase: mocks.supabase,
+}));
+
 function renderPage() {
   return render(
     <MemoryRouter>
@@ -35,6 +63,11 @@ beforeEach(() => {
   vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
   useAuthStore.setState({ isLogin: true, email: "test@test.com", role: "user" });
   vi.useFakeTimers();
+  mocks.subscribeCallbackRef.current = null;
+  mocks.mockSend.mockClear();
+  mocks.mockRemoveChannel.mockClear();
+  mocks.mockChannel.subscribe.mockClear();
+  mocks.supabase.channel.mockClear();
 });
 
 afterEach(() => {
@@ -89,7 +122,6 @@ describe("LogoutBroadcastPage", () => {
 
     expect(parentPostMessage).toHaveBeenCalledWith({ type: "LOGOUT_BROADCAST_DONE" }, "*");
 
-    // 還原（讓後續測試不受影響）
     Object.defineProperty(window, "parent", { get: () => window, configurable: true });
   });
 
@@ -101,11 +133,6 @@ describe("LogoutBroadcastPage", () => {
     expect(useAuthStore.getState().isLogin).toBe(false);
   });
 
-  it("廣播完成後導向 /login", () => {
-    const { getByTestId } = renderPage();
-    expect(getByTestId("location").textContent).toBe("/login");
-  });
-
   it("handledRef guard：多次 render 只執行一次 logout 和廣播", () => {
     const { rerender } = renderPage();
     rerender(
@@ -114,5 +141,49 @@ describe("LogoutBroadcastPage", () => {
       </MemoryRouter>
     );
     expect(MockBroadcastChannel.instances[0].postMessage).toHaveBeenCalledOnce();
+  });
+
+  it("Supabase 廣播 LOGOUT 事件到 tickeasy-logout-test@test.com channel", async () => {
+    renderPage();
+
+    expect(mocks.supabase.channel).toHaveBeenCalledWith("tickeasy-logout-test@test.com");
+
+    await act(async () => {
+      mocks.subscribeCallbackRef.current?.("SUBSCRIBED");
+    });
+
+    expect(mocks.mockSend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "broadcast",
+        event: "LOGOUT",
+        payload: expect.objectContaining({
+          timestamp: expect.any(Number),
+          secret: "test-broadcast-secret",
+        }),
+      })
+    );
+  });
+
+  it("Supabase CHANNEL_ERROR 時仍正常導向 /login", async () => {
+    const { getByTestId } = renderPage();
+
+    await act(async () => {
+      mocks.subscribeCallbackRef.current?.("CHANNEL_ERROR");
+    });
+
+    expect(getByTestId("location").textContent).toBe("/login");
+    expect(mocks.mockRemoveChannel).toHaveBeenCalled();
+  });
+
+  it("email 為空時不建立 Supabase channel", async () => {
+    useAuthStore.setState({ isLogin: false, email: "", role: "" });
+
+    renderPage();
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mocks.supabase.channel).not.toHaveBeenCalled();
   });
 });
