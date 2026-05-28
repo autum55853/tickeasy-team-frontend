@@ -37,11 +37,7 @@ export function AuthSyncProvider() {
     if (!email) return bcCleanup;
 
     const ch = supabase.channel(`tickeasy-session-${email}`);
-    ch.on("presence", { event: "join" }, ({ newPresences }: { newPresences: Array<Record<string, unknown>> }) => {
-      if (newPresences.some((p) => p.event === "LOGOUT")) {
-        performLogout();
-      }
-    });
+    ch.on("broadcast", { event: "LOGOUT" }, () => performLogout());
     ch.subscribe();
 
     return () => {

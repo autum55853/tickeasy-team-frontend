@@ -44,7 +44,11 @@ export default function LogoutBroadcastPage() {
               if (status === "SUBSCRIBED") {
                 clearTimeout(fallback);
                 try {
-                  await ch.track({ event: "LOGOUT", timestamp: Date.now() });
+                  await ch.send({
+                    type: "broadcast",
+                    event: "LOGOUT",
+                    payload: { timestamp: Date.now() },
+                  });
                 } finally {
                   supabase.removeChannel(ch);
                   resolve();
