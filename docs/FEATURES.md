@@ -19,9 +19,15 @@
 2. 輸入 email → 後端寄送驗證碼
 3. 輸入驗證碼 + 新密碼（`isResetPassword: true`）→ 完成重設
 
-### 跨域登出同步（BroadcastChannel）
+### 跨域登出同步
 
-後台 Dashboard 登出時載入前台隱藏 iframe（`/auth/logout-broadcast`），由前台自行清除 auth 狀態並廣播 `BroadcastChannel("tickeasy_auth") { type: "LOGOUT" }`，同域其他 tab 由 `AuthSyncProvider` 監聽後自動登出。舊版 Safari（不支援 BroadcastChannel）以 `StorageEvent` fallback。
+登出同步分兩層：
+
+**同域 Tab 同步（BroadcastChannel）**
+後台 Dashboard 登出時載入前台隱藏 iframe（`/auth/logout-broadcast`），前台清除 auth 狀態並廣播 `BroadcastChannel("tickeasy_auth") { type: "LOGOUT" }`，同域其他 tab 由 `AuthSyncProvider` 監聽後自動登出。舊版 Safari（不支援 BroadcastChannel）以 `StorageEvent`（key: `tickeasy_logout`）fallback。
+
+**跨域同步（Supabase Realtime Presence）**
+`LogoutBroadcastPage` 訂閱 `tickeasy-session-{email}` channel 並呼叫 `ch.track({ event: "LOGOUT" })`；其他域的 `AuthSyncProvider` 監聽同一 channel 的 `presence join` 事件，收到含 `event: "LOGOUT"` 的 presence 後自動登出。此方式不需要共用 secret，安全性由 Supabase anon key 驗證保障。
 
 ### 密碼欄位規則提示
 

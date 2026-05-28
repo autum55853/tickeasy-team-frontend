@@ -38,6 +38,8 @@ jobs:
           VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'https://placeholder.api.com' }}
           VITE_GOOGLE_CALLBACK: ${{ vars.VITE_GOOGLE_CALLBACK || 'https://placeholder.com/callback' }}
           VITE_DASHBOARD_URL: ${{ vars.VITE_DASHBOARD_URL || 'https://placeholder.dashboard.com' }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
 
   deploy:
     name: CD - Deploy to Render

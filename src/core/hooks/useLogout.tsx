@@ -22,14 +22,7 @@ export const useLogout = () => {
     localStorage.setItem("tickeasy_logout", Date.now().toString());
     setTimeout(() => localStorage.removeItem("tickeasy_logout"), 100);
 
-    // 透過 Dashboard 登出端點清除 Dashboard 的 tickeasy_token cookie，再跳回 /login
-    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL ?? "";
-    if (dashboardUrl) {
-      const loginUrl = encodeURIComponent(`${window.location.origin}/login`);
-      window.location.href = `${dashboardUrl}/api/auth/logout?next=${loginUrl}`;
-    } else {
-      navigate("/login");
-    }
+    navigate("/login");
   };
 
   return { handleLogout };
