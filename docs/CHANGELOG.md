@@ -11,6 +11,9 @@
 - `.claude/` 下的 AI 輔助開發設定（rules、hooks、agents）
 - 通用 `EmptyState` 元件（`src/core/components/ui/emptyState.tsx`）：Iconify 圖示 + 可自訂訊息，統一空資料視覺呈現
 
+### Fixed
+- `useLogout`：移除錯誤的 Dashboard 登出端點重導向（`/api/auth/logout?next=...` → 404）；前台登出改為直接 `navigate("/login")`，跨 Tab 通知保留 BroadcastChannel 廣播機制
+
 ### Changed
 - `ConcertDetailPage`：場次按鈕改以 `sellBeginDate` 判斷是否可購票（原為場次日期）；售票時間 1 小時內自動排程 `setTimeout` 解鎖按鈕，免刷新頁面
 
