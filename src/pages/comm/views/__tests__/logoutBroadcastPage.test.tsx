@@ -58,6 +58,13 @@ function renderPage() {
   );
 }
 
+/** 觸發 Supabase SUBSCRIBED 並等待後續同步動作完成 */
+async function triggerSubscribed() {
+  await act(async () => {
+    mocks.subscribeCallbackRef.current?.("SUBSCRIBED");
+  });
+}
+
 beforeEach(() => {
   MockBroadcastChannel.instances = [];
   vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
@@ -78,15 +85,22 @@ afterEach(() => {
 });
 
 describe("LogoutBroadcastPage", () => {
-  it("mount 時呼叫 logout，清除 auth 狀態", () => {
+  it("Supabase broadcast 完成後呼叫 logout，清除 auth 狀態", async () => {
     renderPage();
+    // broadcast 尚未完成前，logout 尚未執行
+    expect(useAuthStore.getState().isLogin).toBe(true);
+
+    await triggerSubscribed();
+
     expect(useAuthStore.getState().isLogin).toBe(false);
     expect(useAuthStore.getState().email).toBe("");
     expect(useAuthStore.getState().role).toBe("");
   });
 
-  it("廣播 LOGOUT 事件到 tickeasy_auth channel", () => {
+  it("broadcast 完成後廣播 LOGOUT 事件到 tickeasy_auth channel", async () => {
     renderPage();
+    await triggerSubscribed();
+
     const channel = MockBroadcastChannel.instances[0];
     expect(channel.name).toBe("tickeasy_auth");
     expect(channel.postMessage).toHaveBeenCalledWith(
@@ -94,47 +108,58 @@ describe("LogoutBroadcastPage", () => {
     );
   });
 
-  it("廣播後 100ms 關閉 channel", () => {
+  it("廣播後 100ms 關閉 BroadcastChannel", async () => {
     renderPage();
+    await triggerSubscribed();
+
     const channel = MockBroadcastChannel.instances[0];
     expect(channel.close).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(100));
     expect(channel.close).toHaveBeenCalledOnce();
   });
 
-  it("寫入 localStorage tickeasy_logout（Safari fallback）", () => {
+  it("broadcast 完成後寫入 localStorage tickeasy_logout（Safari fallback）", async () => {
     renderPage();
+    await triggerSubscribed();
+
     expect(localStorage.getItem("tickeasy_logout")).not.toBeNull();
   });
 
-  it("100ms 後移除 localStorage tickeasy_logout", () => {
+  it("100ms 後移除 localStorage tickeasy_logout", async () => {
     renderPage();
+    await triggerSubscribed();
+
     act(() => vi.advanceTimersByTime(100));
     expect(localStorage.getItem("tickeasy_logout")).toBeNull();
   });
 
-  it("在 iframe 中 → 通知 parent LOGOUT_BROADCAST_DONE", () => {
+  it("在 iframe 中 → 通知 parent LOGOUT_BROADCAST_DONE", async () => {
     const parentPostMessage = vi.fn();
     const mockParent = { postMessage: parentPostMessage };
     Object.defineProperty(window, "parent", { get: () => mockParent, configurable: true });
 
     renderPage();
+    await triggerSubscribed();
 
     expect(parentPostMessage).toHaveBeenCalledWith({ type: "LOGOUT_BROADCAST_DONE" }, "*");
 
     Object.defineProperty(window, "parent", { get: () => window, configurable: true });
   });
 
-  it("BroadcastChannel 不可用時僅用 localStorage fallback，不崩潰", () => {
+  it("BroadcastChannel 不可用時僅用 localStorage fallback，不崩潰", async () => {
     vi.stubGlobal("BroadcastChannel", undefined);
     renderPage();
+    await triggerSubscribed();
+
     expect(MockBroadcastChannel.instances).toHaveLength(0);
     expect(localStorage.getItem("tickeasy_logout")).not.toBeNull();
     expect(useAuthStore.getState().isLogin).toBe(false);
   });
 
-  it("handledRef guard：多次 render 只執行一次 logout 和廣播", () => {
+  it("handledRef guard：多次 render 只執行一次 logout 和廣播", async () => {
     const { rerender } = renderPage();
+    await triggerSubscribed();
+
     rerender(
       <MemoryRouter>
         <LogoutBroadcastPage />
@@ -148,9 +173,7 @@ describe("LogoutBroadcastPage", () => {
 
     expect(mocks.supabase.channel).toHaveBeenCalledWith("tickeasy-session-test@test.com");
 
-    await act(async () => {
-      mocks.subscribeCallbackRef.current?.("SUBSCRIBED");
-    });
+    await triggerSubscribed();
 
     expect(mocks.mockSend).toHaveBeenCalledWith({
       type: "broadcast",
@@ -170,15 +193,16 @@ describe("LogoutBroadcastPage", () => {
     expect(mocks.mockRemoveChannel).toHaveBeenCalled();
   });
 
-  it("email 為空時不建立 Supabase channel", async () => {
+  it("email 為空時不建立 Supabase channel，直接登出並導向 /login", async () => {
     useAuthStore.setState({ isLogin: false, email: "", role: "" });
 
-    renderPage();
+    const { getByTestId } = renderPage();
 
     await act(async () => {
       await Promise.resolve();
     });
 
     expect(mocks.supabase.channel).not.toHaveBeenCalled();
+    expect(getByTestId("location").textContent).toBe("/login");
   });
 });

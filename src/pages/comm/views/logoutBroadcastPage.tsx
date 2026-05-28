@@ -13,25 +13,8 @@ export default function LogoutBroadcastPage() {
     if (handledRef.current) return;
     handledRef.current = true;
 
-    logout();
-
-    if (typeof BroadcastChannel !== "undefined") {
-      const channel = new BroadcastChannel("tickeasy_auth");
-      channel.postMessage({ type: "LOGOUT", timestamp: Date.now() });
-      setTimeout(() => channel.close(), 100);
-    }
-
-    // StorageEvent fallback（舊版 Safari 不支援 BroadcastChannel）
-    localStorage.setItem("tickeasy_logout", Date.now().toString());
-    setTimeout(() => localStorage.removeItem("tickeasy_logout"), 100);
-
-    // 向後相容：若仍被當作 iframe 使用，通知 parent
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: "LOGOUT_BROADCAST_DONE" }, "*");
-    }
-
-    // Supabase Realtime 跨域廣播（best-effort，最多等 2 秒）
-    const broadcastAndNavigate = async () => {
+    const broadcastThenLogout = async () => {
+      // 1. Supabase Realtime 跨域廣播（先廣播，email 尚未被 logout() 清空）
       if (email) {
         try {
           await new Promise<void>((resolve) => {
@@ -64,10 +47,29 @@ export default function LogoutBroadcastPage() {
           // best effort，忽略錯誤
         }
       }
+
+      // 2. 廣播完成後清空本地認證狀態
+      logout();
+
+      if (typeof BroadcastChannel !== "undefined") {
+        const channel = new BroadcastChannel("tickeasy_auth");
+        channel.postMessage({ type: "LOGOUT", timestamp: Date.now() });
+        setTimeout(() => channel.close(), 100);
+      }
+
+      // StorageEvent fallback（舊版 Safari 不支援 BroadcastChannel）
+      localStorage.setItem("tickeasy_logout", Date.now().toString());
+      setTimeout(() => localStorage.removeItem("tickeasy_logout"), 100);
+
+      // 向後相容：若仍被當作 iframe 使用，通知 parent
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: "LOGOUT_BROADCAST_DONE" }, "*");
+      }
+
       navigate("/login", { replace: true });
     };
 
-    broadcastAndNavigate();
+    broadcastThenLogout();
   }, [logout, email, navigate]);
 
   return <div />;
