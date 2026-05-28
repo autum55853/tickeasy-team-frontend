@@ -35,25 +35,20 @@ export default function LogoutBroadcastPage() {
       if (email) {
         try {
           await new Promise<void>((resolve) => {
-            const ch = supabase.channel(`tickeasy-logout-${email}`);
+            const ch = supabase.channel(`tickeasy-session-${email}`);
             const fallback = setTimeout(() => {
               supabase.removeChannel(ch);
               resolve();
             }, 2000);
-            ch.subscribe((status) => {
+            ch.subscribe(async (status) => {
               if (status === "SUBSCRIBED") {
                 clearTimeout(fallback);
-                ch.send({
-                  type: "broadcast",
-                  event: "LOGOUT",
-                  payload: {
-                    timestamp: Date.now(),
-                    secret: import.meta.env.VITE_LOGOUT_BROADCAST_SECRET,
-                  },
-                }).finally(() => {
+                try {
+                  await ch.track({ event: "LOGOUT", timestamp: Date.now() });
+                } finally {
                   supabase.removeChannel(ch);
                   resolve();
-                });
+                }
               } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
                 clearTimeout(fallback);
                 supabase.removeChannel(ch);

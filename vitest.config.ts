@@ -24,7 +24,6 @@ export default defineConfig({
       VITE_DASHBOARD_URL: "https://tickeasy-team-dashboard.onrender.com",
       VITE_SUPABASE_URL: "https://test.supabase.co",
       VITE_SUPABASE_ANON_KEY: "test-anon-key",
-      VITE_LOGOUT_BROADCAST_SECRET: "test-broadcast-secret",
     },
     coverage: {
       provider: "v8",

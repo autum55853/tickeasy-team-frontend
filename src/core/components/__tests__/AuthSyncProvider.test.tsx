@@ -10,6 +10,35 @@ function LocationDisplay() {
   return <div data-testid="location">{pathname}</div>;
 }
 
+const presenceMocks = vi.hoisted(() => {
+  const joinCallbackRef: {
+    current: ((data: { newPresences: Array<Record<string, unknown>> }) => void) | null;
+  } = { current: null };
+  const mockRemoveChannel = vi.fn();
+  const mockChannel = {
+    on: vi.fn().mockImplementation((event: string, filter: { event: string }, callback: unknown) => {
+      if (event === "presence" && filter.event === "join") {
+        joinCallbackRef.current = callback as (data: {
+          newPresences: Array<Record<string, unknown>>;
+        }) => void;
+      }
+      return mockChannel;
+    }),
+    subscribe: vi.fn(),
+  };
+  return {
+    joinCallbackRef,
+    mockRemoveChannel,
+    mockChannel,
+    supabase: {
+      channel: vi.fn(() => mockChannel),
+      removeChannel: mockRemoveChannel,
+    },
+  };
+});
+
+vi.mock("@/lib/supabase", () => ({ supabase: presenceMocks.supabase }));
+
 function renderSyncProvider(initialPath = "/") {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -43,6 +72,21 @@ beforeEach(() => {
   MockBroadcastChannel.instances = [];
   vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
   useAuthStore.setState({ isLogin: true, email: "test@test.com", role: "user" });
+  presenceMocks.joinCallbackRef.current = null;
+  presenceMocks.mockRemoveChannel.mockClear();
+  presenceMocks.mockChannel.on.mockClear();
+  presenceMocks.mockChannel.subscribe.mockClear();
+  presenceMocks.supabase.channel.mockClear();
+  presenceMocks.mockChannel.on.mockImplementation(
+    (event: string, filter: { event: string }, callback: unknown) => {
+      if (event === "presence" && filter.event === "join") {
+        presenceMocks.joinCallbackRef.current = callback as (data: {
+          newPresences: Array<Record<string, unknown>>;
+        }) => void;
+      }
+      return presenceMocks.mockChannel;
+    }
+  );
 });
 
 afterEach(() => {
@@ -141,7 +185,48 @@ describe("AuthSyncProvider - StorageEvent fallback（BroadcastChannel 不可用�
     act(() => {
       window.dispatchEvent(new StorageEvent("storage", { key: "tickeasy_logout", newValue: "123456" }));
     });
-    // 已 unmount，navigate 已失效，驗證 logout 未被觸發（auth state 保持）
     expect(useAuthStore.getState().isLogin).toBe(true);
+  });
+});
+
+describe("AuthSyncProvider - Supabase Presence（跨域登出）", () => {
+  it("email 存在時訂閱 tickeasy-session-{email} presence channel", () => {
+    renderSyncProvider();
+    expect(presenceMocks.supabase.channel).toHaveBeenCalledWith("tickeasy-session-test@test.com");
+    expect(presenceMocks.mockChannel.subscribe).toHaveBeenCalled();
+  });
+
+  it("presence join LOGOUT → 執行登出並導向 /login", () => {
+    const { getByTestId } = renderSyncProvider("/dashboard");
+    act(() => {
+      presenceMocks.joinCallbackRef.current?.({
+        newPresences: [{ event: "LOGOUT", timestamp: Date.now() }],
+      });
+    });
+    expect(getByTestId("location").textContent).toBe("/login");
+    expect(useAuthStore.getState().isLogin).toBe(false);
+  });
+
+  it("presence join 非 LOGOUT 事件 → 無動作", () => {
+    const { getByTestId } = renderSyncProvider("/dashboard");
+    act(() => {
+      presenceMocks.joinCallbackRef.current?.({
+        newPresences: [{ event: "OTHER", timestamp: Date.now() }],
+      });
+    });
+    expect(getByTestId("location").textContent).toBe("/dashboard");
+    expect(useAuthStore.getState().isLogin).toBe(true);
+  });
+
+  it("email 為空時不建立 Supabase channel", () => {
+    useAuthStore.setState({ isLogin: false, email: "", role: "" });
+    renderSyncProvider();
+    expect(presenceMocks.supabase.channel).not.toHaveBeenCalled();
+  });
+
+  it("unmount → removeChannel 被呼叫", () => {
+    const { unmount } = renderSyncProvider();
+    unmount();
+    expect(presenceMocks.mockRemoveChannel).toHaveBeenCalled();
   });
 });

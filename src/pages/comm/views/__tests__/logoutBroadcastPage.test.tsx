@@ -24,18 +24,18 @@ class MockBroadcastChannel {
 // vi.hoisted 確保 mock 變數在 vi.mock 工廠執行前已初始化
 const mocks = vi.hoisted(() => {
   const subscribeCallbackRef: { current: ((status: string) => void) | null } = { current: null };
-  const mockSend = vi.fn().mockResolvedValue("ok");
+  const mockTrack = vi.fn().mockResolvedValue("ok");
   const mockRemoveChannel = vi.fn();
   const mockChannel = {
     subscribe: vi.fn((cb: (status: string) => void) => {
       subscribeCallbackRef.current = cb;
       return mockChannel;
     }),
-    send: mockSend,
+    track: mockTrack,
   };
   return {
     subscribeCallbackRef,
-    mockSend,
+    mockTrack,
     mockRemoveChannel,
     mockChannel,
     supabase: {
@@ -64,7 +64,7 @@ beforeEach(() => {
   useAuthStore.setState({ isLogin: true, email: "test@test.com", role: "user" });
   vi.useFakeTimers();
   mocks.subscribeCallbackRef.current = null;
-  mocks.mockSend.mockClear();
+  mocks.mockTrack.mockClear();
   mocks.mockRemoveChannel.mockClear();
   mocks.mockChannel.subscribe.mockClear();
   mocks.supabase.channel.mockClear();
@@ -143,23 +143,19 @@ describe("LogoutBroadcastPage", () => {
     expect(MockBroadcastChannel.instances[0].postMessage).toHaveBeenCalledOnce();
   });
 
-  it("Supabase 廣播 LOGOUT 事件到 tickeasy-logout-test@test.com channel", async () => {
+  it("Supabase Presence 追蹤 LOGOUT 事件到 tickeasy-session-test@test.com channel", async () => {
     renderPage();
 
-    expect(mocks.supabase.channel).toHaveBeenCalledWith("tickeasy-logout-test@test.com");
+    expect(mocks.supabase.channel).toHaveBeenCalledWith("tickeasy-session-test@test.com");
 
     await act(async () => {
       mocks.subscribeCallbackRef.current?.("SUBSCRIBED");
     });
 
-    expect(mocks.mockSend).toHaveBeenCalledWith(
+    expect(mocks.mockTrack).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: "broadcast",
         event: "LOGOUT",
-        payload: expect.objectContaining({
-          timestamp: expect.any(Number),
-          secret: "test-broadcast-secret",
-        }),
+        timestamp: expect.any(Number),
       })
     );
   });

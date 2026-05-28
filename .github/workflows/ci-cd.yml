@@ -40,7 +40,6 @@ jobs:
           VITE_DASHBOARD_URL: ${{ vars.VITE_DASHBOARD_URL || 'https://placeholder.dashboard.com' }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
-          VITE_LOGOUT_BROADCAST_SECRET: ${{ secrets.VITE_LOGOUT_BROADCAST_SECRET || 'placeholder-broadcast-secret' }}
 
   deploy:
     name: CD - Deploy to Render

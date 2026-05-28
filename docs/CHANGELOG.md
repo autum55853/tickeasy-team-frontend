@@ -15,6 +15,7 @@
 - `useLogout`：移除錯誤的 Dashboard 登出端點重導向（`/api/auth/logout?next=...` → 404）；前台登出改為直接 `navigate("/login")`，跨 Tab 通知保留 BroadcastChannel 廣播機制
 
 ### Changed
+- 跨域登出同步改用 **Supabase Realtime Presence**：`LogoutBroadcastPage` 改呼叫 `ch.track({ event: "LOGOUT" })`，`AuthSyncProvider` 改監聽 `presence join` 事件；移除 `VITE_LOGOUT_BROADCAST_SECRET` 環境變數（前端 bundle 中的 secret 無安全意義），Channel 名稱統一為 `tickeasy-session-{email}`
 - `ConcertDetailPage`：場次按鈕改以 `sellBeginDate` 判斷是否可購票（原為場次日期）；售票時間 1 小時內自動排程 `setTimeout` 解鎖按鈕，免刷新頁面
 
 - `BannerSection`：API 回空陣列時改顯示靜態 Fallback 輪播（本地品牌圖片），載入中顯示 `LoadingSpin`；`bannerCarousel` 無 `concertId` 時隱藏報名按鈕
