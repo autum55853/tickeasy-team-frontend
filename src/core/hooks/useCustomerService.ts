@@ -175,6 +175,11 @@ export const useCustomerService = () => {
           });
         }
 
+        // 後端在本次請求中將會話轉為人工（AI 失效自動轉）→ 同步切換前端進入人工模式
+        if (response.data.sessionType === "human" && currentSession?.sessionType !== "human") {
+          updateSession({ sessionType: "human", status: "transferred" });
+        }
+
         resetRetryCount();
       } else {
         throw new Error(response.message || "發送訊息失敗");
