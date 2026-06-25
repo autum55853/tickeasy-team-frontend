@@ -16,12 +16,9 @@ export function AuthSyncProvider() {
 
     let bcCleanup: () => void;
 
-    console.log("[logout-sync] FRONT AuthSyncProvider mount, email =", email);
-
     if (typeof BroadcastChannel !== "undefined") {
       const channel = new BroadcastChannel("tickeasy_auth");
       channel.onmessage = (event: MessageEvent) => {
-        console.log("[logout-sync] FRONT BroadcastChannel onmessage:", event.data);
         if (event.data?.type === "LOGOUT") {
           performLogout();
         }
@@ -30,7 +27,6 @@ export function AuthSyncProvider() {
     } else {
       const handleStorage = (event: StorageEvent) => {
         if (event.key === "tickeasy_logout") {
-          console.log("[logout-sync] FRONT storage event LOGOUT");
           performLogout();
         }
       };
@@ -39,7 +35,6 @@ export function AuthSyncProvider() {
     }
 
     if (!email) {
-      console.warn("[logout-sync] FRONT email 缺失 → 不訂閱 Supabase channel");
       return bcCleanup;
     }
 

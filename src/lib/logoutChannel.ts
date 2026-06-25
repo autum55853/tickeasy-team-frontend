@@ -18,28 +18,22 @@ export function ensureLogoutChannel(
   onLogout: () => void,
 ): RealtimeChannel {
   if (_logoutChannel && _currentEmail === email) {
-    console.log("[logout-sync] FRONT ensureLogoutChannel skip（singleton 已存在）, email =", email);
     return _logoutChannel;
   }
 
   if (_logoutChannel) {
-    console.log("[logout-sync] FRONT email 變更，移除舊 channel:", _currentEmail);
     supabase.removeChannel(_logoutChannel);
     _logoutChannel = undefined;
   }
 
   _currentEmail = email;
-  console.log("[logout-sync] FRONT subscribe Supabase channel:", `tickeasy-session-${email}`);
   const channel = supabase.channel(`tickeasy-session-${email}`);
   _logoutChannel = channel;
   channel
     .on("broadcast", { event: "LOGOUT" }, () => {
-      console.log("[logout-sync] FRONT 收到 Supabase LOGOUT broadcast");
       onLogout();
     })
-    .subscribe((status: string) => {
-      console.log("[logout-sync] FRONT receiver subscribe status =", status);
-    });
+    .subscribe();
 
   return channel;
 }
@@ -50,13 +44,11 @@ export function ensureLogoutChannel(
  */
 export async function sendLogout(): Promise<void> {
   if (!_logoutChannel) {
-    console.warn("[logout-sync] FRONT sendLogout：singleton channel 不存在，略過 Supabase 廣播");
     return;
   }
-  const sendRes = await _logoutChannel.send({
+  await _logoutChannel.send({
     type: "broadcast",
     event: "LOGOUT",
     payload: { timestamp: Date.now() },
   });
-  console.log("[logout-sync] FRONT sendLogout 結果 =", sendRes);
 }

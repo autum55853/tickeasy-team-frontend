@@ -13,9 +13,10 @@
 
 ### Fixed
 - `useLogout`：移除錯誤的 Dashboard 登出端點重導向（`/api/auth/logout?next=...` → 404）；前台登出改為直接 `navigate("/login")`，跨 Tab 通知保留 BroadcastChannel 廣播機制
+- 前台→Dashboard 跨分頁登出未同步（Direction B）：根因為前台 `supabase` 單例 client 上，receiver（`AuthSyncProvider`）與 sender（`LogoutBroadcastPage`）對同一 topic `tickeasy-session-{email}` 各開一個 channel，違反 Supabase Realtime「單 client 單 topic 只能一個 channel」規則，第二個 subscribe 永遠到不了 `SUBSCRIBED` 而 hang，導致 `LOGOUT` 廣播從未送出。改以模組單例 `src/lib/logoutChannel.ts`（`ensureLogoutChannel` / `sendLogout`）共用同一已訂閱 channel，sender 重用該 channel 直接 `send`，對齊 Dashboard 端 `ensureLogoutChannel` pattern
 
 ### Changed
-- 跨域登出同步改用 **Supabase Realtime Presence**：`LogoutBroadcastPage` 改呼叫 `ch.track({ event: "LOGOUT" })`，`AuthSyncProvider` 改監聽 `presence join` 事件；移除 `VITE_LOGOUT_BROADCAST_SECRET` 環境變數（前端 bundle 中的 secret 無安全意義），Channel 名稱統一為 `tickeasy-session-{email}`
+- 跨域登出同步改用 **Supabase Realtime Broadcast**：`AuthSyncProvider` 透過 `ensureLogoutChannel` 訂閱 `broadcast` 事件 `LOGOUT`，`LogoutBroadcastPage` 透過 `sendLogout` 在同一單例 channel 送出 `LOGOUT` broadcast；移除 `VITE_LOGOUT_BROADCAST_SECRET` 環境變數（前端 bundle 中的 secret 無安全意義），Channel 名稱統一為 `tickeasy-session-{email}`
 - `ConcertDetailPage`：場次按鈕改以 `sellBeginDate` 判斷是否可購票（原為場次日期）；售票時間 1 小時內自動排程 `setTimeout` 解鎖按鈕，免刷新頁面
 
 - `BannerSection`：API 回空陣列時改顯示靜態 Fallback 輪播（本地品牌圖片），載入中顯示 `LoadingSpin`；`bannerCarousel` 無 `concertId` 時隱藏報名按鈕
