@@ -10,30 +10,20 @@ function LocationDisplay() {
   return <div data-testid="location">{pathname}</div>;
 }
 
+// receiver 端訂閱已抽到 @/lib/logoutChannel 的單例；測試以契約方式驗證
+// AuthSyncProvider 委派呼叫 ensureLogoutChannel(email, onLogout) 並串接 onLogout。
 const presenceMocks = vi.hoisted(() => {
   const logoutCallbackRef: { current: (() => void) | null } = { current: null };
-  const mockRemoveChannel = vi.fn();
-  const mockChannel = {
-    on: vi.fn().mockImplementation((event: string, filter: { event: string }, callback: unknown) => {
-      if (event === "broadcast" && filter.event === "LOGOUT") {
-        logoutCallbackRef.current = callback as () => void;
-      }
-      return mockChannel;
-    }),
-    subscribe: vi.fn(),
-  };
-  return {
-    logoutCallbackRef,
-    mockRemoveChannel,
-    mockChannel,
-    supabase: {
-      channel: vi.fn(() => mockChannel),
-      removeChannel: mockRemoveChannel,
-    },
-  };
+  const ensureLogoutChannel = vi.fn((email: string, onLogout: () => void) => {
+    logoutCallbackRef.current = onLogout;
+    return {};
+  });
+  return { logoutCallbackRef, ensureLogoutChannel };
 });
 
-vi.mock("@/lib/supabase", () => ({ supabase: presenceMocks.supabase }));
+vi.mock("@/lib/logoutChannel", () => ({
+  ensureLogoutChannel: presenceMocks.ensureLogoutChannel,
+}));
 
 function renderSyncProvider(initialPath = "/") {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -69,18 +59,7 @@ beforeEach(() => {
   vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
   useAuthStore.setState({ isLogin: true, email: "test@test.com", role: "user" });
   presenceMocks.logoutCallbackRef.current = null;
-  presenceMocks.mockRemoveChannel.mockClear();
-  presenceMocks.mockChannel.on.mockClear();
-  presenceMocks.mockChannel.subscribe.mockClear();
-  presenceMocks.supabase.channel.mockClear();
-  presenceMocks.mockChannel.on.mockImplementation(
-    (event: string, filter: { event: string }, callback: unknown) => {
-      if (event === "broadcast" && filter.event === "LOGOUT") {
-        presenceMocks.logoutCallbackRef.current = callback as () => void;
-      }
-      return presenceMocks.mockChannel;
-    }
-  );
+  presenceMocks.ensureLogoutChannel.mockClear();
 });
 
 afterEach(() => {
@@ -184,14 +163,15 @@ describe("AuthSyncProvider - StorageEvent fallback（BroadcastChannel 不可用�
 });
 
 describe("AuthSyncProvider - Supabase Broadcast（跨域登出）", () => {
-  it("email 存在時訂閱 tickeasy-session-{email} broadcast channel", () => {
+  it("email 存在時委派 ensureLogoutChannel(email, onLogout) 建立單例 channel", () => {
     renderSyncProvider();
-    expect(presenceMocks.supabase.channel).toHaveBeenCalledWith("tickeasy-session-test@test.com");
-    expect(presenceMocks.mockChannel.on).toHaveBeenCalledWith("broadcast", { event: "LOGOUT" }, expect.any(Function));
-    expect(presenceMocks.mockChannel.subscribe).toHaveBeenCalled();
+    expect(presenceMocks.ensureLogoutChannel).toHaveBeenCalledWith(
+      "test@test.com",
+      expect.any(Function)
+    );
   });
 
-  it("broadcast LOGOUT → 執行登出並導向 /login", () => {
+  it("收到 Supabase LOGOUT broadcast → 執行登出並導向 /login", () => {
     const { getByTestId } = renderSyncProvider("/dashboard");
     act(() => {
       presenceMocks.logoutCallbackRef.current?.();
@@ -200,15 +180,18 @@ describe("AuthSyncProvider - Supabase Broadcast（跨域登出）", () => {
     expect(useAuthStore.getState().isLogin).toBe(false);
   });
 
-  it("email 為空時不建立 Supabase channel", () => {
+  it("email 為空時不呼叫 ensureLogoutChannel", () => {
     useAuthStore.setState({ isLogin: false, email: "", role: "" });
     renderSyncProvider();
-    expect(presenceMocks.supabase.channel).not.toHaveBeenCalled();
+    expect(presenceMocks.ensureLogoutChannel).not.toHaveBeenCalled();
   });
 
-  it("unmount → removeChannel 被呼叫", () => {
+  it("unmount 不移除單例 channel（僅關閉同源 BroadcastChannel）", () => {
     const { unmount } = renderSyncProvider();
+    const channel = MockBroadcastChannel.instances[0];
     unmount();
-    expect(presenceMocks.mockRemoveChannel).toHaveBeenCalled();
+    // 單例 channel 由 logoutChannel 模組長存（避免 StrictMode 重訂閱關 WebSocket），
+    // 元件 cleanup 只負責關閉同源 BroadcastChannel。
+    expect(channel.close).toHaveBeenCalledOnce();
   });
 });

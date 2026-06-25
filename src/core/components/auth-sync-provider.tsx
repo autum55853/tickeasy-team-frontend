@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
-import { supabase } from "@/lib/supabase";
+import { ensureLogoutChannel } from "@/lib/logoutChannel";
 
 export function AuthSyncProvider() {
   const navigate = useNavigate();
@@ -43,19 +43,12 @@ export function AuthSyncProvider() {
       return bcCleanup;
     }
 
-    console.log("[logout-sync] FRONT subscribe Supabase channel:", `tickeasy-session-${email}`);
-    const ch = supabase.channel(`tickeasy-session-${email}`);
-    ch.on("broadcast", { event: "LOGOUT" }, () => {
-      console.log("[logout-sync] FRONT 收到 Supabase LOGOUT broadcast");
-      performLogout();
-    });
-    ch.subscribe((status) => {
-      console.log("[logout-sync] FRONT receiver subscribe status =", status);
-    });
+    // 接收端：建立/重用 singleton channel（與 sender 共用，避免同 topic 重複 channel）。
+    ensureLogoutChannel(email, performLogout);
 
+    // singleton channel 不在 unmount 時移除，避免 StrictMode 重訂閱關閉 WebSocket。
     return () => {
       bcCleanup();
-      supabase.removeChannel(ch);
     };
   }, [logout, navigate, email]);
 
