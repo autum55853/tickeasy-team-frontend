@@ -21,32 +21,15 @@ class MockBroadcastChannel {
   }
 }
 
-// vi.hoisted 確保 mock 變數在 vi.mock 工廠執行前已初始化
+// sender 端跨域廣播已抽到 @/lib/logoutChannel 的 sendLogout（重用接收端單例
+// channel）。測試以契約方式驗證頁面委派呼叫 sendLogout，不再自建 channel/subscribe。
 const mocks = vi.hoisted(() => {
-  const subscribeCallbackRef: { current: ((status: string) => void) | null } = { current: null };
-  const mockSend = vi.fn().mockResolvedValue({ status: "ok" });
-  const mockRemoveChannel = vi.fn();
-  const mockChannel = {
-    subscribe: vi.fn((cb: (status: string) => void) => {
-      subscribeCallbackRef.current = cb;
-      return mockChannel;
-    }),
-    send: mockSend,
-  };
-  return {
-    subscribeCallbackRef,
-    mockSend,
-    mockRemoveChannel,
-    mockChannel,
-    supabase: {
-      channel: vi.fn(() => mockChannel),
-      removeChannel: mockRemoveChannel,
-    },
-  };
+  const sendLogout = vi.fn().mockResolvedValue(undefined);
+  return { sendLogout };
 });
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: mocks.supabase,
+vi.mock("@/lib/logoutChannel", () => ({
+  sendLogout: mocks.sendLogout,
 }));
 
 function renderPage() {
@@ -58,10 +41,11 @@ function renderPage() {
   );
 }
 
-/** 觸發 Supabase SUBSCRIBED 並等待後續同步動作完成 */
-async function triggerSubscribed() {
+/** 等待頁面 async 廣播流程（await sendLogout → logout → 同源廣播 → navigate）完成 */
+async function flushBroadcast() {
   await act(async () => {
-    mocks.subscribeCallbackRef.current?.("SUBSCRIBED");
+    await Promise.resolve();
+    await Promise.resolve();
   });
 }
 
@@ -70,11 +54,8 @@ beforeEach(() => {
   vi.stubGlobal("BroadcastChannel", MockBroadcastChannel);
   useAuthStore.setState({ isLogin: true, email: "test@test.com", role: "user" });
   vi.useFakeTimers();
-  mocks.subscribeCallbackRef.current = null;
-  mocks.mockSend.mockClear();
-  mocks.mockRemoveChannel.mockClear();
-  mocks.mockChannel.subscribe.mockClear();
-  mocks.supabase.channel.mockClear();
+  mocks.sendLogout.mockClear();
+  mocks.sendLogout.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -90,7 +71,7 @@ describe("LogoutBroadcastPage", () => {
     // broadcast 尚未完成前，logout 尚未執行
     expect(useAuthStore.getState().isLogin).toBe(true);
 
-    await triggerSubscribed();
+    await flushBroadcast();
 
     expect(useAuthStore.getState().isLogin).toBe(false);
     expect(useAuthStore.getState().email).toBe("");
@@ -99,7 +80,7 @@ describe("LogoutBroadcastPage", () => {
 
   it("broadcast 完成後廣播 LOGOUT 事件到 tickeasy_auth channel", async () => {
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     const channel = MockBroadcastChannel.instances[0];
     expect(channel.name).toBe("tickeasy_auth");
@@ -110,7 +91,7 @@ describe("LogoutBroadcastPage", () => {
 
   it("廣播後 100ms 關閉 BroadcastChannel", async () => {
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     const channel = MockBroadcastChannel.instances[0];
     expect(channel.close).not.toHaveBeenCalled();
@@ -120,14 +101,14 @@ describe("LogoutBroadcastPage", () => {
 
   it("broadcast 完成後寫入 localStorage tickeasy_logout（Safari fallback）", async () => {
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     expect(localStorage.getItem("tickeasy_logout")).not.toBeNull();
   });
 
   it("100ms 後移除 localStorage tickeasy_logout", async () => {
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     act(() => vi.advanceTimersByTime(100));
     expect(localStorage.getItem("tickeasy_logout")).toBeNull();
@@ -139,7 +120,7 @@ describe("LogoutBroadcastPage", () => {
     Object.defineProperty(window, "parent", { get: () => mockParent, configurable: true });
 
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     expect(parentPostMessage).toHaveBeenCalledWith({ type: "LOGOUT_BROADCAST_DONE" }, "*");
 
@@ -149,7 +130,7 @@ describe("LogoutBroadcastPage", () => {
   it("BroadcastChannel 不可用時僅用 localStorage fallback，不崩潰", async () => {
     vi.stubGlobal("BroadcastChannel", undefined);
     renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     expect(MockBroadcastChannel.instances).toHaveLength(0);
     expect(localStorage.getItem("tickeasy_logout")).not.toBeNull();
@@ -158,7 +139,7 @@ describe("LogoutBroadcastPage", () => {
 
   it("handledRef guard：多次 render 只執行一次 logout 和廣播", async () => {
     const { rerender } = renderPage();
-    await triggerSubscribed();
+    await flushBroadcast();
 
     rerender(
       <MemoryRouter>
@@ -168,41 +149,30 @@ describe("LogoutBroadcastPage", () => {
     expect(MockBroadcastChannel.instances[0].postMessage).toHaveBeenCalledOnce();
   });
 
-  it("Supabase Broadcast 廣播 LOGOUT 事件到 tickeasy-session-test@test.com channel", async () => {
+  it("email 存在時呼叫 sendLogout 送出跨域 LOGOUT 廣播", async () => {
     renderPage();
+    await flushBroadcast();
 
-    expect(mocks.supabase.channel).toHaveBeenCalledWith("tickeasy-session-test@test.com");
-
-    await triggerSubscribed();
-
-    expect(mocks.mockSend).toHaveBeenCalledWith({
-      type: "broadcast",
-      event: "LOGOUT",
-      payload: expect.objectContaining({ timestamp: expect.any(Number) }),
-    });
+    expect(mocks.sendLogout).toHaveBeenCalledTimes(1);
   });
 
-  it("Supabase CHANNEL_ERROR 時仍正常導向 /login", async () => {
-    const { getByTestId } = renderPage();
+  it("sendLogout reject 時仍正常導向 /login（best effort）", async () => {
+    mocks.sendLogout.mockRejectedValueOnce(new Error("broadcast failed"));
 
-    await act(async () => {
-      mocks.subscribeCallbackRef.current?.("CHANNEL_ERROR");
-    });
+    const { getByTestId } = renderPage();
+    await flushBroadcast();
 
     expect(getByTestId("location").textContent).toBe("/login");
-    expect(mocks.mockRemoveChannel).toHaveBeenCalled();
+    expect(useAuthStore.getState().isLogin).toBe(false);
   });
 
-  it("email 為空時不建立 Supabase channel，直接登出並導向 /login", async () => {
+  it("email 為空時不呼叫 sendLogout，直接登出並導向 /login", async () => {
     useAuthStore.setState({ isLogin: false, email: "", role: "" });
 
     const { getByTestId } = renderPage();
+    await flushBroadcast();
 
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    expect(mocks.supabase.channel).not.toHaveBeenCalled();
+    expect(mocks.sendLogout).not.toHaveBeenCalled();
     expect(getByTestId("location").textContent).toBe("/login");
   });
 });
