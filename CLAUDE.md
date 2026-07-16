@@ -14,9 +14,12 @@ npm run build      # 型別檢查 + 建構生產版本
 npm run lint       # ESLint 檢查
 npm run format     # Prettier 格式化
 npm run register-icons  # 重新掃描並註冊 Iconify 圖示
+npm run test           # 單元/整合測試（Vitest）
+npm run test:coverage  # 覆蓋率報告
+npm run test:e2e       # E2E 測試（Playwright，需先啟動 dev server）
 ```
 
-無測試框架，無單元測試指令。
+單元/整合測試使用 Vitest 3 + React Testing Library + MSW，E2E 測試使用 Playwright，詳見 [docs/TESTING.md](./docs/TESTING.md)。
 
 ## 環境變數
 
