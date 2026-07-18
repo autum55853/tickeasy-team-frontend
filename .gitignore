@@ -32,3 +32,9 @@ dist-ssr
 /playwright-report/
 /coverage/
 docs/figma-design/*
+/src/test/*.yml
+/src/test/*.mjs
+/.playwright-mcp/
+
+# Claude Code worktrees
+.claude/worktrees/

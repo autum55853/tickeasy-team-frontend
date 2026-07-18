@@ -1,5 +1,7 @@
 # 計畫：修正前台→Dashboard 跨分頁登出未同步
 
+**狀態：✅ 已完成（2026-06-25）** — 功能實機驗證通過（Direction B 前台登出 → Dashboard 自動登出；Direction A 回歸正常）。`[logout-sync]` 診斷 log 已移除；單元測試同步至單例架構（124 全綠）。
+
 ## Context（為何要改）
 
 使用者回報：前台分頁登出後，Dashboard 分頁沒有被登出（Direction B）。反向（Dashboard 登出→前台）正常。
