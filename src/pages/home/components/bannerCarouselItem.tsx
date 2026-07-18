@@ -1,7 +1,7 @@
 export default function CarouselItem({ imageUrl, title, description }: { imageUrl: string; title: string; description: string }) {
   return (
     <div
-      className="relative mx-auto h-[80vh] max-h-[500px] w-[96%] rounded-t-[30px] rounded-b-[60px] py-2 before:absolute before:inset-0 before:z-0 before:rounded-t-[30px] before:rounded-b-[60px] before:bg-black before:opacity-40 lg:max-h-[900px]"
+      className="relative mx-auto h-[80vh] max-h-[500px] w-[96%] rounded-t-[30px] py-2 before:absolute before:inset-0 before:z-0 before:rounded-t-[30px] before:bg-black before:opacity-40 lg:max-h-[900px]"
       style={{
         backgroundImage: `url(${imageUrl})`,
         backgroundSize: "cover",

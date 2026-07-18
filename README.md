@@ -1,193 +1,151 @@
-# Tickeasy Project
+# Tickeasy — 演唱會購票系統前端
 
-Tickeasy 是一個現代化的演唱會購票系統，旨在為用戶提供流暢、便捷的購票體驗。
+Tickeasy 是一個現代化的演唱會購票平台，支援三種角色操作：**參與者**（瀏覽與購票）、**主辦方**（建立/管理演唱會）、**網站管理者**。
 
-## 專案概述
+## 測試帳號
 
-### 測試帳號
-- (舉辦者) admin@gmail.com / admin1234
-- (參與者) user@gmail.com / user1234
-- (網站管理者) admin@gmail.com / admin1234
+| 角色 | 帳號 | 密碼 |
+|---|---|---|
+| 參與者 | user@gmail.com | user1234 |
+| 主辦方 / 管理者 | admin@gmail.com | admin1234 |
 
+## 核心功能
 
-本系統提供以下核心功能：
+### 參與者
+- 演唱會搜尋與篩選（依名稱、日期、地點、標籤）
+- 線上購票（信用卡付款）
+- 電子票券（QR Code）查看
+- 退票申請
+- 會員資料管理、偏好設定
 
-### 用戶功能
+### 主辦方
+- 演唱會建立與編輯（基本資料 + 場次票種兩步驟流程）
+- 演唱會送審與狀態追蹤（draft → reviewing → published → finished）
+- 票種銷售統計與入場記錄查詢
+- QR Code 現場驗票
 
-- 🎫 票務查詢與購買
-  - 多元支付方式 (信用卡)
-- 🎭 演唱會活動資訊
-  - 進階搜尋與篩選 (依名稱、日期、地點)
-- 👤 會員系統
-  - OAuth 社群登入 (Google)
-  - 個人資料管理
-  - 購買記錄查詢
-  - 退票申請功能
-- 📱 跨平台支援
-  - 響應式網頁設計
-
-### 主辦方功能
-
-- 📊 活動管理
-  - 活動資訊建立與編輯
-  - 票種與價格設定
-- 💼 訂單管理
-  - 訂單狀態追蹤
-  - 退票處理
-  - 付款紀錄查詢
-- 🎟️ 票務驗證
-  - QR Code 電子票券
-  - 現場驗票系統
-
-這是一個使用現代前端技術棧構建的專案，基於 React + TypeScript + Vite。
+### 全站
+- Google OAuth 登入
+- 常見問題（FAQ）
+- AI 客服浮動 Widget
+- 響應式設計（桌面 + 手機）
 
 ## 技術棧
 
-- **核心框架**: React 19.1.0
-- **建構工具**: Vite 5.1.4
-- **開發語言**: TypeScript 5.7.2
-- **UI框架**:
-  - shadcn/ui (基於 Radix UI 的組件庫)
-  - Radix UI (無樣式、可訪問性組件)
-  - Lucide React (圖示庫)
-- **樣式解決方案**:
-  - TailwindCSS 4.1.3
-  - Styled-components 6.1.15
-  - SASS
-- **狀態管理**: 
-  - TanStack Query (React Query) 5.74.3
-  - Zustand 5.0.4
-- **表單處理**: React Hook Form 7.55.0
-- **路由管理**: React Router 7.5.2
-- **資料驗證**: Zod 3.24.2
-- **HTTP 客戶端**: Axios 1.8.4
-- **工具庫**:
-  - dayjs (日期處理)
-  - clsx & tailwind-merge (類名合併)
-  - date-fns (日期處理)
+| 類型 | 技術 |
+|---|---|
+| 框架 | React 19 + TypeScript 5 |
+| 建構工具 | Vite 5 |
+| 路由 | React Router DOM 7 |
+| UI 元件 | shadcn/ui（Radix UI）|
+| 樣式 | TailwindCSS 4 + Styled Components |
+| 全域狀態 | Zustand 5（localStorage 持久化）|
+| 伺服器狀態 | TanStack Query 5 |
+| HTTP | Axios（Bearer token 自動附加、401 自動登出）|
+| 表單 | react-hook-form + Zod |
+| 富文字 | Lexical |
+| 圖示 | Iconify |
+| 日期 | dayjs + date-fns |
 
-## 程式碼品質工具
-
-- ESLint 9.21.0 (程式碼檢查)
-- Stylelint 16.2.1 (樣式檢查)
-- Prettier (程式碼格式化)
-
-## 開發指令
+## 快速開始
 
 ```bash
-# 啟動開發伺服器
+# 1. 安裝依賴
+npm install
+
+# 2. 設定環境變數
+cp .env.example .env.local
+# 編輯 .env.local，填入後端 API URL 等設定
+
+# 3. 啟動開發伺服器（預設 port 3000）
 npm run dev
-
-# 建構生產版本
-npm run build
-
-# 預覽生產建構
-npm run preview
-
-# 執行 ESLint 檢查
-npm run lint
-
-# 格式化程式碼
-npm run format
 ```
 
-## Git 開發流程
+## 常用指令
 
-本專案採用 [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) 開發流程：
+| 指令 | 說明 |
+|---|---|
+| `npm run dev` | 啟動開發伺服器（port 3000）|
+| `npm run build` | 型別檢查 + 建構生產版本 |
+| `npm run preview` | 預覽生產建構結果 |
+| `npm run lint` | ESLint 語法檢查 |
+| `npm run format` | Prettier 格式化所有檔案 |
+| `npm run register-icons` | 重新掃描並註冊 Iconify 圖示 |
 
-1. **從 `main` 建立分支**  
-   為每個 issue 或功能建立專屬分支，命名格式建議為 `feat/#編號/功能名稱`、`fix/#編號/修正內容` 等。
+## 環境變數
 
-2. **本地開發與提交**  
-   在分支中完成開發，並適時使用 `git commit` 紀錄變更。
+複製 `.env.example` 為 `.env.local` 後填入以下設定：
 
-3. **發送 Pull Request**  
-   開發完成後，發 PR 至 `main`，標題需清楚描述內容並關聯對應 Issue。
-
-4. **Code Review**  
-   由其他成員審查後進行修正或合併。
-
-5. **合併與刪除**
+| 變數 | 說明 | 必要性 |
+|---|---|---|
+| `VITE_API_BASE_URL` | 後端 API base URL | 必要 |
+| `VITE_GOOGLE_CALLBACK` | Google OAuth callback URL | 必要 |
+| `VITE_PORT` | 開發伺服器 port | 選填（預設 3000）|
 
 ## 專案結構
 
 ```
 src/
-├── assets/ # 應用程式資源
-│ ├── icons/ # 圖示資源
-│ └── images/ # 圖片資源
-├── context/ # React Context 狀態管理
-├── core/ # 核心功能模組
-│ ├── boot/ # 應用程式啟動相關
-│ ├── components/ # 全域共用元件
-│ │ ├── customer-service/ # 客服相關元件
-│ │ ├── global/ # 一般共用元件
-│ │ └── ui/ # UI 基礎元件
-│ ├── hooks/ # 全域共用 Hooks
-│ ├── icons/ # 圖示註冊
-│ ├── lib/ # 工具函式庫
-│ ├── routers/ # 路由配置
-│ ├── styles/ # 全域樣式
-│ └── types/ # TypeScript 類型定義
-├── pages/ # 頁面模組
-│ ├── comm/ # 共用頁面 (登入、404等)
-│ ├── company/ # 公司/主辦方頁面
-│ ├── concerts/ # 演唱會相關頁面
-│ ├── home/ # 首頁模組
-│ └── user/ # 用戶相關頁面
-├── schema/ # Zod 資料驗證結構定義
-├── store/ # 全域狀態管理
-└── utils/ # 工具函式
+├── main.tsx            # 應用入口
+├── App.tsx             # 根元件（Provider 組合）
+├── assets/             # 圖片、SVG 圖示等靜態資源
+├── context/            # React Context（購票流程、搜尋篩選等頁面流程狀態）
+├── schema/             # 全域 Zod schema（跨模組共用）
+├── store/              # 全域 Zustand store（authStore、customer-service）
+├── utils/              # 全域工具函式（時間、金額格式化、權限檢查）
+├── pages/              # 頁面模組（自動路由聚合）
+│   ├── index.ts        # 自動掃描所有 config.ts，合併路由
+│   ├── comm/           # 共用頁面（登入、註冊、Google OAuth、FAQ、403、404）
+│   ├── home/           # 首頁（Banner、分類、最新、熱門、場館）
+│   ├── concerts/       # 演唱會（列表、詳情、建立/編輯、購票、驗票）
+│   ├── company/        # 主辦方後台（公司資訊、演唱會統計）
+│   └── user/           # 會員中心（個人資料、訂票紀錄、修改密碼）
+└── core/               # 核心基礎設施（全域共用）
+    ├── boot/           # 路由渲染主體
+    ├── routers/        # 路由匯出
+    ├── lib/            # axios 實例、cn() 工具、客服 API
+    ├── types/          # 全域 TypeScript 型別（RouteView、ModuleConfig）
+    ├── hooks/          # 全域 Custom Hooks（useRequest、useRouterMiddleWare、useLogout 等）
+    ├── icons/          # Iconify 圖示集註冊
+    ├── styles/         # 全域 CSS
+    └── components/
+        ├── global/     # 全域佈局元件（header、footer、lexicalEditor、googleMap 等）
+        ├── customer-service/  # AI 客服浮動 Widget
+        └── ui/         # shadcn/ui 元件（button、dialog、input、calendar、pagination 等）
 ```
 
-### 目錄說明
+### 頁面模組結構規範
 
-- **assets**: 應用程式內部使用的資源
-  - **icons**: SVG 圖示等向量圖形
-  - **images**: 應用程式內使用的圖片
-- **context**: React Context 用於跨組件狀態管理
-- **core**: 核心功能模組
-  - **boot**: 應用程式啟動與初始化相關
-  - **components**: 全域共用元件
-    - **customer-service**: 客服相關元件
-    - **global**: 一般共用元件
-    - **ui**: UI 基礎元件
-  - **hooks**: 全域共用的自定義 Hooks
-  - **icons**: 圖示註冊與管理
-  - **lib**: 工具函式與共用邏輯
-  - **routers**: 路由配置與管理
-  - **styles**: 全域樣式設定
-  - **types**: TypeScript 類型定義
-- **pages**: 頁面模組，每個子目錄代表一個功能模組
-  - **comm**: 共用頁面模組 (如登入、404等)
-  - **company**: 公司/主辦方相關頁面
-  - **concerts**: 演唱會相關頁面
-  - **home**: 首頁模組
-  - **user**: 用戶相關頁面
-- **schema**: 使用 Zod 進行資料驗證的結構定義
-  - 定義表單、API 請求/響應等資料的驗證規則
-  - 自動生成 TypeScript 類型定義
-  - 提供運行時的資料驗證
-  - 集中管理所有資料結構的驗證邏輯
-- **store**: 全域狀態管理 (Zustand stores)
-- **utils**: 工具函式
+每個 `src/pages/<module>/` 模組的標準結構：
 
-### 模組結構規範
+```
+config.ts       # 路由定義（必須）— 使用 lazy() 懶載入
+views/          # 頁面元件
+components/     # 模組專用元件
+hook/ 或 hooks/ # 模組專用 Custom Hooks
+types/          # 模組 TypeScript 型別
+store/          # 模組 Zustand store（需要時）
+schemas/ 或 schema/  # Zod 驗證 schema（需要時）
+utils/          # 模組工具函式（需要時）
+```
 
-每個功能模組應包含：
+新增頁面模組只需在 `src/pages/` 建立資料夾並加入 `config.ts`，路由系統自動識別，無須手動修改任何設定。
 
-- `config.ts`: 模組配置文件，定義路由等設定
-- `components/`: 模組專用元件
-- `hooks/`: 模組專用的自定義 Hooks
-- `types/`: 模組相關的類型定義
-- `views/`: 實際的頁面元件
-- `schemas/`: 模組相關的資料驗證結構 (如適用)
+## Git 開發流程
 
-### 資料驗證規範
+分支命名：
+- 新功能：`feat/#<issue編號>/<功能名稱>`
+- 修正：`fix/#<issue編號>/<修正內容>`
+- PR 目標分支：`dev`
 
-每個 schema 文件應包含：
+## 文件索引
 
-- 基本的資料結構定義
-- 必要的驗證規則（如長度限制、格式要求等）
-- 對應的 TypeScript 類型導出
-- 適當的錯誤提示信息
+| 文件 | 說明 |
+|---|---|
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 架構、完整目錄結構、路由總覽、狀態管理、API 端點 |
+| [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) | 開發規範、命名規則、新增模組流程 |
+| [docs/FEATURES.md](./docs/FEATURES.md) | 功能清單與完成狀態 |
+| [docs/TESTING.md](./docs/TESTING.md) | 測試規範與指南 |
+| [docs/CHANGELOG.md](./docs/CHANGELOG.md) | 更新日誌 |
+| [docs/plans/](./docs/plans/) | 進行中的開發計畫 |
+| [docs/plans/archive/](./docs/plans/archive/) | 已完成計畫歸檔 |

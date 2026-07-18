@@ -75,5 +75,5 @@ export const useRouterMiddleWare = () => {
       }
       return;
     }
-  }, [location.pathname, location.state?.from, navigate, isLogin]);
+  }, [location.pathname, location.state?.from, location.state?.skipAutoScroll, navigate, isLogin]);
 };

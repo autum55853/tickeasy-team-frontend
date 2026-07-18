@@ -137,6 +137,7 @@ export class CustomerServiceAPI {
       message: string;
       confidence: number;
       strategy: string;
+      sessionType?: string;
       sessionStatus: string;
     }>
   > {

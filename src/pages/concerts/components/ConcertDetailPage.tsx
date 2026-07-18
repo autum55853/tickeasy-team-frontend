@@ -58,6 +58,7 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
   const [concert, setConcert] = useState<OrganizationConcert | ConcertResponse["data"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date());
 
   const sessionsRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
@@ -133,6 +134,25 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
     const idx = tabOptions.findIndex((opt) => opt.label === e.target.value);
     setSelectedTab(e.target.value);
     tabOptions[idx].ref.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    if (!concert?.sessions) return;
+    const futureDates = concert.sessions
+      .flatMap((s) => (s.ticketTypes || []).map((t) => new Date(t.sellBeginDate)))
+      .filter((d) => d > now)
+      .sort((a, b) => a.getTime() - b.getTime());
+    if (futureDates.length === 0) return;
+    const delay = futureDates[0].getTime() - now.getTime();
+    if (delay > 60 * 60 * 1000) return;
+    const timer = setTimeout(() => setNow(new Date()), delay);
+    return () => clearTimeout(timer);
+  }, [concert, now]);
+
+  function isTicketSaleNotStarted(ticketTypes: Array<{ sellBeginDate: string }>): boolean {
+    if (!ticketTypes || ticketTypes.length === 0) return true;
+    const earliest = ticketTypes.reduce((min, t) => (new Date(t.sellBeginDate) < new Date(min.sellBeginDate) ? t : min));
+    return new Date(earliest.sellBeginDate) > now;
   }
 
   function isLexicalJson(str: string) {
@@ -382,7 +402,7 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
             <div className="space-y-6 text-base text-gray-800">
               <div>{renderContent(concert.precautions || "尚未設定注意事項")}</div>
               <div>
-                <div className="mb-2 text-lg font-bold text-blue-700">退票注意事項</div>
+                <div className="mb-2 text-lg font-bold text-red-600">退票注意事項</div>
                 <div>{renderContent(concert.refundPolicy || "尚未設定退票注意事項")}</div>
               </div>
             </div>
@@ -435,9 +455,10 @@ export default function ConcertDetailPage({ isPreview = false }: ConcertDetailPa
                     size="lg"
                     className="flex items-center gap-2 rounded-full bg-[#2A7AC0] px-8 hover:bg-[#2563eb]"
                     onClick={handleBuyTicket}
-                    disabled={isPreview}
+                    disabled={isPreview || isTicketSaleNotStarted(session.ticketTypes || [])}
                   >
-                    {isPreview ? "預覽模式" : "下一步"} <ArrowRight className="ml-1" size={20} />
+                    {isPreview ? "預覽模式" : isTicketSaleNotStarted(session.ticketTypes || []) ? "敬請期待" : "下一步"}
+                    <ArrowRight className="ml-1" size={20} />
                   </Button>
                 </div>
               </div>

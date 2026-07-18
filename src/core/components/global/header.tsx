@@ -106,9 +106,12 @@ export default function Header() {
                   <p className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100" onClick={() => navigate("/login")}>
                     登入
                   </p>
-                  <p onClick={() => navigate("/signup")} className="cursor-pointer rounded-sm p-2 transition-all hover:bg-neutral-100">
+                  <button
+                    onClick={() => navigate("/signup")}
+                    className="cursor-pointer rounded-full bg-gradient-to-b from-[#2D6ED0] to-[#2BC6CC] px-5 py-2 text-white transition-opacity hover:opacity-90"
+                  >
                     註冊
-                  </p>
+                  </button>
                 </>
               )}
             </div>

@@ -35,6 +35,12 @@ export default {
       ],
     },
     {
+      path: "/auth/logout-broadcast",
+      component: lazy(() => import("./views/logoutBroadcastPage")),
+      meta: { title: "登出廣播" },
+      needLogin: false,
+    },
+    {
       path: "/403",
       component: lazy(() => import("./views/403")),
       meta: { title: "403 無權限" },

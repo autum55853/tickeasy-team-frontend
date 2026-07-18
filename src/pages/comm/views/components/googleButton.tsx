@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react";
 export function GoogleButton() {
   const currentOrigin = window.location.origin;
   const fullRedirectUri = `${currentOrigin}${"/callback"}`;
-  const googleAuthUrl = `https://tickeasy-team-backend.onrender.com/api/v1/auth/google?state=${encodeURIComponent(fullRedirectUri)}`;
+  const googleAuthUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/google?state=${encodeURIComponent(fullRedirectUri)}`;
   return (
     <div className="my-5">
       <a

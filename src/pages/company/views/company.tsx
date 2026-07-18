@@ -51,7 +51,7 @@ function PageContent() {
 
   useEffect(() => {
     refetch();
-  }, []); // 空依賴數組表示只在組件掛載時執行一次
+  }, [refetch]);
 
   useEffect(() => {
     if (companyCount.current === 0) {

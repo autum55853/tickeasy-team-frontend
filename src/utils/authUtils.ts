@@ -14,7 +14,8 @@ export const redirectToDashboard = () => {
     });
 
     // 在新視窗開啟 Dashboard
-    window.open(`https://tickeasy-dashboard.onrender.com/dashboard?${params}`, "_blank");
+    const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
+    window.open(`${dashboardUrl}/dashboard?${params}`, "_blank");
   } else {
     // 如果沒有 token，提示用戶重新登入
     // console.warn('未找到認證資訊，請重新登入');

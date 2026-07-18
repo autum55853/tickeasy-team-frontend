@@ -9,7 +9,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="mt-24 flex flex-col overflow-x-hidden overflow-y-scroll pb-[400px]">
+    <div className="flex flex-col overflow-x-hidden overflow-y-scroll pb-[0px]">
       <Header />
       <main>
         {children}

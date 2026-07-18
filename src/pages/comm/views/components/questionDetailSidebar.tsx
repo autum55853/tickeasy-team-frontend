@@ -37,6 +37,7 @@ export default function QuestionDetailSidebar({ faqType }: { faqType: QuestionTy
       setActiveQuestion(faqDetails[faqType][0].title);
       setRouteParam(faqDetails[faqType][0].param);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [faqType]);
   return (
     <>

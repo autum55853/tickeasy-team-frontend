@@ -1,4 +1,5 @@
 import type { TicketType } from "../types/concertStatus";
+import EmptyState from "@/core/components/ui/emptyState";
 
 interface TicketSalesTableProps {
   ticketTypes: TicketType[];
@@ -18,15 +19,23 @@ export default function TicketSalesTable({ ticketTypes }: TicketSalesTableProps)
             </tr>
           </thead>
           <tbody>
-            {ticketTypes.map((ticket) => (
-              <tr key={ticket.ticketTypeId} className="border-t">
-                <td className="py-3 pr-4">{ticket.ticketTypeName}</td>
-                <td className="px-4 py-3">{parseInt(ticket.ticketTypePrice, 10)}</td>
-                <td className="py-3 pl-4">
-                  {ticket.remainingQuantity}/{ticket.totalQuantity}
+            {ticketTypes.length === 0 ? (
+              <tr>
+                <td colSpan={3}>
+                  <EmptyState message="尚無票種資料" />
                 </td>
               </tr>
-            ))}
+            ) : (
+              ticketTypes.map((ticket) => (
+                <tr key={ticket.ticketTypeId} className="border-t">
+                  <td className="py-3 pr-4">{ticket.ticketTypeName}</td>
+                  <td className="px-4 py-3">{parseInt(ticket.ticketTypePrice, 10)}</td>
+                  <td className="py-3 pl-4">
+                    {ticket.remainingQuantity}/{ticket.totalQuantity}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

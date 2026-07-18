@@ -54,8 +54,8 @@ export default function PasswordInfo({ data, onSubmit, isSubmitting }: PasswordI
             />
           </div>
         </div>
-        <div className="my-2 grid h-[60px] grid-cols-4 gap-2">
-          <div className="col-span-1 flex h-full items-center justify-end">
+        <div className="my-2 grid grid-cols-4 gap-2">
+          <div className="col-span-1 flex h-[60px] items-center justify-end">
             <p className="font-bold">新密碼</p>
           </div>
           <div className="col-span-3">
@@ -71,6 +71,12 @@ export default function PasswordInfo({ data, onSubmit, isSubmitting }: PasswordI
               error={!!formErrors.newPassword}
               errorMessage={formErrors.newPassword?.message}
             />
+            <ul className="mt-1 list-disc pl-5 text-xs text-gray-400">
+              <li>至少 8 字元</li>
+              <li>必須含至少一個英文字母（大小寫皆可）</li>
+              <li>必須含至少一個數字</li>
+              <li>只允許英文字母與數字（不能含特殊符號）</li>
+            </ul>
           </div>
         </div>
         <div className="my-2 grid h-[60px] grid-cols-4 gap-2">

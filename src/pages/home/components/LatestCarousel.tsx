@@ -1,14 +1,14 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/core/components/ui/Carousel";
-import CustomCarouselItem from "./LastestCard";
+import CustomCarouselItem from "./LatestCard";
 import React from "react";
-import { LastestCardProps } from "../types/LastestCard";
+import { LatestCardProps } from "../types/LatestCard";
 import { CarouselApi } from "@/core/components/ui/Carousel";
 
-interface LastestCarouselProps {
-  cardList: LastestCardProps[];
+interface LatestCarouselProps {
+  cardList: LatestCardProps[];
 }
 
-export default function LastestCarousel({ cardList }: LastestCarouselProps) {
+export default function LastestCarousel({ cardList }: LatestCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = React.useState(cardList[0]?.idx);
   // 添加計時器的 ref

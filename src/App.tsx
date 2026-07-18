@@ -4,6 +4,7 @@ import { Toaster } from "@/core/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ModalStatusProvider } from "@/context/modalStatusContext";
 import { CustomerServiceWidget } from "@/core/components/customer-service";
+import { AuthSyncProvider } from "@/core/components/auth-sync-provider";
 // 創建一個新的 QueryClient 實例
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ModalStatusProvider>
+        <AuthSyncProvider />
         <Boot />
         <Toaster /> {/* 放在這裡可以確保所有子組件都能使用 toast */}
         {/* 客服 Widget - 全局浮動組件 */}

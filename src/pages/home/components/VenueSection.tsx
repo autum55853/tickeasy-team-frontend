@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { VenueData, VenueCardProps } from "../types/VenueCard";
 import { Button } from "@/core/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import EmptyState from "@/core/components/ui/emptyState";
+import LoadingSpin from "@/core/components/global/loadingSpin";
 
 export default function VenueSection() {
   const { toast } = useToast();
@@ -15,7 +17,7 @@ export default function VenueSection() {
   const cardsPerPage = 3;
 
   // 取得 Venue 列表
-  const { data, error, refetch } = useRequest<VenueData[]>({
+  const { data, error, refetch, isLoading } = useRequest<VenueData[]>({
     queryKey: ["concerts", "venues"],
     url: "/api/v1/concerts/venues",
   }).useGet();
@@ -64,56 +66,64 @@ export default function VenueSection() {
 
   return (
     <section className="mt-10 min-h-[100px]">
-      {/* 手機板 */}
-      <div className="lg:hidden">
-        <MobileTitle title="場館資訊" subtitle="Spotlight Venues" />
-        <div className="mt-10">
-          <VenueCarousel cardList={venueCardData} />
-        </div>
-      </div>
-      {/* 電腦板 */}
-      <div className="mt-20 hidden h-[60vh] min-h-[700px] lg:block">
-        <div className="h-[360px] bg-neutral-100 pt-[100px]">
-          <div className="mx-auto flex max-w-[1600px] gap-4">
-            <div className="relative mx-4 h-fit w-fit min-w-[200px] text-center text-4xl font-bold select-none xl:min-w-[300px]">
-              <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">場館資訊</h2>
-              <span className={`text-primary/20 absolute top-full -left-[0px] hidden text-[40px] text-wrap text-neutral-200 xl:block`}>
-                Spotlight Venues
-              </span>
-              <span className="absolute top-80 left-50 flex h-[100px] w-[200px] -translate-x-1/2 gap-4">
-                <Button
-                  size="icon"
-                  disabled={currentIndex === 0}
-                  className="bg-sidebar-accent-foreground hover:bg-sidebar-accent-foreground/90 rounded-full p-6"
-                  onClick={handlePrevClick}
-                >
-                  <ChevronLeftIcon className="h-[14px] text-neutral-800" />
-                </Button>
-                <Button
-                  size="icon"
-                  disabled={currentIndex >= venueCardData.length - cardsPerPage}
-                  className="bg-sidebar-accent-foreground hover:bg-sidebar-accent-foreground/90 rounded-full p-6"
-                  onClick={handleNextClick}
-                >
-                  <ChevronRightIcon className="h-[14px] text-neutral-800" />
-                </Button>
-              </span>
+      {isLoading ? (
+        <LoadingSpin />
+      ) : venueCardData.length === 0 ? (
+        <EmptyState message="目前沒有場館資訊" className="mt-10" />
+      ) : (
+        <>
+          {/* 手機板 */}
+          <div className="lg:hidden">
+            <MobileTitle title="場館資訊" subtitle="Spotlight Venues" />
+            <div className="mt-10">
+              <VenueCarousel cardList={venueCardData} />
             </div>
-            <div className="overflow-hidden">
-              <div
-                className="flex gap-4 transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentIndex * (100 / 3)}%)` }}
-              >
-                {venueCardData.map((card) => (
-                  <div key={card.idx} className="w-[calc(33.333%-1rem)] flex-shrink-0">
-                    <VenueCard {...card} />
+          </div>
+          {/* 電腦板 */}
+          <div className="mt-20 hidden h-[60vh] min-h-[700px] lg:block">
+            <div className="h-[360px] bg-neutral-100 pt-[100px]">
+              <div className="mx-auto flex max-w-[1600px] gap-4">
+                <div className="relative mx-4 h-fit w-fit min-w-[200px] text-center text-4xl font-bold select-none xl:min-w-[300px]">
+                  <h2 className="relative z-20 bg-gradient-to-r from-[#2D6ED0] to-[#2BC6CC] bg-clip-text text-[48px] text-transparent">場館資訊</h2>
+                  <span className={`text-primary/20 absolute top-full -left-[0px] hidden text-[40px] text-wrap text-neutral-200 xl:block`}>
+                    Spotlight Venues
+                  </span>
+                  <span className="absolute top-80 left-50 flex h-[100px] w-[200px] -translate-x-1/2 gap-4">
+                    <Button
+                      size="icon"
+                      disabled={currentIndex === 0}
+                      className="bg-sidebar-accent-foreground hover:bg-sidebar-accent-foreground/90 rounded-full p-6"
+                      onClick={handlePrevClick}
+                    >
+                      <ChevronLeftIcon className="h-[14px] text-neutral-800" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      disabled={currentIndex >= venueCardData.length - cardsPerPage}
+                      className="bg-sidebar-accent-foreground hover:bg-sidebar-accent-foreground/90 rounded-full p-6"
+                      onClick={handleNextClick}
+                    >
+                      <ChevronRightIcon className="h-[14px] text-neutral-800" />
+                    </Button>
+                  </span>
+                </div>
+                <div className="overflow-hidden">
+                  <div
+                    className="flex gap-4 transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentIndex * (100 / 3)}%)` }}
+                  >
+                    {venueCardData.map((card) => (
+                      <div key={card.idx} className="w-[calc(33.333%-1rem)] flex-shrink-0">
+                        <VenueCard {...card} />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </section>
   );
 }
